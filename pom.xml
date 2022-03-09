@@ -14,6 +14,44 @@
         <kotlin.version>1.6.10</kotlin.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>connexin-snapshot</id>
+            <name>Connexin Snapshots</name>
+            <url>https://repo1.connexin.local/content/repositories/connexin-snapshot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>connexin-release</id>
+            <name>Connexin Releases</name>
+            <url>https://repo1.connexin.local/content/repositories/connexin-release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>connexin-release</id>
+            <name>Connexin Releases</name>
+            <url>${env.RELEASE_REPO}</url>
+        </repository>
+        <snapshotRepository>
+            <id>connexin-snapshot</id>
+            <name>Connexin Snapshots</name>
+            <url>${env.SNAPSHOT_REPO}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <!-- Kotlin Dependencies -->
         <dependency>
