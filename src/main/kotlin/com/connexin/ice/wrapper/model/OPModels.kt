@@ -1,0 +1,8 @@
+package com.connexin.ice.wrapper.model
+
+import java.time.LocalDate
+
+
+data class Vaccine(val id:String,val cvx:String,val name:String,val date:LocalDate)
+data class Indicator(val id:String?=null,val name:String?=null,val code:String,val system: CodeSystem,val interpretation: Interpretation,val date:LocalDate)
+data class VaccineReport(val gender:Gender,val dateOfBirth: LocalDate,val requestTime: LocalDate,val vaccines : List<Vaccine>,val indicators:List<Indicator>)
