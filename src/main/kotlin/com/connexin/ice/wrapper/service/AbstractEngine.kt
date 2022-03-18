@@ -42,7 +42,7 @@ abstract class AbstractEngine() {
 
     protected fun unmarshal(vmr:VMR): JAXBElement<CDSInput> {
         //Not threadsafe, so we need to create a new one everytime, we could pool it, but I'm not sure of the gains there
-        return context.createUnmarshaller().unmarshal(StringSource(vmr.toXML()), CDSInput::class.java)
+        return context.createUnmarshaller().unmarshal(StrSource(vmr.toXML()), CDSInput::class.java)
     }
 
     private fun convertGender(gender:Gender):String{

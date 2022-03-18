@@ -14,40 +14,15 @@
         <kotlin.version>1.6.10</kotlin.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>connexin-snapshot</id>
-            <name>Connexin Snapshots</name>
-            <url>https://repo1.connexin.local/content/repositories/connexin-snapshot/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>connexin-release</id>
-            <name>Connexin Releases</name>
-            <url>https://repo1.connexin.local/content/repositories/connexin-release</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <repository>
-            <id>connexin-release</id>
-            <name>Connexin Releases</name>
+            <id>release</id>
+            <name>Releases</name>
             <url>${env.RELEASE_REPO}</url>
         </repository>
         <snapshotRepository>
-            <id>connexin-snapshot</id>
-            <name>Connexin Snapshots</name>
+            <id>snapshot</id>
+            <name>Snapshots</name>
             <url>${env.SNAPSHOT_REPO}</url>
         </snapshotRepository>
     </distributionManagement>
@@ -88,6 +63,19 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.30</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>1.8.2</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

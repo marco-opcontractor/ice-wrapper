@@ -30,7 +30,7 @@ import javax.xml.bind.JAXBElement
 /**
  * More or less mirrors the internals of the ICEDecisionEngineDSS7EvaluationAdapter.getOneResponse
  * the main advantages of this wrapper is it allows the user to provide a differently configured drools container and a greatly simplified input
- * the goal fo this call was the hide specific ICE concepts for easier use
+ * the goal of this call was the hide specific ICE concepts for easier use
  * To instantiate this class:
  * build a kiecontainer with the drools files, use the provided OPKieContainer class if unsure
  * create your own concept service, or use the provided OPConceptServiceImpl
