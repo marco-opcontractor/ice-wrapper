@@ -1,10 +1,9 @@
 package com.connexin.ice.wrapper.service.ice
 
-import com.connexin.ice.wrapper.service.op.TestHelpers
+import com.connexin.ice.wrapper.service.TestHelpers
 import org.cdsframework.ice.service.configurations.ICEDecisionEngineDSS7EvaluationAdapter
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.opencds.config.api.ConfigData
 import org.opencds.config.file.FileConfigStrategy
