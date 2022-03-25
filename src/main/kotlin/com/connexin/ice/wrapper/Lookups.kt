@@ -35,6 +35,8 @@ object Lookups {
     fun codes(concept: Interpretation):String{
         return when(concept){
             Interpretation.IS_IMMUNE -> OID_IS_IMMUNE
+            Interpretation.REFUSED -> OID_IS_IMMUNE
+            Interpretation.DISEASE -> OID_IS_IMMUNE
         }
     }
 

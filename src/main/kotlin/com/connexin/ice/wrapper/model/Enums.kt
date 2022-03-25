@@ -16,7 +16,9 @@ enum class CodeSystem{
 }
 
 enum class Interpretation{
-    IS_IMMUNE
+    IS_IMMUNE,
+    REFUSED,
+    DISEASE
 }
 
 enum class ObservationConcept{
