@@ -134,7 +134,7 @@ data class VMR(val demographics: VMRDemographic, val obs: List<VMRObservationRes
          }.toString(options)
      }
     companion object{
-        private val formatter = DateTimeFormatter.ofPattern("YYYYMMdd")
+        private val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
         private fun safeFormat(value:LocalDate?):String{
             return if(value == null){
