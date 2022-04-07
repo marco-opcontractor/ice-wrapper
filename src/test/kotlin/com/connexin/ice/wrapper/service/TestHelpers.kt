@@ -1,8 +1,6 @@
 package com.connexin.ice.wrapper.service
 
-import com.connexin.ice.wrapper.model.Gender
-import com.connexin.ice.wrapper.model.Vaccine
-import com.connexin.ice.wrapper.model.VaccineReport
+import com.connexin.ice.wrapper.model.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -53,6 +51,64 @@ object TestHelpers {
             Vaccine("22","150","FLU-IIV4 6m+ pf", LocalDate.of(2021,12,20)),
         ),
         listOf()
+    )
+
+    val vaccineReportIndicator = VaccineReport(
+        Gender.M, LocalDate.of(2020,11,5),
+        LocalDate.now(),
+        mutableMapOf(),
+        listOf(
+            Vaccine("1","08","HepB", LocalDate.of(2020,11,6)),
+
+            Vaccine("2","08","HepB", LocalDate.of(2020,12,8)),
+
+            Vaccine("3","106","DTaP+"    , LocalDate.of(2021,1,5)),
+            Vaccine("4","10","IPV"       , LocalDate.of(2021,1,5)),
+            Vaccine("5","48","HIB-PRP-T" , LocalDate.of(2021,1,5)),
+            Vaccine("6","133","PCV13"    , LocalDate.of(2021,1,5)),
+            Vaccine("7","116","RotaVirus", LocalDate.of(2021,1,5)),
+
+            Vaccine("8","106","DTaP+"    , LocalDate.of(2021,3,12)),
+            Vaccine("9", "48","HIB-PRP-T", LocalDate.of(2021,3,12)),
+            Vaccine("10","10","IPV"      , LocalDate.of(2021,3,12)),
+            Vaccine("11","133","PCV13"      , LocalDate.of(2021,3,12)),
+            Vaccine("12","116","RotaVirus"  , LocalDate.of(2021,3,12)),
+
+            Vaccine("13","106","DTaP+"    , LocalDate.of(2021,5,7)),
+            Vaccine("14", "48","HIB-PRP-T", LocalDate.of(2021,5,7)),
+            Vaccine("15","133","PCV13"      , LocalDate.of(2021,5,7)),
+            Vaccine("16","116","RotaVirus"  , LocalDate.of(2021,5,7)),
+
+            Vaccine("17","08","HepB", LocalDate.of(2021,8,9)),
+
+            Vaccine("18","150","FLU-IIV4 6m+ pf", LocalDate.of(2021,11,15)),
+            Vaccine("19","83","HepA 2dose", LocalDate.of(2021,11,15)),
+            Vaccine("20","03","MMR", LocalDate.of(2021,11,15)),
+
+            Vaccine("22","150","FLU-IIV4 6m+ pf", LocalDate.of(2021,12,20)),
+        ),
+        listOf(
+            Indicator(id="654",name="Measles","055.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2021,12,12)),
+            Indicator(id="655",name="Mumps","072.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2021,12,12)),
+            Indicator(id="656",name="Rubella","056.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2021,12,12)),
+            Indicator(id="657",name="Varicella","052.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2021,12,12)),
+        )
+    )
+
+    val vaccineReportIndicatorOnly = VaccineReport(
+        Gender.M, LocalDate.of(2020,11,5),
+        LocalDate.now(),
+        mutableMapOf(),
+        listOf(
+        ),
+        listOf(
+            Indicator(id="657",name="Varicella","052.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
+            Indicator(id="658",name="Hep B","070.30", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
+            //Indicator(id="654",name="Measles","055.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
+            Indicator(id="655",name="Mumps","072.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
+            //Indicator(id="656",name="Rubella","056.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),*/
+
+        )
     )
 
     /**

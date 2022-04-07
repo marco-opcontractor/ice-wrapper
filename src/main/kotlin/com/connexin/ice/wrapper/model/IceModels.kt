@@ -66,8 +66,8 @@ data class VMR(val demographics: VMRDemographic, val obs: List<VMRObservationRes
                                              attribute("root", "2.16.840.1.113883.3.795.11.6.3.1")
                                          }
                                          "id" {
-                                             attribute("root", "2.16.840.1.113883.3.795.12.100.17")
-                                             attribute("extension", "427")
+                                             attribute("root", UUID.randomUUID().toString())//"2.16.840.1.113883.3.795.12.100.17")
+                                             /*attribute("extension", "427")*/
                                          }
                                          "observationFocus" {
                                              attribute("code", ob.code)
@@ -84,7 +84,7 @@ data class VMR(val demographics: VMRDemographic, val obs: List<VMRObservationRes
                                              }
                                          }
                                          "interpretation"{
-                                             attribute("code",ob.concept.name)
+                                             attribute("code","IS_IMMUNE")
                                              attribute("codeSystem", Lookups.codes(ob.interpretation))
                                          }
 
@@ -140,7 +140,7 @@ data class VMR(val demographics: VMRDemographic, val obs: List<VMRObservationRes
             return if(value == null){
                 ""
             }else{
-                formatter.format(value)  + "000000"
+                formatter.format(value)//  + "000000"
             }
         }
     }

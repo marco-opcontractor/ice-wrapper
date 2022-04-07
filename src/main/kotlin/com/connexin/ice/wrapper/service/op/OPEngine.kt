@@ -27,6 +27,7 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.xml.bind.JAXBElement
 
+
 /**
  * More or less mirrors the internals of the ICEDecisionEngineDSS7EvaluationAdapter.getOneResponse
  * the main advantages of this wrapper is it allows the user to provide a differently configured drools container and a greatly simplified input
@@ -57,6 +58,8 @@ class OPEngine(private val kieContainer: KieContainer,
             vaccineReport.vaccines.size,vaccineReport.indicators.size,vaccineReport.gender,vaccineReport.dateOfBirth)
         val namedObject = HashMap<String,Any>()
         val session = kieContainer.newStatelessKieSession()
+       // val agendaEventListener = TrackingAgendaEventListener()
+       // session.addEventListener(agendaEventListener)
         val cmds = mutableListOf<Command<*>>()
         cmds.add(CommandFactory.newSetGlobal("evalTime",vaccineReport.requestTime.toDate()))
         cmds.add(CommandFactory.newSetGlobal("clientLanguage","en"))
@@ -91,6 +94,10 @@ class OPEngine(private val kieContainer: KieContainer,
 
         cmds.add(CommandFactory.newStartProcess("PrimaryProcess"))
         val result =  session.execute(CommandFactory.newBatchExecution((cmds)))
+     /*   agendaEventListener.getMatchList().forEach {
+            println(it)
+        }*/
+
         return convertExecutionResult(result,namedObject.toMap())
     }
 
