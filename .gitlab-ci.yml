@@ -7,7 +7,7 @@ stages:
 upload-repo:
   image: maven:3-jdk-8-slim
   stage: upload
-  script: "mvn deploy -DskipTests -B -Dmaven.wagon.http.ssl.insecure=true"
+  script: "mvn deploy -DskipTests -B -U -Dmaven.wagon.http.ssl.insecure=true"
   only:
     - master
     - develop
