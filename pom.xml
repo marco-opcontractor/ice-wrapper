@@ -6,7 +6,7 @@
 
     <groupId>com.connexin.immunization</groupId>
     <artifactId>ice-wrapper</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>org.opencds</groupId>
             <artifactId>opencds-ice-service</artifactId>
-            <version>1.35.2.0</version>
+            <version>1.35.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.opencds</groupId>
