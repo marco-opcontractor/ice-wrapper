@@ -6,7 +6,7 @@
 
     <groupId>com.connexin.immunization</groupId>
     <artifactId>ice-wrapper</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -26,6 +26,51 @@
             <url>${env.SNAPSHOT_REPO}</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>connexin-thirdparty</id>
+            <name>Connexin ThirdParty</name>
+            <url>https://repo1.connexin.local/content/repositories/thirdparty/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>connexin-snapshot</id>
+            <name>Connexin Snapshots</name>
+            <url>https://repo1.connexin.local/content/repositories/connexin-snapshot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>connexin-release</id>
+            <name>Connexin Releases</name>
+            <url>https://repo1.connexin.local/content/repositories/connexin-release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+
+
+
+
+
+
+
 
     <dependencies>
         <!-- Kotlin Dependencies -->
@@ -50,7 +95,7 @@
         <dependency>
             <groupId>org.opencds</groupId>
             <artifactId>opencds-ice-service</artifactId>
-            <version>1.35.3.0</version>
+            <version>1.36.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.opencds</groupId>
