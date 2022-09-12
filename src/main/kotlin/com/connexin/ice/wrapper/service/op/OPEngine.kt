@@ -72,6 +72,10 @@ class OPEngine(private val kieContainer: KieContainer,
         cmds.add(CommandFactory.newSetGlobal("doseOverrideFeatureEnabled",java.lang.Boolean("false")))
         cmds.add(CommandFactory.newSetGlobal("outputSupplementalText",java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("outputRuleName",java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup",java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
+
+
 
 
         val vmr = convertToIceModel(vaccineReport)
