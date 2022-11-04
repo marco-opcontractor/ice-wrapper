@@ -18,6 +18,7 @@ enum class CodeSystem{
 enum class Interpretation{
     IS_IMMUNE,
     REFUSED,
+    PROOF_OF_IMMUNITY,
     DISEASE
 }
 
