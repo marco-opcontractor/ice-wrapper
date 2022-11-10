@@ -1,6 +1,7 @@
 package com.connexin.ice.wrapper.service.op
 
 import com.connexin.ice.wrapper.service.Engine
+import com.connexin.ice.wrapper.service.TestHelpers
 import com.connexin.ice.wrapper.service.TestHelpers.VMR_OBSERVATION_RESULT
 import com.connexin.ice.wrapper.service.TestHelpers.VMR_SUBSTANCE_ADMINISTRATION_PROPOSAL
 import com.connexin.ice.wrapper.service.TestHelpers.vaccineReportIndicator
@@ -46,6 +47,16 @@ internal class OPEngineTest {
 
     }
 
+    @Test
+    fun evaluateProofOfImmunity() {
+        val result = Engine.opEngine.evaluateRaw(vaccineReportIndicatorOnly)
+
+        val observations =  result[VMR_OBSERVATION_RESULT] as List<ObservationResult>
+        val proposals = result[VMR_SUBSTANCE_ADMINISTRATION_PROPOSAL] as List<SubstanceAdministrationProposal>
+        val mmr = TestHelpers.getVaccineGroup("500",proposals)
+        println("Found ${proposals.size} proposals and ${observations.size} observations")
+
+    }
 
 
 }

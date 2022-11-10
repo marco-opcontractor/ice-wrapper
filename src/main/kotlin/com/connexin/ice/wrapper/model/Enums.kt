@@ -18,10 +18,10 @@ enum class CodeSystem{
 enum class Interpretation{
     IS_IMMUNE,
     REFUSED,
-    PROOF_OF_IMMUNITY,
     DISEASE
 }
 
 enum class ObservationConcept{
-    DISEASE_DOCUMENTED
+    DISEASE_DOCUMENTED,
+    PROOF_OF_IMMUNITY
 }

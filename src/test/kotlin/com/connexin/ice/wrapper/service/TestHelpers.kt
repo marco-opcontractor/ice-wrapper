@@ -1,6 +1,8 @@
 package com.connexin.ice.wrapper.service
 
 import com.connexin.ice.wrapper.model.*
+import com.sun.xml.internal.bind.v2.model.core.ID
+import org.opencds.vmr.v1_0.internal.SubstanceAdministrationProposal
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -111,6 +113,21 @@ object TestHelpers {
         )
     )
 
+    val vaccineReportIndicatorOnlyDisease = VaccineReport(
+        Gender.M, LocalDate.of(2020,11,5),
+        LocalDate.now(),
+        mutableMapOf(),
+        listOf(
+        ),
+        listOf(
+            Indicator(id="657",name="Varicella","052.9", system = CodeSystem.ICD_9, interpretation = Interpretation.DISEASE , date = LocalDate.of(2020,12,12)),
+            Indicator(id="658",name="Hep B","070.30", system = CodeSystem.ICD_9, interpretation = Interpretation.DISEASE, date = LocalDate.of(2020,12,12)),
+            //Indicator(id="654",name="Measles","055.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
+            Indicator(id="655",name="Mumps","072.9", system = CodeSystem.ICD_9, interpretation = Interpretation.DISEASE, date = LocalDate.of(2020,12,12)),
+            //Indicator(id="656",name="Rubella","056.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),*/
+
+        )
+    )
     /**
      * Unzips a file to the specified location
      */
@@ -159,7 +176,7 @@ object TestHelpers {
     fun getDTAPVaccine(id:String,date:LocalDate):Vaccine{
         return Vaccine(id,"01","DTP",date)
     }
-I
+
     fun getTDAPVaccine(id:String,date:LocalDate):Vaccine{
         return Vaccine(id,"115","Tdap",date)
     }
@@ -175,5 +192,9 @@ I
             throw IOException("Entry is outside of the target dir: " + zipEntry.name)
         }
         return destFile
+    }
+
+    fun getVaccineGroup(id:String,list: List<SubstanceAdministrationProposal>):SubstanceAdministrationProposal?{
+        return list.find { it.substance.substanceCode.code == id }
     }
 }

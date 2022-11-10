@@ -30,7 +30,10 @@ abstract class AbstractEngine() {
         vaccineReport.indicators.forEach {
             obs.add(
                 VMRObservationResult(it.code,it.system,
-                    ObservationConcept.DISEASE_DOCUMENTED,it.interpretation,it.date)
+                     when(it.interpretation){
+                        Interpretation.REFUSED,Interpretation.IS_IMMUNE -> ObservationConcept.PROOF_OF_IMMUNITY
+                        Interpretation.DISEASE -> ObservationConcept.DISEASE_DOCUMENTED
+                    },it.interpretation,it.date)
             )
         }
         return VMR(
