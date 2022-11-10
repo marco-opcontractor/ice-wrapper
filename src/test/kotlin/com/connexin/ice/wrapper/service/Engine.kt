@@ -7,15 +7,14 @@ import com.connexin.ice.wrapper.service.op.OPKieContainer
 import java.io.File
 
 object Engine {
-    private val tempDirectory = System.getProperty("java.io.tmpdir")
-    private val iceDirectory = TestHelpers.appendSlash(tempDirectory) + "ice"
+    //private val tempDirectory = System.getProperty("java.io.tmpdir")
+    private val iceDirectory = "src/main/resources/rules/v1.36.1"
     private val iceCommonKnowledgeDirectory = "$iceDirectory/knowledgeCommon"
     private val iceKnowledgeModuleDirectory = "$iceDirectory/knowledgeModule"
     private val cdmFile = "$iceDirectory/conceptDeterminationMethods/cdm.xml"
 
     val opEngine : OPEngine by lazy {
 
-        TestHelpers.unzip(File("src/test/resources/ice.zip"), File(tempDirectory))
         OPEngine(
             kieContainer = OPKieContainer().buildContainer(
                 iceCommonKnowledgeDirectoryParam = iceCommonKnowledgeDirectory,
