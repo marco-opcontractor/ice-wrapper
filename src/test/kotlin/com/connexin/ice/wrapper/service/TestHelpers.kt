@@ -102,7 +102,7 @@ object TestHelpers {
         listOf(
         ),
         listOf(
-            Indicator(id="657",name="Varicella","052.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
+            Indicator(id="657",name="Varicella","052.9", system = CodeSystem.ICD_9, interpretation = Interpretation.DISEASE, date = LocalDate.of(2020,12,12)),
             Indicator(id="658",name="Hep B","070.30", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
             //Indicator(id="654",name="Measles","055.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
             Indicator(id="655",name="Mumps","072.9", system = CodeSystem.ICD_9, interpretation = Interpretation.IS_IMMUNE, date = LocalDate.of(2020,12,12)),
@@ -159,7 +159,7 @@ object TestHelpers {
     fun getDTAPVaccine(id:String,date:LocalDate):Vaccine{
         return Vaccine(id,"01","DTP",date)
     }
-I
+
     fun getTDAPVaccine(id:String,date:LocalDate):Vaccine{
         return Vaccine(id,"115","Tdap",date)
     }
