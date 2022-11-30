@@ -152,6 +152,19 @@
                             </target>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>zip-rules2</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.36.1.1.zip"
+                                     basedir="${project.basedir}/src/main/resources/rules/v1.36.1.1" />
+                            </target>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

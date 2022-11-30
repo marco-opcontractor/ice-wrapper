@@ -24,7 +24,7 @@ object Engine {
         val loader = Engine::class.java.classLoader
         val zip = saveFile("$outputDirectory.zip",loader.getResourceAsStream(rulesPackage))
 
-        unzip(zip,File(extraction))
+        unzip(zip,File(outputDirectory))
 
         val iceCommonKnowledgeDirectory = "$outputDirectory/knowledgeCommon"
         val iceKnowledgeModuleDirectory = "$outputDirectory/knowledgeModule"
