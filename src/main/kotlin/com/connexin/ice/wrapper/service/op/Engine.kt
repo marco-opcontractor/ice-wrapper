@@ -18,7 +18,6 @@ object Engine {
             rulesVersion
         }
 
-
         val outputDirectory = if(tempDirectory.endsWith(separator)){
              tempDirectory + "ice/$rules"
         }else{
