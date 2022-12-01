@@ -1,0 +1,11 @@
+version: '3.2'
+
+services:
+
+  drools-wb:
+    image: "jboss/drools-workbench-showcase:latest"
+    ports:
+      - "8090:8080"
+      - "8001:8001"
+    volumes:
+      - ./rules:/rules

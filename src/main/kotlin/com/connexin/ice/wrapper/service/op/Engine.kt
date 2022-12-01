@@ -8,6 +8,7 @@ import java.util.zip.ZipInputStream
 object Engine {
 
     private val tempDirectory =  System.getProperty("java.io.tmpdir")
+    private val separator = System.getProperty("file.separator")
 
     fun createOpEngine(rulesVersion:String):IEngine{
         val rules = if(!rulesVersion.startsWith("v")){
@@ -17,8 +18,14 @@ object Engine {
             rulesVersion
         }
 
-        val extraction = tempDirectory + "ice" // the rules are built into the package
-        val outputDirectory = tempDirectory + "ice/$rules"
+
+        val outputDirectory = if(tempDirectory.endsWith(separator)){
+             tempDirectory + "ice/$rules"
+        }else{
+            tempDirectory + "${separator}ice/$rules"
+        }
+
+
         val rulesPackage = "rules/packaged/${rules}.zip"
 
         val loader = Engine::class.java.classLoader
