@@ -52,8 +52,8 @@
 [condition][]- [Tt]he [Ss]hot does not belong to the [Ss]eries {oTargetSeries}=associatedTargetSeries != {oTargetSeries}
 [condition][]- [Tt]he [Ss]hot belongs to the [Vv]accine [Gg]roup {dd_oVaccineGroupCdsListItem} and the [Ss]eries with [Nn]ame {sSeriesName}=associatedVaccineGroup == {dd_oVaccineGroupCdsListItem}, associatedSeriesName == {sSeriesName}
 [condition][]- [Tt]he [Ss]hot belongs to the [Vv]accine [Gg]roup {dd_oVaccineGroupCdsListItem}=associatedVaccineGroup == {dd_oVaccineGroupCdsListItem}
-[condition][]- [Tt]he [Ss]hot is [Nn]ot [Ii]gnored for [Cc]ompletion of the [Ss]eries=isShotIgnoredForCompletionOfSeries() == false
-[condition][]- [Tt]he [Ss]hot is [Ii]gnored for [Cc]ompletion of the [Ss]eries=isShotIgnoredForCompletionOfSeries() == true
+[condition][]- [Tt]he [Ss]hot is [Nn]ot [Ii]gnored=isShotIgnored() == false
+[condition][]- [Tt]he [Ss]hot is [Ii]gnored=isShotIgnored() == true
 [condition][]- [Tt]he [Ss]eries that the [Ss]hot belongs to is [Cc]omplete=associatedTargetSeries.isSeriesComplete() == true
 [condition][]- [Tt]he [Ss]eries that the [Ss]hot belongs to is [Nn]ot [Cc]omplete=associatedTargetSeries.isSeriesComplete() == false
 [condition][]- [Tt]he [Vv]accine [Aa]dministered is a [Ll]ive [Vv]irus [Vv]accine=vaccineComponent.isLiveVirusVaccine == true
@@ -65,8 +65,8 @@
 [condition][]- [Tt]he [Vv]accine [Aa]dministered has a [Mm]aximum [Vv]alid [Aa]ge=vaccineComponent.validMaximumAgeForUse != null
 [condition][]- [Tt]he [Vv]accine [Aa]dministered has a [Mm]inimum [Vv]alid [Aa]ge=vaccineComponent.validMinimumAgeForUse != null
 [condition][]- [Tt]he [Aa]dministered [Ss]hot [Nn]umber is {aOp}  {nAdministeredShotNumber}=administeredShotNumberInSeries {aOp}  {nAdministeredShotNumber}
-[condition][]- [Tt]he [Dd]ose [Nn]umber in the [Ss]eries is one of {list_oDoseNumbers:([\\(]{1})([0-9\\.\\-_\\"\\,\\ \\(\\)]+)([\\)]{1})}=$assign_nDoseNumber : new Integer(getDoseNumberInSeries()).toString(), $assign_nDoseNumber in {list_oDoseNumbers} 
-[condition][]- [Tt]he [Dd]ose [Nn]umber in the [Ss]eries is one of {list_oDoseNumbers:([\\(]{1})[a-zA-Z0-9\\.\\_\\,\\\-\\+\\$\\ ]+([\\)]{1})}=$assign_nDoseNumber : new Integer(getDoseNumberInSeries()).toString(), $assign_nDoseNumber in {list_oDoseNumbers} 
+[condition][]- [Tt]he [Dd]ose [Nn]umber in the [Ss]eries is one of {list_oDoseNumbers:([\\(]{1})([0-9\\.\\-_\\"\\,\\ \\(\\)]+)([\\)]{1})}=$assign_nDoseNumber : new Integer(getDoseNumberInSeries()).toString(), $assign_nDoseNumber in {list_oDoseNumbers}
+[condition][]- [Tt]he [Dd]ose [Nn]umber in the [Ss]eries is one of {list_oDoseNumbers:([\\(]{1})[a-zA-Z0-9\\.\\_\\,\\\-\\+\\$\\ ]+([\\)]{1})}=$assign_nDoseNumber : new Integer(getDoseNumberInSeries()).toString(), $assign_nDoseNumber in {list_oDoseNumbers}
 [condition][]- [Tt]he [Dd]ose [Nn]umber in the [Ss]eries is {aOp} {nDoseNumber}=doseNumberInSeries {aOp} {nDoseNumber}
 [condition][]- [Tt]hat has already been [Ee]valuated and whose [Ss]hot [Vv]alidity [Ss]tatus is not {oShotValidityStatus}=status != DoseStatus.{oShotValidityStatus} && (status == DoseStatus.INVALID || status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 [condition][]- [Tt]hat has already been [Ee]valuated and whose [Ss]hot [Vv]alidity [Ss]tatus is {oShotValidityStatus}=status == DoseStatus.{oShotValidityStatus} && (status == DoseStatus.INVALID || status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
@@ -77,6 +77,7 @@
 [condition][]- [Tt]hat has already been [Ee]valuated and whose [Ss]hot [Vv]alidity is ACCEPTED=status == DoseStatus.ACCEPTED
 [condition][]- [Tt]hat has already been [Ee]valuated=status == DoseStatus.INVALID || status == DoseStatus.VALID || status == DoseStatus.ACCEPTED
 [condition][]- [Tt]hat has not already been [Ee]valuated=status == DoseStatus.EVALUATION_NOT_STARTED
+[condition][]- [Tt]he [Aa]dministration [Dd]ate of the [Ss]hot is {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=administrationDate {aOp} {strDate}
 [condition][]- [Tt]he [Aa]dministration [Dd]ate of the [Ss]hot is {aOp:[\=\\<\\>]+}  {dtOtherDate}=administrationDate {aOp} {dtOtherDate}
 [condition][]- [Tt]he [Ss]hot has not already been marked as a [Ll]ive [Vv]irus [Cc]onflict \(as we do not want this [Rr]ule executing more than necessary\)=containsInvalidReason(BaseDataEvaluationReason._TOO_EARLY_LIVE_VIRUS.getCdsListItemName()) == false
 [condition][]- [Tt]he [Ss]hot has not already been marked as a [Ss]elect [Aa]djuvant [Pp]roduct [Ii]nterval [Cc]onflict \(as we do not want this [Rr]ule executing more than necessary\)=containsInvalidReason(BaseDataEvaluationReason._SELECT_ADJUVANT_PRODUCT_INTERVAL.getCdsListItemName()) == false
@@ -95,13 +96,14 @@
 [condition][]- [Mm]ake [Nn]ote of the [Ee]arliest [Rr]ecommended [Ii]nterval from [Tt]his [Dd]ose to the [Nn]ext [Dd]ose as {assign_oTimePeriod}=getAssociatedTargetSeries().obtainDoseRuleForSeriesByDoseNumber(this.getDoseNumberInSeries()) != null, {assign_oTimePeriod} : getAssociatedTargetSeries().obtainDoseRuleForSeriesByDoseNumber(this.getDoseNumberInSeries()).getEarliestRecommendedInterval(), {assign_oTimePeriod} != null
 [condition][]- [Mm]ake [Nn]ote of the [Aa]ssociated [Ss]eries as {assign_oTargetSeries}={assign_oTargetSeries} : associatedTargetSeries, {assign_oTargetSeries} != null
 [condition][]- [Mm]ake [Nn]ote of [Aa]ll [Ee]valuation [Rr]easons for this [Ss]hot as {assign_oCollectionOfReasons}={assign_oCollectionOfReasons} : allEvaluationReasonsFromAllReasonSets
-[condition][]- [Mm]ake [Nn]ote of the [Aa]dministered [Vv]accine as {assign_oVaccineAdministered}={assign_oVaccineAdministered} : administeredVaccine 
+[condition][]- [Mm]ake [Nn]ote of the [Aa]dministered [Vv]accine as {assign_oVaccineAdministered}={assign_oVaccineAdministered} : administeredVaccine
 [condition][]- [Tt]he [Cc]ollection {oCollection} contains {oCollectionElement}={oCollection} contains {oCollectionElement}
 [condition][]- [Tt]he [Cc]ollection {oCollection} does not contain {oCollectionElement}={oCollection} not contains {oCollectionElement}
 [condition][]- [Tt]he [Ss]ize of the [Cc]ollection {oCollection} is {aOp}  {nNumeric:([0-9]+)([\\.][0-9]+)?}={oCollection}.size() {aOp} {nNumeric}
 [condition][]- [Tt]he [Nn]umeric  {oNumericOne:[\\$]?[a-zA-Z0-9\\.\\_]+}  is {aOp}  {nNumericTwo:([0-9]+)([\\.][0-9]+)?}={oNumericOne} {aOp} {nNumericTwo}
 [condition][]- [Tt]he [Nn]umeric  {oNumericOne:([0-9]+)([\\.][0-9]+)?}  is {aOp}  {nNumericTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oNumericOne} {aOp} {nNumericTwo}
 [condition][]- [Tt]he [Nn]umeric  {oNumericOne:[\\$]?[a-zA-Z0-9\\.\\_]+}  is {aOp}  {nNumericTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oNumericOne} {aOp} {nNumericTwo}
+[condition][]- [Tt]he [Dd]ate {dtDateOne} {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} {aOp} {strDate}
 [condition][]- [Tt]he [Dd]ate {dtObjectOne} {aOp}  {dtObjectTwo}={dtObjectOne} != null && {dtObjectTwo} != null && {dtObjectOne} {aOp} {dtObjectTwo}
 
 
@@ -192,10 +194,10 @@
 [condition][]- [Tt]he [Ss]ize of the [Cc]ollection {oCollection} is {aOp}  {nNumeric:([0-9]+)([\\.][0-9]+)?}={oCollection}.size() {aOp} {nNumeric}
 [condition][]- [Tt]he [Nn]umeric  {oNumericOne:[\\$]?[a-zA-Z0-9\\.\\_]+}  is {aOp}  {nNumericTwo:([0-9]+)([\\.][0-9]+)?}={oNumericOne} {aOp} {nNumericTwo}
 [condition][]- [Tt]he [Nn]umeric  {oNumericOne:([0-9]+)([\\.][0-9]+)?}  is {aOp}  {nNumericTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oNumericOne} {aOp} {nNumericTwo}
-[condition][]- [Tt]he [Nn]umeric  {oNumericOne:[\\$]?[a-zA-Z0-9\\.\\_]+}  is {aOp}  {nNumericTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oNumericOne} {aOp} {nNumericTwo}
 [condition][]- [Tt]he [Ss]tring {strObject} {aOp}  {strValue}={strObject} != null && {strObject} {aOp} {strValue} || {strObject} == null && {strValue} == null
-[condition][]- [Tt]he [Dd]ate {dtObjectOne} {aOp}  {dtObjectTwo}={dtObjectOne} != null && {dtObjectTwo} != null && {dtObjectOne} {aOp} {dtObjectTwo}
- 
+[condition][]- [Tt]he [Dd]ate {dtDateOne} {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} {aOp} {strDate}
+[condition][]- [Tt]he [Dd]ate {dtObjectOne} {aOp:[\=\\<\\>]+}  {dtObjectTwo}={dtObjectOne} != null && {dtObjectTwo} != null && {dtObjectOne} {aOp} {dtObjectTwo}
+
 //
 // TargetDose accumulates
 //
@@ -219,7 +221,7 @@
 [condition][][Tt]he [Dd]ate {dtDateOne} is after {dtDateTwo:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={dtDateOne} != null && {dtDateTwo} != null && {dtDateOne}.after({dtDateTwo})
 [condition][][Tt]he [Dd]ate {dtDateOne} is before {strDateTwo:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} != null && {dtDateOne}.before(TimePeriod.generateDateFromStringInDroolsDateFormat({strDateTwo}))
 [condition][][Tt]he [Dd]ate {dtDateOne} is before {dtDateTwo:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={dtDateOne} != null && {dtDateTwo} != null && {dtDateOne}.before({dtDateTwo})
-[condition][][Tt]he [Dd]ate {dtDateOne} is on the same date or before {strDateTwo:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} != null {dtDateOne}.compareTo(TimePeriod.generateDateFromStringInDroolsDateFormat({strDateTwo})) <= 0
+[condition][][Tt]he [Dd]ate {dtDateOne} is on the same date or before {strDateTwo:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} != null && {dtDateOne}.compareTo(TimePeriod.generateDateFromStringInDroolsDateFormat({strDateTwo})) <= 0
 [condition][][Tt]he [Dd]ate {dtDateOne} is on the same date or before {dtDateTwo:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={dtDateOne} != null && {dtDateTwo} != null && {dtDateOne}.compareTo({dtDateTwo}) <= 0
 [condition][][Tt]he [Dd]ate {dtDateOne} is on the same date or after {strDateTwo:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} != null && {dtDateOne}.compareTo(TimePeriod.generateDateFromStringInDroolsDateFormat({strDateTwo})) >= 0
 [condition][][Tt]he [Dd]ate {dtDateOne} is on the same date or after {dtDateTwo:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={dtDateOne} != null && {dtDateTwo} != null && {dtDateOne}.compareTo({dtDateTwo}) >= 0
@@ -239,26 +241,26 @@
 
 [consequence][][Ss]et the [Ss]hot [Ss]tatus of {refer_oTargetDose} to [Vv]alid={refer_oTargetDose}.setStatus(DoseStatus.VALID);
 [consequence][][Ss]et the [Ss]hot [Ss]tatus of {refer_oTargetDose} to [Aa]ccepted={refer_oTargetDose}.setStatus(DoseStatus.ACCEPTED);
-[consequence][][Ss]et the [Ss]hot [Ss]tatus of {refer_oTargetDose} to [Ii]nvalid={refer_oTargetDose}.setStatus(DoseStatus.INVALID); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
+[consequence][][Ss]et the [Ss]hot [Ss]tatus of {refer_oTargetDose} to [Ii]nvalid={refer_oTargetDose}.setStatus(DoseStatus.INVALID);
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Vv]alid=
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Insufficient Antigen"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.INSUFFICIENT_ANTIGEN"); {refer_oTargetDose}.setRuleName(drools.getRule().getName()); insert(new ICEFactTypeFinding(SupportedFactConcept._INVALID_VACCINE.getConceptCodeValue(), {refer_oTargetDose}));
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Age for Vaccine"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_VACCINE"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Age for Final Dose"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_FINAL_DOSE"); {refer_oTargetDose}.setRuleName(drools.getRule().getName()); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_AGE.getConceptCodeValue(), {refer_oTargetDose}));
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Age"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_SERIES"); {refer_oTargetDose}.setRuleName(drools.getRule().getName()); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_AGE.getConceptCodeValue(), {refer_oTargetDose}));
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Interval"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_INTERVAL"); {refer_oTargetDose}.setRuleName(drools.getRule().getName()); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_INTERVAL.getConceptCodeValue(), {refer_oTargetDose}));
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Duplicate Same Day"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.DUPLICATE_SAME_DAY"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Too Early Live Virus"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.TOO_EARLY_LIVE_VIRUS"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Select Adjuvant Product Interval"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.SELECT_ADJUVANT_PRODUCT_INTERVAL"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Prior to DOB"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.PRIOR_TO_DOB"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to the following reason code {sInvalidReasonCode}={refer_oTargetDose}.addInvalidReason({sInvalidReasonCode}); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine not Permitted for this Dose \(Booster Only\)"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BOOSTER_ONLY"); {refer_oTargetDose}.setRuleName(drools.getRule().getName()); insert(new ICEFactTypeFinding(SupportedFactConcept._INVALID_VACCINE.getConceptCodeValue(), {refer_oTargetDose}));
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine not Permitted for this Dose"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"); {refer_oTargetDose}.setRuleName(drools.getRule().getName()); insert(new ICEFactTypeFinding(SupportedFactConcept._INVALID_VACCINE.getConceptCodeValue(), {refer_oTargetDose}));
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Interval \(PCV PPSV\)"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MIN_INTERVAL_PCV_PPSV"); {refer_oTargetDose}.setRuleName(drools.getRule().getName()); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_INTERVAL.getConceptCodeValue(), {refer_oTargetDose}));
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Outside Flu Season"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.OUTSIDE_FLU_VAC_SEASON"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Missing Antigen"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.MISSING_ANTIGEN"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "D_AND_T_INVALID/P_VALID"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.D_AND_T_INVALID/P_VALID"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine not Allowed in U.S."={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_IN_US"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine Not Approved for Use in the U.S. or by the WHO"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_APPROVED_IN_US_OR_BY_WHO"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Insufficient Antigen"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.INSUFFICIENT_ANTIGEN"); insert(new ICEFactTypeFinding(SupportedFactConcept._INVALID_VACCINE.getConceptCodeValue(), {refer_oTargetDose}));
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Age for Vaccine"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_VACCINE");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Age for Final Dose"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_FINAL_DOSE"); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_AGE.getConceptCodeValue(), {refer_oTargetDose}));
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Age"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_SERIES"); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_AGE.getConceptCodeValue(), {refer_oTargetDose}));
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Interval"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_INTERVAL"); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_INTERVAL.getConceptCodeValue(), {refer_oTargetDose}));
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Duplicate Same Day"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.DUPLICATE_SAME_DAY");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Too Early Live Virus"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.TOO_EARLY_LIVE_VIRUS");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Select Adjuvant Product Interval"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.SELECT_ADJUVANT_PRODUCT_INTERVAL");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Prior to DOB"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.PRIOR_TO_DOB");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to the following reason code {sInvalidReasonCode}={refer_oTargetDose}.addInvalidReason({sInvalidReasonCode});
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine not Permitted for this Dose \(Booster Only\)"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BOOSTER_ONLY"); insert(new ICEFactTypeFinding(SupportedFactConcept._INVALID_VACCINE.getConceptCodeValue(), {refer_oTargetDose}));
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine not Permitted for this Dose"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"); insert(new ICEFactTypeFinding(SupportedFactConcept._INVALID_VACCINE.getConceptCodeValue(), {refer_oTargetDose}));
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Below Minimum Interval \(PCV PPSV\)"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.BELOW_MIN_INTERVAL_PCV_PPSV"); insert(new ICEFactTypeFinding(SupportedFactConcept._BELOW_MINIMUM_INTERVAL.getConceptCodeValue(), {refer_oTargetDose}));
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Outside Flu Season"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.OUTSIDE_FLU_VAC_SEASON");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Missing Antigen"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.MISSING_ANTIGEN");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "D_AND_T_INVALID/P_VALID"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.D_AND_T_INVALID/P_VALID");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine not Allowed in U.S."={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_IN_US");
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Vaccine Not Approved for Use in the U.S. or by the WHO"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_APPROVED_IN_US_OR_BY_WHO");
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted due to "Vaccine Not Approved for Use in U.S."={refer_oTargetDose}.addAcceptedReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_APPROVED_IN_US");
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted due to "Proof of Immunity"={refer_oTargetDose}.addAcceptedReason("EVALUATION_REASON_CONCEPT.PROOF_OF_IMMUNITY");
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted due to "Above Recommended Age for Series"={refer_oTargetDose}.addAcceptedReason("EVALUATION_REASON_CONCEPT.ABOVE_REC_AGE_SERIES");
@@ -274,16 +276,15 @@
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted due to "Shot Administered Outside of a Series"={refer_oTargetDose}.addAcceptedReason("EVALUATION_REASON_CONCEPT.OUTSIDE_SERIES");
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted due to "Clinical Patient Discretion"={refer_oTargetDose}.addAcceptedReason("EVALUATION_REASON_CONCEPT.CLINICAL_PATIENT_DISCRETION");
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted for this [Ss]eries={refer_oTargetDose}.addAcceptedReason("EVALUATION_REASON_CONCEPT.UNSPECIFIED_REASON");
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid for this [Ss]eries={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.UNSPECIFIED_REASON"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid for this [Ss]eries={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.UNSPECIFIED_REASON");
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Nn]ot [Ee]valuated due to "Vaccine Not Supported"={refer_oTargetDose}.addNotEvalatedReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_SUPPORTED");
-[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Outside RSV Season"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.OUTSIDE_SEASON"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
 ////////////// DO NOT USE [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted due to {oReason:[\\$]?[a-zA-Z0-9\\.\\_\\(\\)\\/\\"]+}={refer_oTargetDose}.addAcceptedReason({oReason});
 ////////////// DO NOT USE [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to {oReason:[\\$]?[a-zA-Z0-9\\.\\_\\(\\)\\/\\"]+}={refer_oTargetDose}.addInvalidReason({oReason});
 [consequence][][Rr]emove [Ee]valuation [Rr]eason {strReason:[\\"]{1}[a-zA-Z0-9\\.\\_\\ ]+[\\"]{1}} from [Ss]hot {refer_oTargetDose:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={refer_oTargetDose}.removeEvaluationReasonFromAllReasonSets({strReason});
 [consequence][][Rr]emove [Ee]valuation [Rr]eason {oReason:[\\$]?[a-zA-Z0-9\\.\\_\\(\\)]+} from [Ss]hot {refer_oTargetDose:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={refer_oTargetDose}.removeEvaluationReasonFromAllReasonSets({oReason});
 [consequence][][Rr]emove [Aa]ll [Ee]valuation [Rr]easons from [Ss]hot {refer_oTargetDose:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={refer_oTargetDose}.removeAllEvaluationReasonsFromAllReasonSets();
-[consequence][][Mm]ark the [Ss]hot {refer_oTargetDose} as [Nn]ot [Ii]gnored={refer_oTargetDose}.setIsShotIgnoredForCompletionOfSeries(false);
-[consequence][][Mm]ark the [Ss]hot {refer_oTargetDose} as [Ii]gnored={refer_oTargetDose}.setIsShotIgnoredForCompletionOfSeries(true);
+[consequence][][Mm]ark the [Ss]hot {refer_oTargetDose} as [Nn]ot [Ii]gnored={refer_oTargetDose}.setIsShotIgnored(false);
+[consequence][][Mm]ark the [Ss]hot {refer_oTargetDose} as [Ii]gnored={refer_oTargetDose}.setIsShotIgnored(true);
 [consequence][][Ss]et [Dd]ose [Nn]umber of {refer_oTargetDose} to {nDoseNumber}=modify({refer_oTargetDose}) \{ setDoseNumberInSeries({nDoseNumber}); \};
 [consequence][][Mm]ark that [Ee]valuation of [Ss]hot {refer_oTargetDose} is complete and therefore should not be reevaluated by any other rules=modify ({refer_oTargetDose}) \{ setStatus(DoseStatus.EVALUATION_COMPLETE) \}
 ////////////// [consequence][][Mm]ark the [Ss]hot {refer_oTargetDose} as [Ee]valuation [Nn]ot [Ss]tarted for this [Ss]eries=modify({refer_oTargetDose}) \{ setStatus(DoseStatus.EVALUATION_NOT_STARTED), removeAllEvaluationReasonsFromAllReasonSets(); \};
@@ -320,20 +321,24 @@
 [consequence][][Mm]ake [Nn]ote of the [Aa]bsolute [Mm]inimum [Aa]ge for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getAbsoluteMinimumAgeForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Aa]ge for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedAgeForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Ii]nterval for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedIntervalForTargetDoseInStringFormat({nDoseNumber});
-[consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRuleName(drools.getRule().getName()); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
-[consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRuleName(drools.getRule().getName());
+[consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
+[consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries});
 [consequence][][Ss]et the [Rr]ecommendation [Ss]tatus for {refer_oRecommendation} to {enum_RecommendationStatus}={refer_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
+[consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setEarliestDate(latterDate);
+[consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={refer_oRecommendation}.setEarliestDate(TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}));
 [consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to {dtForecastDate}={refer_oRecommendation}.setEarliestDate({dtForecastDate});
+[consequence][][Ss]et the [Rr]ecommendation [Rr]ecommended [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setRecommendationDate(latterDate);
+[consequence][][Ss]et the [Rr]ecommendation [Rr]ecommended [Ff]orecast [Dd]ate for {refer_oRecommendation} to {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={refer_oRecommendation}.setRecommendationDate(TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}));
 [consequence][][Ss]et the [Rr]ecommendation [Rr]ecommended [Ff]orecast [Dd]ate for {refer_oRecommendation} to {dtForecastDate}={refer_oRecommendation}.setRecommendationDate({dtForecastDate});
 [consequence][][Ss]et the [Rr]ecommendation [Oo]verdue [Ff]orecast [Dd]ate for {refer_oRecommendation} to {dtForecastDate}={refer_oRecommendation}.setOverdueDate({dtForecastDate});
 [consequence][][Ss]et the [Rr]ecommendation [Rr]eason for {refer_oRecommendation} to {oCD}={refer_oRecommendation}.setRecommendationReason({oCD});
 [consequence][][Ss]et the [Rr]ecommendation [Ss]upplemental [Tt]ext for {refer_oRecommendation} to {sSupplementalText}={refer_oRecommendation}.setRecommendationSupplementalText({sSupplementalText}); {refer_oRecommendation}.setRecommendationReason(BaseDataRecommendationReason._SUPPLEMENTAL_TEXT.getCdsListItemName());
 [consequence][][Ss]et the [Rr]ecommendation [Vv]accine for {refer_oRecommendation} to {dd_strCdsConceptValue}={refer_oRecommendation}.setRecommendedVaccine(schedule.getVaccineByCdsConceptValue({dd_strCdsConceptValue}));
-[consequence][][Uu]nset the [Rr]ecommendation [Vv]accine for {refer_oRecommendation}={refer_oRecommendation}.setRecommendedVaccine(null); 
-[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} and [Rr]ecommended [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRuleName(drools.getRule().getName()); {assign_oRecommendation}.setRecommendationDate({dtForecastDate}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus}); insert({assign_oRecommendation});
-[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Ee]arliest [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRuleName(drools.getRule().getName()); {assign_oRecommendation}.setEarliestDate({dtForecastDate}); insert({assign_oRecommendation});
-[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Rr]ecommended [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRuleName(drools.getRule().getName()); {assign_oRecommendation}.setRecommendationDate({dtForecastDate}); insert({assign_oRecommendation});
-[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Oo]verdue [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRuleName(drools.getRule().getName()); {assign_oRecommendation}.setOverdueDate({dtForecastDate}); insert({assign_oRecommendation});
+[consequence][][Uu]nset the [Rr]ecommendation [Vv]accine for {refer_oRecommendation}={refer_oRecommendation}.setRecommendedVaccine(null);
+[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} and [Rr]ecommended [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRecommendationDate({dtForecastDate}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus}); insert({assign_oRecommendation});
+[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Ee]arliest [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setEarliestDate({dtForecastDate}); insert({assign_oRecommendation});
+[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Rr]ecommended [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRecommendationDate({dtForecastDate}); insert({assign_oRecommendation});
+[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Oo]verdue [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setOverdueDate({dtForecastDate}); insert({assign_oRecommendation});
 [consequence][][Ii]nclude the [Rr]ecommendation {refer_oRecommendation} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries=insert({refer_oRecommendation});
 [consequence][][Ll]ogically [Ii]nsert the [Rr]ecommendation {refer_oRecommendation} into [Ww]orking [Mm]emory for [Pp]otential [Cc]onsideration in the final [Ff]orecast of the [Ss]eries=insertLogical({refer_oRecommendation});
 
@@ -368,10 +373,10 @@
 [consequence][][Ss]et the [Ll]atest [Rr]ecommended [Ii]nterval for [Dd]oseRule {assign_oDoseRule} to TimePeriod {sDuration:([\\"]{1})([-|+]?[0-9]+[Yy])?([-|+]?[0-9]+[Mm])?([-|+]?[0-9]+[Ww])?([-|+]?[0-9]+[Dd])?([\\"]{1})}={assign_oDoseRule}.setLatestRecommendedInterval(new TimePeriod({sDuration}));
 [consequence][][Ss]et the [Ll]atest [Rr]ecommended [Ii]nterval for [Dd]oseRule {assign_oDoseRule} to TimePeriod {refer_oTimePeriod}={assign_oDoseRule}.setLatestRecommendedInterval({refer_oTimePeriod});
 [consequence][][Ss]et the [Ll]atest [Rr]ecommended [Ii]nterval for [Dd]oseRule {oDoseRule} to that of [Dd]oseRule {refer_oDoseRule}={oDoseRule}.setLatestRecommendedInterval({refer_oDoseRule}.getLatestRecommendedInterval());
-[consequence][][Aa]dd a [Pp]referable [Vv]accine {refer_oVaccine} to DoseRule {refer_oDoseRule}={refer_oDoseRule}.addPreferableVaccine({refer_oListVaccines}); 
-[consequence][][Aa]dd a [Aa]llowable [Vv]accine {refer_oVaccine} to DoseRule {refer_oDoseRule}={refer_oDoseRule}.addAllowableVaccine({refer_oListVaccines}); 
-[consequence][][Ss]et the [Ll]ist of [Pp]referable [Vv]accines for [Dd]oseRule {refer_oDoseRule} to {refer_oListVaccines}={refer_oDoseRule}.setPreferableVaccines({refer_oListVaccines}); 
-[consequence][][Ss]et the [Ll]ist of [Aa]llowable [Vv]accines for [Dd]oseRule {refer_oDoseRule} to {refer_oListVaccines}={refer_oDoseRule}.setAllowableVaccines({refer_oListVaccines}); 
+[consequence][][Aa]dd a [Pp]referable [Vv]accine {refer_oVaccine} to DoseRule {refer_oDoseRule}={refer_oDoseRule}.addPreferableVaccine({refer_oListVaccines});
+[consequence][][Aa]dd a [Aa]llowable [Vv]accine {refer_oVaccine} to DoseRule {refer_oDoseRule}={refer_oDoseRule}.addAllowableVaccine({refer_oListVaccines});
+[consequence][][Ss]et the [Ll]ist of [Pp]referable [Vv]accines for [Dd]oseRule {refer_oDoseRule} to {refer_oListVaccines}={refer_oDoseRule}.setPreferableVaccines({refer_oListVaccines});
+[consequence][][Ss]et the [Ll]ist of [Aa]llowable [Vv]accines for [Dd]oseRule {refer_oDoseRule} to {refer_oListVaccines}={refer_oDoseRule}.setAllowableVaccines({refer_oListVaccines});
 [consequence][][Aa]dd the new DoseRule {refer_oDoseRule} to the SeriesRules for [Ss]eries {refer_oTargetSeries}={refer_oTargetSeries}.addVaccineGroupDoseRule({refer_oDoseRule});
 [consequence][][Rr]eplace the existing DoseRule in the [Ss]eries {refer_oTargetSeries} with {refer_oDoseRule}={refer_oTargetSeries}.modifyVaccineGroupDoseRule({refer_oDoseRule});
 
@@ -387,7 +392,7 @@
 [consequence][][Uu]nset the [Rr]ecommended [Vv]accine for the [Ff]orecast in the [Ss]eries {refer_oTargetSeries}={refer_oTargetSeries}.setRecommendationVaccine(null); for (Recommendation r : {refer_oTargetSeries}.getFinalRecommendations()) \{ r.setRecommendedVaccine(null); \}
 [consequence][][Ss]et [Dd]isplay [Ff]orecast [Dd]ate for [Cc]onditional [Rr]ecommendations in the [Ss]eries {refer_oTargetSeries} to [Tt]rue={refer_oTargetSeries}.setForecastDateToBeDisplayedForConditionalRecommendations(true);
 [consequence][][Ss]et [Dd]isplay [Ff]orecast [Dd]ate for [Cc]onditional [Rr]ecommendations in the [Ss]eries {refer_oTargetSeries} to [Ff]alse={refer_oTargetSeries}.setForecastDateToBeDisplayedForConditionalRecommendations(false);
-[consequence][][Ss]et the [Aa]genda [Gg]roup [Ff]ocus to {sAgendaGroupFocus:[\\"]{1}[a-zA-Z0-9\\^\\.\\_\\ ]+[\\"]{1}}=drools.setFocus({sAgendaGroupFocus}); 
+[consequence][][Ss]et the [Aa]genda [Gg]roup [Ff]ocus to {sAgendaGroupFocus:[\\"]{1}[a-zA-Z0-9\\^\\.\\_\\ ]+[\\"]{1}}=drools.setFocus({sAgendaGroupFocus});
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Logging actions
@@ -416,7 +421,7 @@
 [condition][]IceResult [Ff]inding=iceResultFinding
 [condition][]IceResult [Aa]dministration [Dd]ate=targetDose != null, targetDose.administrationDate
 [condition][]IceResult [Dd]iseases [Tt]argeted=targetDose.administeredVaccine.allDiseasesTargetedForImmunity
-[condition][]where {attr:[A-Za-z0-9\\.\\(\\)\\ ]+} {aOp}  {value}={attr} {aOp}  {value} 
+[condition][]where {attr:[A-Za-z0-9\\.\\(\\)\\ ]+} {aOp}  {value}={attr} {aOp}  {value}
 [condition][]as well as {attr} {aOp}  {value}=, {attr} {aOp}  {value}
 
 // e.g. - // - with associated administered shot $currentShot and administration date > "blah"
@@ -433,7 +438,7 @@
 [condition][]- [Tt]hat has [Aa]ssociated [Ss]eries {oTargetSeries}=associatedTargetSeries == {oTargetSeries}
 [condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose} {attr}=targetDose == {oTargetDose} {attr}
 [condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=targetDose == {oTargetDose}
-[condition][]- [Tt]here is an [Aa]ssociated [Aa]dministered [Ss]hot in the [Ss]eries {refer_oTargetSeries}=associatedTargetSeries == {refer_oTargetSeries}, targetDose != null 
+[condition][]- [Tt]here is an [Aa]ssociated [Aa]dministered [Ss]hot in the [Ss]eries {refer_oTargetSeries}=associatedTargetSeries == {refer_oTargetSeries}, targetDose != null
 [condition][]- [Mm]ake [Nn]ote of the IceResult [Ff]inding as {assign_sIceResultFinding}={assign_sIceResultFinding} : iceResultFinding
 [condition][]- [Mm]ake [Nn]ote of the [Aa]ssociated [Aa]dministered [Ss]hot as {assign_oTargetDose}=targetDose != null, {assign_oTargetDose} : targetDose
 [condition][]- [Mm]ake [Nn]ote of the [Dd]ate the [Aa]ssociated [Ss]hot was [Aa]dministered as {assign_oTargetDoseDate}=targetDose != null, {assign_oTargetDoseDate} : targetDose.administrationDate
@@ -467,4 +472,3 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IceResult Fact Object END
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
