@@ -940,7 +940,7 @@ rule "HistoryEvaluation.setDoseEvaluationStatusValid" ruleflow-group "HistoryEva
 		modify($td) {
 			setDoseNumberCount($ts.determineNumberOfDosesAdministeredInSeries()+1),
 			addDoseRuleProcessed(_RULENAME),
-			setStatus(DoseStatus.VALID);					// Also sets hasBeenEvaluated flag to true
+			setStatus(DoseStatus.VALID);
 		}
 		update($ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, $td.toString() + " in TargetSeries " + $ts);
