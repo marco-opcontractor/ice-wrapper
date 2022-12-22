@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+participant OP
+
+
+participant HotIce [
+                       =HotIce
+                       ----
+                       ""IOPEngine""
+                   ]
+participant VaccineService
+participant evaluateOP
+participant evaluateRaw
+participant IceWrapper #898EDE
+participant DroolEngine
+participant OPIceEngine
+collections KnowledgeModule
+
+
+participant evaluateVaclogic
+
+autonumber
+
+OP -> HotIce: Sends vaccine data
+
+HotIce -> HotIce: creates VaccineReport
+HotIce -> VaccineService: Sends VaccineReport
+VaccineService -> evaluateOP: calls evaluateOP
+evaluateOP -> evaluateRaw
+IceWrapper -> IceWrapper: evaluates each vaccine using Knowledge Module
+note right
+  Runs ICE Engine as a library
+endnote
+evaluateOP -> VaccineService: Returns OPResult
+
+
+
+
+
+
+@enduml
+
+
+
+
