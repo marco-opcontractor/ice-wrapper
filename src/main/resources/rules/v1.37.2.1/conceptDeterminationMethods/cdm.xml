@@ -1210,42 +1210,42 @@
 		</conceptMapping>
 		<conceptMapping>
 			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-				codeSystemName="OpenCDS concepts" code="ICE229" displayName="COVID-19, mRNA, bivalent booster, Moderna" />
+				codeSystemName="OpenCDS concepts" code="ICE229" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 50 mcg/0.5 mL or 25mcg/0.25 mL dose, Moderna" />
 			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
 				codeSystemName="Vaccines administered (CVX)" displayName="CVX">
-				<concept code="229" displayName="COVID-19, mRNA, bivalent booster, Moderna" />
+				<concept code="229" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 50 mcg/0.5 mL or 25mcg/0.25 mL dose, Moderna" />
 			</fromConcepts>
 		</conceptMapping>
 		<conceptMapping>
 			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-					   codeSystemName="OpenCDS concepts" code="ICE230" displayName="COVID-19, mRNA, 6mos-5yrs, bivalent booster, Moderna" />
+					   codeSystemName="OpenCDS concepts" code="ICE230" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose, Moderna" />
 			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
 						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
-				<concept code="230" displayName="COVID-19, mRNA, 6mos-5yrs, bivalent booster, Moderna" />
+				<concept code="230" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose, Moderna" />
 			</fromConcepts>
 		</conceptMapping>
 		<conceptMapping>
 			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-				codeSystemName="OpenCDS concepts" code="ICE300" displayName="COVID-19, mRNA, >= 12yrs, bivalent booster, Pfizer" />
+				codeSystemName="OpenCDS concepts" code="ICE300" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 30 mcg/0.3 mL dose, Pfizer" />
 			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
 				codeSystemName="Vaccines administered (CVX)" displayName="CVX">
-				<concept code="300" displayName="COVID-19, mRNA, >= 12yrs, bivalent booster, Pfizer" />
+				<concept code="300" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 30 mcg/0.3 mL dose, Pfizer" />
 			</fromConcepts>
 		</conceptMapping>
 		<conceptMapping>
 			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-				codeSystemName="OpenCDS concepts" code="ICE301" displayName="COVID-19, mRNA, 5yrs-11yrs, bivalent booster, Pfizer" />
+				codeSystemName="OpenCDS concepts" code="ICE301" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose, Pfizer" />
 			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
 				codeSystemName="Vaccines administered (CVX)" displayName="CVX">
-				<concept code="301" displayName="COVID-19, mRNA, 5yrs-11yrs, bivalent booster, Pfizer" />
+				<concept code="301" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose, Pfizer" />
 			</fromConcepts>
 		</conceptMapping>
 		<conceptMapping>
 			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-					   codeSystemName="OpenCDS concepts" code="ICE302" displayName="COVID-19, mRNA, 6mos-4yrs, bivalent booster, Pfizer" />
+					   codeSystemName="OpenCDS concepts" code="ICE302" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose, Pfizer" />
 			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
 						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
-				<concept code="302" displayName="COVID-19, mRNA, 6mos-4yrs, bivalent booster, Pfizer" />
+				<concept code="302" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose, Pfizer" />
 			</fromConcepts>
 		</conceptMapping>
 		<conceptMapping>

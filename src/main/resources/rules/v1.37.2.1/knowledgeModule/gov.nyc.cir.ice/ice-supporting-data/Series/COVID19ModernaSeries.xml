@@ -71,23 +71,23 @@
         <ns2:earliestRecommendedAge>6m</ns2:earliestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
-            <ns2:vaccine code="229" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, bivalent booster, Moderna"/>
+            <ns2:vaccine code="229" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 50 mcg/0.5 mL or 25mcg/0.25 mL dose, Moderna"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
-            <ns2:vaccine code="230" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, 6mos-5yrs, bivalent booster, Moderna"/>
+            <ns2:vaccine code="230" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose, Moderna"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
-            <ns2:vaccine code="300" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, >= 12yrs, bivalent booster, Pfizer"/>
+            <ns2:vaccine code="300" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 30 mcg/0.3 mL dose, Pfizer"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
-            <ns2:vaccine code="301" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, 5yrs-11yrs, bivalent booster, Pfizer"/>
+            <ns2:vaccine code="301" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose, Pfizer"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>false</ns2:preferred>
-            <ns2:vaccine code="302" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, 6mos-4yrs, bivalent booster, Pfizer"/>
+            <ns2:vaccine code="302" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose, Pfizer"/>
         </ns2:doseVaccine>
     </ns2:iceSeriesDose>
 </ns2:iceSeriesSpecificationFile>
