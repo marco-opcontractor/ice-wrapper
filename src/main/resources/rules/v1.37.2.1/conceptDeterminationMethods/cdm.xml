@@ -531,10 +531,10 @@
 		</conceptMapping>
 		<conceptMapping>
 			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-				codeSystemName="OpenCDS concepts" code="ICE198" displayName="DTP-Hep B-Hib, Pentavalent"/>
+				codeSystemName="OpenCDS concepts" code="ICE198" displayName="DTP-Hep B-Hib Pentavalent Non-US"/>
 			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
-				codeSystemName="Vaccines administered (CVX)" displayName="DTP-Hep B-Hib, Pentavalent">
-				<concept code="198" displayName="Hep B, adjuvanted" />
+				codeSystemName="Vaccines administered (CVX)" displayName="DTP-Hep B-Hib Pentavalent Non-US">
+				<concept code="198" displayName="DTP-Hep B-Hib Pentavalent Non-US" />
 			</fromConcepts>
 		</conceptMapping>
 		<conceptMapping>
