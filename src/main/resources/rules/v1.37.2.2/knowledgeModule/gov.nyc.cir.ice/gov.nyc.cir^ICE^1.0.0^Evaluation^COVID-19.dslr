@@ -312,7 +312,7 @@ rule "COVID-19(Abstract): Determination if additional dose and/or up to 3 booste
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19Novavax2DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Novavax2DoseSeries", "COVID19Medicago2DoseSeries")
 			- the series that the shot belongs to is complete
-			- the vaccine administered a member of ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301")
+			- the vaccine administered a member of ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301", "ICE302")
 			- make note of the date this shot was administered as $currentShotDate
 			- the date $currentShotDate >= "02-Sep-2022"
 			- make note of the dose number as $doseNumberCurrentShot
@@ -672,26 +672,26 @@ end
 // "Skip dose" logic
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19: If 2 or more doses were administered >= 5 years of age in the Pfizer or Mixed Product series, then the 3rd dose is not required and the series is complete"
+rule "COVID-19: If 2 or more doses were administered >= 6 months of age in the Pfizer, Moderna, or Mixed Product series, then the 3rd dose is not required and the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries")
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries")
 			- the series is not complete
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
+			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
 		There is an Administered Shot $firstDose
 			- the Shot belongs to the Series $targetSeries 
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 1
-			- the administration date of the shot is >= $dtAtAge5y
+			- the administration date of the shot is >= $dtAtAge6m
 		There is an Administered Shot $secondDose
 			- the Shot belongs to the Series $targetSeries 
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 2
-			- the administration date of the shot is >= $dtAtAge5y
+			- the administration date of the shot is >= $dtAtAge6m
 		There does not exist an administered shot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated
