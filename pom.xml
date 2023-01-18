@@ -6,7 +6,7 @@
 
     <groupId>com.connexin.immunization</groupId>
     <artifactId>ice-wrapper</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.opencds</groupId>
             <artifactId>opencds-ice-service</artifactId>
-            <version>1.37.2.1</version>
+            <version>1.37.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.opencds</groupId>
@@ -155,6 +155,8 @@
                                      basedir="${project.basedir}/src/main/resources/rules/v1.37.1.1" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.1.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.37.2.1" />
+                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.2.zip"
+                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.2.2" />
                             </target>
                         </configuration>
                     </execution>
