@@ -53,11 +53,11 @@ global java.util.Date evalTime
 rule "Duplicate Shots/Same Day (COVID-19): If a Janssen is administered on the same day as a Pfizer, Moderna or Novavax vaccine, evaluate the Pfizer/Moderna/Novavax shot first"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^duplicateShotSameDay"
-	activation-group "duplicateShotEvaluationOrder"	
+	activation-group "duplicateShotEvaluationOrder"
 	auto-focus true
 	when
 		$td: TargetDose(hasBeenEvaluated == false, status == DoseStatus.PRIMARY_SHOT_DETERMINATION_IN_PROCESS, associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", vaccineComponent.cdsConceptName == "ICE212")
-		$tdother : TargetDose(this != $td, hasBeenEvaluated == false, status == DoseStatus.EVALUATION_NOT_STARTED, associatedTargetSeries == $td.associatedTargetSeries, administrationDate == $td.administrationDate, 
+		$tdother : TargetDose(this != $td, hasBeenEvaluated == false, status == DoseStatus.EVALUATION_NOT_STARTED, associatedTargetSeries == $td.associatedTargetSeries, administrationDate == $td.administrationDate,
 			vaccineComponent.cdsConceptName in ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301"))
 	then
 		String _RULENAME = kcontext.rule.name;
