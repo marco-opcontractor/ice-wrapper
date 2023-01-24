@@ -851,11 +851,11 @@ end
 
 
 /*************************************************************************************************************************************************************************************
- START If prior booster dose(s) were administered >= 9/2/2022 or >= 10/12/2022
+ START If prior booster dose(s) were administered >= 9/2/2022 or >= 10/12/2022 or >= 12/09/2022
 /************************************************************************************************************************************************************************************/
 
 // If a prior booster dose was administered in the Pfizer, Moderna, Mixed Product or WHO-approved series >= 12/09/2022 and the patient is >= 6 months of age, recommend Not Recommended / COMPLETE
-rule "COVID-19: If a prior booster dose was administered in the Pfizer, Moderna, Mixed Product or WHO-approved Series on or after 10/12/2022 and the patient is >= 6 mos, recommend Not Recommended / COMPLETE"
+rule "COVID-19: If a prior booster dose was administered in the Pfizer, Moderna, Mixed Product or WHO-approved Series on or after 12/09/2022 and the patient is >= 6 mos, recommend Not Recommended / COMPLETE"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	salience 20
@@ -886,7 +886,6 @@ rule "COVID-19: If a prior booster dose was administered in the Pfizer, Moderna,
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
       	Log that this Series Rule fired for the Series $targetSeries
 end
-
 
 
 // If a prior booster dose was administered in the Pfizer, Moderna, Mixed Product or WHO-approved series >= 10/12/2022 and the patient is >= 5 years of age, recommend Not Recommended / COMPLETE
@@ -957,7 +956,7 @@ rule "COVID-19: If a prior booster dose was administered in the Pfizer, Moderna,
 end
 
 /*************************************************************************************************************************************************************************************
- END If prior booster dose(s) were administered >= 9/2/2022 or >= 10/12/2022
+ END If prior booster dose(s) were administered >= 9/2/2022 or >= 10/12/2022 or >= 12/09/2022
 /************************************************************************************************************************************************************************************/
 
 
