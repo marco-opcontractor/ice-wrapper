@@ -1,5 +1,6 @@
 package com.connexin.ice.wrapper.service.op
 
+import com.connexin.ice.wrapper.service.TestHelpers
 import com.connexin.ice.wrapper.service.TestHelpers.VMR_OBSERVATION_RESULT
 import com.connexin.ice.wrapper.service.TestHelpers.VMR_SUBSTANCE_ADMINISTRATION_PROPOSAL
 import com.connexin.ice.wrapper.service.TestHelpers.vaccineReportIndicator
@@ -12,7 +13,7 @@ import org.opencds.vmr.v1_0.internal.SubstanceAdministrationProposal
 
 internal class OPEngineTest {
 
-    private val engine = Engine.createOpEngine("v1.37.2")
+    private val engine = Engine.createOpEngine("v1.37.2.4")
 
     @Test
     fun evaluateRaw() {

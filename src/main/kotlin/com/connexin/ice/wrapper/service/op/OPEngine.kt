@@ -41,6 +41,7 @@ import javax.xml.bind.JAXBElement
  */
 class OPEngine(private val kieContainer: KieContainer,
                private val conceptService: ConceptService,
+               private val enableTracking:Boolean,
                commonLogicModule:String,
                commonKnowledgeDirectory:String,
                commonModuleDirectory:String,
@@ -58,8 +59,10 @@ class OPEngine(private val kieContainer: KieContainer,
             vaccineReport.vaccines.size,vaccineReport.indicators.size,vaccineReport.gender,vaccineReport.dateOfBirth)
         val namedObject = HashMap<String,Any>()
         val session = kieContainer.newStatelessKieSession()
-       // val agendaEventListener = TrackingAgendaEventListener()
-       // session.addEventListener(agendaEventListener)
+        if(enableTracking) {
+            val agendaEventListener = TrackingAgendaEventListener()
+            session.addEventListener(agendaEventListener)
+        }
         val cmds = mutableListOf<Command<*>>()
         cmds.add(CommandFactory.newSetGlobal("evalTime",vaccineReport.requestTime.toDate()))
         cmds.add(CommandFactory.newSetGlobal("clientLanguage","en"))
