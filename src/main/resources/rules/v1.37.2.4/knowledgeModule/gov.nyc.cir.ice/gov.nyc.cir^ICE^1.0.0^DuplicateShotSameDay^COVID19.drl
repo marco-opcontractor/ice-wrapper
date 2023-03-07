@@ -50,6 +50,29 @@ import org.cdsframework.ice.service.Vaccine
 global java.util.Date evalTime
 
 
+rule "Duplicate Shots/Same Day (COVID-19): If a Janssen is administered on the same day as a Pfizer, Moderna or Novavax vaccine, evaluate the Pfizer/Moderna/Novavax shot first"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^duplicateShotSameDay"
+	activation-group "duplicateShotEvaluationOrder"
+	auto-focus true
+	when
+		$td: TargetDose(hasBeenEvaluated == false, status == DoseStatus.PRIMARY_SHOT_DETERMINATION_IN_PROCESS, associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", vaccineComponent.cdsConceptName == "ICE212")
+		$tdother : TargetDose(this != $td, hasBeenEvaluated == false, status == DoseStatus.EVALUATION_NOT_STARTED, associatedTargetSeries == $td.associatedTargetSeries, administrationDate == $td.administrationDate,
+			vaccineComponent.cdsConceptName in ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302"))
+	then
+		String _RULENAME = kcontext.rule.name;
+		modify($td) {
+			setStatus(DoseStatus.EVALUATION_NOT_STARTED),
+			setDuplicateShotSameDayEvaluationOrderCompleted(true);
+		}
+		modify($tdother) {
+			setStatus(DoseStatus.PRIMARY_SHOT_DETERMINATION_IN_PROCESS),
+			setDuplicateShotSameDayEvaluationOrderCompleted(true);
+		}
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, $tdother + "will be evaluted before " + $td + " in TargetSeries " + $td.associatedTargetSeries);
+end
+
+
 rule "Duplicate Shots/Same Day (COVID-19): For shots prior to 10/25/2021, bypass Duplicate Shot/Same Day Processing by not setting the target dose number of the shot to be evaluated shot to the prior dose number"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customMakeNoteOfDuplicateShotSameDayIfAny"
@@ -76,7 +99,7 @@ rule "Duplicate Shots/Same Day (COVID-19): If shot is marked valid but another s
 	salience 5
 	when
 		$td: TargetDose(hasBeenEvaluated == true, associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", isDoseStatusOverridden() == false)
-		$tdother : TargetDose(this != $td, associatedTargetSeries == $td.associatedTargetSeries, administrationDate == $td.administrationDate, hasBeenEvaluated == true, doseNumberInSeries == $td.doseNumberInSeries, 
+		$tdother : TargetDose(this != $td, associatedTargetSeries == $td.associatedTargetSeries, administrationDate == $td.administrationDate, hasBeenEvaluated == true, doseNumberInSeries == $td.doseNumberInSeries,
 			status == DoseStatus.ACCEPTED, isDoseStatusOverridden() == false, isDuplicateShotSameDayCheckCompleted() == false || $td.isDuplicateShotSameDayCheckCompleted() == false)
 	then
 		String _RULENAME = kcontext.rule.name;
@@ -99,9 +122,9 @@ rule "Duplicate Shots/Same Day (COVID-19): If one of those shots is Valid and an
 	auto-focus true
 	salience 10
 	when
-		$td: TargetDose(hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", 
+		$td: TargetDose(hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850",
 			$tdAdministrationDate : administrationDate, $tdAssociatedTargetSeries : associatedTargetSeries, $tddosenumber : doseNumberInSeries)
-		$tdother : TargetDose(this != $td, administrationDate == $tdAdministrationDate, hasBeenEvaluated == true, status == DoseStatus.INVALID, isDoseStatusOverridden() == false, associatedTargetSeries == $tdAssociatedTargetSeries, 
+		$tdother : TargetDose(this != $td, administrationDate == $tdAdministrationDate, hasBeenEvaluated == true, status == DoseStatus.INVALID, isDoseStatusOverridden() == false, associatedTargetSeries == $tdAssociatedTargetSeries,
 			doseNumberInSeries == $tddosenumber, containsInvalidReason(BaseDataEvaluationReason._VACCINE_NOT_ALLOWED_FOR_THIS_DOSE.cdsListItemName), isDuplicateShotSameDayCheckCompleted() == false || $td.isDuplicateShotSameDayCheckCompleted() == false)
 	then
 		String _RULENAME = kcontext.rule.name;
@@ -124,8 +147,8 @@ rule "Duplicate Shots/Same Day (COVID-19): If a Moderna shot and Pfizer shot are
 	auto-focus true
 	salience 10
 	when
-		$tdpfizer: TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, administeredVaccine.cdsConceptName in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301"))
-		$tdmoderna : TargetDose(this != $tdpfizer, associatedTargetSeries == $tdpfizer.associatedTargetSeries, doseNumberInSeries == $tdpfizer.doseNumberInSeries, administrationDate == $tdpfizer.administrationDate, status == DoseStatus.VALID, isDoseStatusOverridden() == false, 
+		$tdpfizer: TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, administeredVaccine.cdsConceptName in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302"))
+		$tdmoderna : TargetDose(this != $tdpfizer, associatedTargetSeries == $tdpfizer.associatedTargetSeries, doseNumberInSeries == $tdpfizer.doseNumberInSeries, administrationDate == $tdpfizer.administrationDate, status == DoseStatus.VALID, isDoseStatusOverridden() == false,
 			administeredVaccine.cdsConceptName in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230"), isDuplicateShotSameDayCheckCompleted() == false || $tdpfizer.isDuplicateShotSameDayCheckCompleted() == false)
 	then
 		String _RULENAME = kcontext.rule.name;
@@ -149,9 +172,9 @@ rule "Duplicate Shots/Same Day (COVID-19): If an FDA-approved vaccine and a WHO-
 	auto-focus true
 	salience 10
 	when
-		$tdfda: TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, administeredVaccine.cdsConceptName in ("ICE207", "ICE208", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301"))
-		$tdwho : TargetDose(this != $tdfda, associatedTargetSeries == $tdfda.associatedTargetSeries, doseNumberInSeries == $tdfda.doseNumberInSeries, administrationDate == $tdfda.administrationDate, status == DoseStatus.VALID, isDoseStatusOverridden() == false, 
-			administeredVaccine.cdsConceptName not in ("ICE207", "ICE208", "ICE211", "ICE213", "ICE217", "ICE218", "ICE219", "ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301", "ICE302"), isDuplicateShotSameDayCheckCompleted() == false || $tdfda.isDuplicateShotSameDayCheckCompleted() == false)
+		$tdfda: TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, administeredVaccine.cdsConceptName in ("ICE207", "ICE208", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301", "ICE302"))
+		$tdwho : TargetDose(this != $tdfda, associatedTargetSeries == $tdfda.associatedTargetSeries, doseNumberInSeries == $tdfda.doseNumberInSeries, administrationDate == $tdfda.administrationDate, status == DoseStatus.VALID, isDoseStatusOverridden() == false,
+			administeredVaccine.cdsConceptName not in ("ICE207", "ICE208", "ICE211", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302"), isDuplicateShotSameDayCheckCompleted() == false || $tdfda.isDuplicateShotSameDayCheckCompleted() == false)
 	then
 		String _RULENAME = kcontext.rule.name;
 		modify($tdwho) {

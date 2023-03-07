@@ -115,21 +115,3 @@ rule "COVID-19(Any): Note an execution date on or after 10/12/2022"
 		Insert an IceFact SupportedFactConcept._EXECUTION_DATE_ON_OR_AFTER_20221012.getConceptCodeValue() with TargetSeries $targetSeries into Working Memory
 		Log that this Series Rule fired for the Series $targetSeries
 end
-
-rule "COVID-19(Any): Note an execution date on or after 12/09/2022"
-	agenda-group "customAnyRuleflowGroupRule"
-	auto-focus true
-	dialect "mvel"
-	no-loop true
-	when
-		There is a Series $targetSeries
-			- the series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the series is complete
-		There does not exist an IceFact
-			- that has finding SupportedFactConcept._EXECUTION_DATE_ON_OR_AFTER_20221209.getConceptCodeValue()
-			- that has associated series $targetSeries
-		Confirm the date evalTime is on the same date or after "09-Dec-2022"
-	then
-		Insert an IceFact SupportedFactConcept._EXECUTION_DATE_ON_OR_AFTER_20221209.getConceptCodeValue() with TargetSeries $targetSeries into Working Memory
-		Log that this Series Rule fired for the Series $targetSeries
-end
