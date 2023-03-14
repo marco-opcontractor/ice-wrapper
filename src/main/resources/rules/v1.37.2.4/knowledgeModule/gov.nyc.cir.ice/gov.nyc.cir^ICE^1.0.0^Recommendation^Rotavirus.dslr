@@ -66,7 +66,7 @@ end
 
 // If the patient is currently >8 months, 0 days, or will be >8 months, 0 days __as of the recommended date due__, then rotavirus is not recommended, and the reason is Too_Old 
 // (display text: "Not recommended at this age").
-rule "Rotavirus: Series is Complete if Over 8 Years of Age or Will Be as of the Routine Recommendation Date"
+rule "Rotavirus: Series is Complete if Over 8 Months of Age or Will Be as of the Routine Recommendation Date"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	when
 		There is a Series $targetSeries
