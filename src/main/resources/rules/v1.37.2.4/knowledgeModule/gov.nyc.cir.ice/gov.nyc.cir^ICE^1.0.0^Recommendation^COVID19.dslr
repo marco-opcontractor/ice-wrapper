@@ -955,10 +955,8 @@ rule "COVID-19: If the execution date is < 3/17/2023 AND a prior booster dose wa
       	Log that this Series Rule fired for the Series $targetSeries
 end
 
-//NEW RULE if the execution date is >= 3/17/2023 and dose 3 is not a bivalent vaccine (CVX 229, CVX 230, CVX 300, CVX 301, CVX 302, CVX 519, or CVX 520),
- //recommend a booster dose of COVID-19 at the vaccine group level and recommended interval (8 weeks) or on 3/17/2023, whichever date is latest,
- //along with recommendation reasons BOOSTER_DOSE and SUPPLEMENTAL_TEXT and Descriptive Text:
-rule "COVID-19: If the execution date is >= 3/17/2023 AND"
+//NEW RULE if the execution date is >= 3/17/2023 and dose 3 is not a bivalent vaccine (CVX 229, CVX 230, CVX 300, CVX 301, CVX 302, CVX 519, or CVX 520), recommend a booster dose of COVID-19 at the vaccine group level and recommended interval (8 weeks) or on 3/17/2023, whichever date is latest, along with recommendation reasons BOOSTER_DOSE and SUPPLEMENTAL_TEXT and Descriptive Text:
+rule "COVID-19: If the execution date is >= 3/17/2023 AND dose 3 is not a bivalent vaccine, recommend a booster dose at earliest/recommended age of 6m & 3/17/2023 w/ earliest/recommended interval of 8 weeks "
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	salience 30
