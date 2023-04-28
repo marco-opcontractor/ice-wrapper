@@ -10,7 +10,7 @@ object Engine {
     private val tempDirectory =  System.getProperty("java.io.tmpdir")
     private val separator = System.getProperty("file.separator")
 
-    fun createOpEngine(rulesVersion:String):IEngine{
+    fun createOpEngine(rulesVersion:String,enableDebugLogging:Boolean=false):IEngine{
         val rules = if(!rulesVersion.startsWith("v")){
             "v${rulesVersion}"
         }
@@ -50,6 +50,7 @@ object Engine {
                 iceCustomRules = "gov.nyc.cir^ICE^1.0.0",
                 iceCustomPackageName = "gov.nyc.cir.ice"
             ),
+            enableTracking = enableDebugLogging,
             conceptService = OPConceptServiceImpl.build(File(cdmFile)),
             commonLogicModule = "org.cdsframework^ICE^1.0.0",
             commonKnowledgeDirectory = iceCommonKnowledgeDirectory,
