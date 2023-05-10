@@ -13,7 +13,7 @@ import org.opencds.vmr.v1_0.internal.SubstanceAdministrationProposal
 
 internal class OPEngineTest {
 
-    private val engine = Engine.createOpEngine("v1.37.2.4")
+    private val engine = Engine.createOpEngine("v1.38.1.1")
 
     @Test
     fun evaluateRaw() {
