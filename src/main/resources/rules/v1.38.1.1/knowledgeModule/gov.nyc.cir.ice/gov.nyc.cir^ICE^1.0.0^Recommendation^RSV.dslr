@@ -65,7 +65,7 @@ rule "RSV: Series is Complete if Over 2 Years of Age or Will Be as of the Routin
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "RSV: If the patient < 2yrs and no doses on record, recommendation is CONDITIONAL/HIGH_RISK"
+rule "RSV: If the patient <= 2yrs and no doses on record, recommendation is CONDITIONAL/HIGH_RISK"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
@@ -74,7 +74,7 @@ rule "RSV: If the patient < 2yrs and no doses on record, recommendation is CONDI
 			- the number of doses administered is == 0
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
-		Confirm elapsed time between $birthdate and evalTime < "2y"
+		Confirm elapsed time between $birthdate and evalTime <= "2y"
 	then
 		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
 		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.HIGH_RISK"
