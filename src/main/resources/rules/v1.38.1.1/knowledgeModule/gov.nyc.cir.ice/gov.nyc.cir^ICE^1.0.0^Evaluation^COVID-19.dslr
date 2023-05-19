@@ -780,7 +780,7 @@ rule "COVID-19: If eval date < 10/12/2022 and 2 doses CVX 208, CVX 217, CVX 218,
 			- the dose number in the Series is == 1
 			- that has already been evaluated and whose Shot Validity is VALID
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE300", "ICE301")
-		Confirm the date evalTime is before "12-Oct-2023"
+		Confirm the date evalTime is before "12-Oct-2022"
 	then
 		Mark the Series $associatedTargetSeries complete
 		Record that this dose rule was Processed for the TargetDose $administeredShot
