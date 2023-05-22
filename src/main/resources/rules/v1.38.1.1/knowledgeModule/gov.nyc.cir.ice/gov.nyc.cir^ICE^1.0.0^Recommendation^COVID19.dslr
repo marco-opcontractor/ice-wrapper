@@ -1173,7 +1173,7 @@ rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer or mixed seri
 		Confirm the date evalTime is on the same date or after "18-Apr-2023"
 	then
 		Create a Recommendation as $r_interval for the Series $targetSeries
-		Add "3w" to $lastShotAdministeredDose and make note of the newly calculated date as $dtCalculated
+		Add "8w" to $lastShotAdministeredDose and make note of the newly calculated date as $dtCalculated
 		Set the Recommendation Recommended Forecast Date for $r_interval to the latter of $dtCalculated and "18-Apr-2023"
 		Include the Recommendation $r_interval for Consideration in the final forecast of the Series
 		Create a Recommendation as $recommendation with Status RecommendationStatus.RECOMMENDED for the Series $targetSeries

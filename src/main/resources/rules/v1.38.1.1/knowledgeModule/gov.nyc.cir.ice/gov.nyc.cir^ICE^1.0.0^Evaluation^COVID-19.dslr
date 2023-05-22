@@ -849,41 +849,35 @@ rule "COVID-19: If eval date >= 4/18/2023 and 3 shots were administered and 1 or
 			- the series is not complete
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
-			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
 		There is an Administered Shot $administeredShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is >= 3
 			- the vaccine administered a member of ("ICE300", "ICE301", "ICE302", "ICE229")
 			- the administration date of the shot is >= $dtAtAge6m
-			- the administration date of the shot is < $dtAtAge5y
 		There is an administered shot $secondDose
 			- the Shot belongs to the Series $targetSeries
 			- that is not the same shot as $administeredShot
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 2
 			- the vaccine administered a member of ("ICE207", "ICE208", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301", "ICE302")
-			- the administration date of the shot is >= $dtAtAge6m
-			- the administration date of the shot is < $dtAtAge5y
-		There is an administered shot $thirdDose
+		There is an administered shot $firstDose
 			- the Shot belongs to the Series $targetSeries
 			- that is not the same shot as $secondDose
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 1
 			- the vaccine administered a member of ("ICE207", "ICE208", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE300", "ICE301", "ICE302")
-			- the administration date of the shot is >= $dtAtAge6m
-			- the administration date of the shot is < $dtAtAge5y
 		Confirm the date evalTime is on the same date or after "18-Apr-2023"
 	then
 		Mark the Series $targetSeries complete
 		/////// Refresh all facts in the Series $targetSeries
 		Record that this dose rule was Processed for the TargetDose $secondDose
-		Log that this dose rule fired for the dose $thirdDose in the Series $targetSeries
+		Log that this dose rule fired for the dose $firstDose in the Series $targetSeries
 end
 
 
 
-rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was administered >= 5 years and < 12 years of age in the Pfizer or Mixed Product series, then the series is complete"
+rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of valid bivalent was administered >= 5 years of age in the Pfizer or Mixed Product series, then the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
@@ -893,13 +887,10 @@ rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was ad
 			- the series is not complete
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
 		There is an Administered Shot $administeredShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE300", "ICE301", "ICE229")
-			- the administration date of the shot is >= $dtAtAge5y
-			- the administration date of the shot is < $dtAtAge12y
+			- the vaccine administered a member of ("ICE300", "ICE301")
 		Confirm the date evalTime is on the same date or after "18-Apr-2023"
 	then
 		Mark the Series $targetSeries complete
@@ -909,7 +900,7 @@ rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was ad
 end
 
 
-rule "COVID-19: If eval date >= 4/18/2023 and 2 or more doses were administered and >=1 is bivalent ICE229, at >= 6 months and < 6 years of age in the Moderna series, then the series is complete"
+rule "COVID-19: If eval date >= 4/18/2023 and 3 or more doses were administered and >=1 is bivalent at >= 6 months of age in the Moderna series, then the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
@@ -919,12 +910,45 @@ rule "COVID-19: If eval date >= 4/18/2023 and 2 or more doses were administered 
 			- the series is not complete
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
+		There is an Administered Shot $administeredShot
+			- the Shot belongs to the Series $targetSeries
+			- that has already been evaluated and whose shot validity is VALID
+			- the vaccine administered a member of ("ICE229", "ICE230")
+		There is an administered shot $secondDose
+			- the Shot belongs to the Series $targetSeries
+			- that is not the same shot as $administeredShot
+			- that has already been evaluated and whose shot validity is VALID
+			- the dose number in the Series is == 2
+			- the vaccine administered a member of ("ICE207", "ICE221", "ICE228")
+		There is an administered shot $firstDose
+			- the Shot belongs to the Series $targetSeries
+			- that is not the same shot as $administeredShot
+			- that has already been evaluated and whose shot validity is VALID
+			- the dose number in the Series is == 1
+			- the vaccine administered a member of ("ICE207", "ICE221", "ICE228")
+			- the administration date of the shot is >= $dtAtAge6m
+		Confirm the date evalTime is on the same date or after "18-Apr-2023"
+	then
+		Mark the Series $targetSeries complete
+		/////// Refresh all facts in the Series $targetSeries
+		Record that this dose rule was Processed for the TargetDose $administeredShot
+		Log that this dose rule fired for the dose $administeredShot in the Series $targetSeries
+end
+
+rule "COVID-19: If eval date >= 4/18/2023 and 2 or more doses administered and at least one is bivalent, >= 6 months and <6 years of age in the Moderna series, then the series is complete"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	when
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19ModernaSeries"
+			- the series is not complete
+		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge6y when the Patient is "6y" of age
 		There is an Administered Shot $administeredShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE229", "ICE301")
-			- the administration date of the shot is >= $dtAtAge6m
+			- the vaccine administered a member of ("ICE229", "ICE230")
 			- the administration date of the shot is < $dtAtAge6y
 		There is an administered shot $firstDose
 			- the Shot belongs to the Series $targetSeries
@@ -941,44 +965,8 @@ rule "COVID-19: If eval date >= 4/18/2023 and 2 or more doses were administered 
 end
 
 
-rule "COVID-19: If eval date >= 4/18/2023 and 3 or more doses were administered and >=1 is bivalent at >= 6 months and < 6 years of age in the Moderna series, then the series is complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19ModernaSeries"
-			- the series is not complete
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
-			- make note of the date as $dtAtAge6y when the Patient is "6y" of age
-		There is an Administered Shot $administeredShot
-			- the Shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE229", "ICE230")
-			- the administration date of the shot is >= $dtAtAge6m
-			- the administration date of the shot is < $dtAtAge6y
-		There is an administered shot $secondDose
-			- the Shot belongs to the Series $targetSeries
-			- that is not the same shot as $administeredShot
-			- that has already been evaluated and whose shot validity is VALID
-			- the dose number in the Series is == 2
-			- the vaccine administered a member of ("ICE207", "ICE221", "ICE228")
-		There is an administered shot $firstDose
-			- the Shot belongs to the Series $targetSeries
-			- that is not the same shot as $administeredShot
-			- that has already been evaluated and whose shot validity is VALID
-			- the dose number in the Series is == 1
-			- the vaccine administered a member of ("ICE207", "ICE221", "ICE228")
-		Confirm the date evalTime is on the same date or after "18-Apr-2023"
-	then
-		Mark the Series $targetSeries complete
-		/////// Refresh all facts in the Series $targetSeries
-		Record that this dose rule was Processed for the TargetDose $administeredShot
-		Log that this dose rule fired for the dose $administeredShot in the Series $targetSeries
-end
 
-rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was administered >= 6 years and < 12 years of age in the Moderna series, then the series is complete"
+rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was administered >= 6 years of age in the Moderna series, then the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
@@ -988,13 +976,11 @@ rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was ad
 			- the series is not complete
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge6y when the Patient is "6y" of age
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
 		There is an Administered Shot $administeredShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE229", "ICE300", "ICE301")
+			- the vaccine administered a member of ("ICE229")
 			- the administration date of the shot is >= $dtAtAge6y
-			- the administration date of the shot is < $dtAtAge12y
 		Confirm the date evalTime is on the same date or after "18-Apr-2023"
 	then
 		Mark the Series $targetSeries complete
@@ -1004,28 +990,7 @@ rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was ad
 end
 
 
-rule "COVID-19: If eval date >= 4/18/2023 and 1 or more doses of bivalent was administered >= 12 years of age in the Moderna, Pfizer or Mixed Product series, then the series is complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19ModernaSeries", "COVID19PfizerSeries", "COVID19MixedProductSeries")
-			- the series is not complete
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-		There is an Administered Shot $administeredShot
-			- the Shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE229", "ICE300")
-			- the administration date of the shot is >= $dtAtAge12y
-		Confirm the date evalTime is on the same date or after "18-Apr-2023"
-	then
-		Mark the Series $targetSeries complete
-		/////// Refresh all facts in the Series $targetSeries
-		Record that this dose rule was Processed for the TargetDose $administeredShot
-		Log that this dose rule fired for the dose $administeredShot in the Series $targetSeries
-end
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // "Skip dose" logic - END
 //////////////////////////////////////////////////////////////////////////////////////////////////
