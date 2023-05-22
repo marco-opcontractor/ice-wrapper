@@ -1258,7 +1258,7 @@ end
 
 
 //Pfizer,Mixed,Moderna, Novavax - >=12y, >=1 mono, 0 biv, >=4/18/23
-rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer, Moderna, Novavax or mixed series and the patient is >= 6 years of age and and has received >=1 monovalent and 0 bivalent, recommend bivalent at earliest/recommended age of 6y & 4/18/2023 w/ earliest/recommended interval of 8 weeks"
+rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer, Moderna, Novavax or mixed series and the patient is >= 12 years of age and and has received >=1 monovalent and 0 bivalent, recommend bivalent at earliest/recommended age of 12y & 4/18/2023 w/ earliest/recommended interval of 8 weeks"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	salience 30
@@ -1272,10 +1272,8 @@ rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer, Moderna, Nov
 			- make note of the date this shot was administered as $lastShotAdministeredDose
 			- the vaccine administered a member of ("ICE211", "ICE217", "ICE207")
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge6y when the Patient is "6y" of age
 			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-			- the date evalTime >= $dtAtAge6y
-		    - the date evalTime < $dtAtAge12y
+			- the date evalTime >= $dtAtAge12y
 		Confirm the date evalTime is on the same date or after "18-Apr-2023"
 	then
 		Create a Recommendation as $r_interval for the Series $targetSeries
