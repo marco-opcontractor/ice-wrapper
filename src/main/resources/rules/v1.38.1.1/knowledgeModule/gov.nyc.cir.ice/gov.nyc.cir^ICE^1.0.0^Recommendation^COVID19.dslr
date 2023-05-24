@@ -1130,7 +1130,7 @@ rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer or mixed seri
 			- the shot belongs to the series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $lastShotAdministeredDose
-			- the vaccine administered a member of ("ICE217", "ICE218", "ICE219")
+			- the vaccine administered a member of ("ICE217", "ICE218", "ICE219", "ICE208")
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
 			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
@@ -1164,7 +1164,7 @@ rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer or mixed seri
 			- the shot belongs to the series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $lastShotAdministeredDose
-			- the vaccine administered a member of ("ICE217", "ICE218")
+			- the vaccine administered a member of ("ICE217", "ICE218", "ICE208")
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
 			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
@@ -1237,7 +1237,7 @@ rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer, Moderna or m
 			- the shot belongs to the series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $lastShotAdministeredDose
-			- the vaccine administered a member of ("ICE217", "ICE218", "ICE207", "ICE221")
+			- the vaccine administered a member of ("ICE217", "ICE218", "ICE207", "ICE208", "ICE221")
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge6y when the Patient is "6y" of age
 			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
@@ -1270,7 +1270,7 @@ rule "COVID-19: If the execution date is >=4/18/2023 in the Pfizer, Moderna, Nov
 			- the shot belongs to the series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $lastShotAdministeredDose
-			- the vaccine administered a member of ("ICE211", "ICE217", "ICE207")
+			- the vaccine administered a member of ("ICE211", "ICE217", "ICE207", "ICE208")
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
 			- the date evalTime >= $dtAtAge12y
