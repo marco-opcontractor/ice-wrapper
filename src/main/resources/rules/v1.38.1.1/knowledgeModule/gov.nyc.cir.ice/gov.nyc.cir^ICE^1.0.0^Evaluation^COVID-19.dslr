@@ -326,7 +326,6 @@ rule "COVID-19(Abstract): Determination if additional dose and/or up to 3 booste
 			- make note of the date as $dateAt5yOfAge when the patient is "5y" of age
 			- make note of the date as $dateAt6yOfAge when the patient is "6y" of age
 			- make note of the date as $dateAt12yOfAge when the patient is "12y" of age
-		Confirm the date evalTime is before "18-Apr-2023"
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
         Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
@@ -613,6 +612,7 @@ rule "COVID-19: Supplemental Text- If the shot administration date is >= 9/2/202
 			- the dose number in the Series is == $numberOfDosesRequired+2
 			- make note of the date this shot was administered as $currentShotDate
 			- the date $currentShotDate >= "02-Sep-2022"
+			- the date $currentShotDate < "18-Apr-2023"
 			- make note of the associated series as $associatedTargetSeries
 		There does not exist an administered shot
 			- the shot belongs to the series $targetSeries
@@ -644,6 +644,7 @@ rule "COVID-19: If the 3rd booster dose is administered to an already completed 
 			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
 			- make note of the date this shot was administered as $currentShotDate
 			- the date $currentShotDate >= "02-Sep-2022"
+			- the date $currentShotDate < "18-Apr-2023"
 			- make note of the dose number as $doseNumberCurrentShot
 			- make note of the Associated Series as $associatedTargetSeries
 		There is a Series $targetSeries identified by $associatedTargetSeries
@@ -1009,6 +1010,34 @@ end
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+/*************************************************************************************************
+ START High Risk Doses >= 4/18/2023
+/************************************************************************************************/
+
+rule "COVID-19: If the evaluation date is >= 4/18/2023 and an Additional bivalent Dose is administered in the __Pfizer, Moderna, Mixed Product Series the shot is permitted"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "extraDoseCheck"
+	when
+		There is an administered shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries")
+			- make note of the date this shot was administered as $currentShotDate
+			- the date $currentShotDate >= "18-Apr-2023"
+			- make note of the associated series as $associatedTargetSeries
+		There is a Series $targetSeries identified by $associatedTargetSeries
+			- the series is complete
+			- make note of the dose number after which the Series was marked complete as $doseNumberAfterWhichComplete
+			- the effective number of doses administered in the Series is > $doseNumberAfterWhichComplete
+		The patient information $oEvaluatedPersonAbstract must be known to complete writing this rule
+			- make note of the date as $dateAt5yOfAge when the patient is "5y" of age
+	then
+		Set the Shot Status of $currentShot to Valid
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // START If a Moderna bivalent vaccine (CVX 229) is inadvertently administered in the Pfizer or Mixed Product primary series and was evaluated as INVALID with reason code VACCINE_NOT_ALLOWED_FOR_THIS_DOSE,
 // ignore the bivalent vaccine (CVX 229) when determining the recommended due date for the next target dose due and when evaluating the next shot based on the absolute minimum interval for that target dose.
@@ -1027,6 +1056,7 @@ rule "COVID-19: If CVX 229 or CVX 230 was evaluated as Not Valid due to VACCINE_
 			- make note of all evaluation reasons for this shot as $collectionOfStrReasons
 			- the collection $collectionOfStrReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 			- make note of the Associated Series as $associatedTargetSeries
+		Confirm the date evalTime is before "18-Apr-2023"
 	then
 		Mark the shot $administeredShot as Ignored
 		Refresh all facts in the shot $administeredShot
