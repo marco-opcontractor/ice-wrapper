@@ -289,6 +289,7 @@ rule "COVID-19: If the evaluation date is < 4/18/2023 and the shot administratio
 			- the vaccine administered a member of ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228")
 			- make note of the date this shot was administered as $currentShotDate
 			- the date $currentShotDate >= "02-Sep-2022"
+			- the date $currentShotDate < "18-Apr-2023"
 			- make note of the associated series as $associatedTargetSeries
 		There is a Series $targetSeries identified by $associatedTargetSeries
 			- the series is complete
@@ -297,7 +298,6 @@ rule "COVID-19: If the evaluation date is < 4/18/2023 and the shot administratio
 		The patient information $oEvaluatedPersonAbstract must be known to complete writing this rule
 			- make note of the date as $dateAt5yOfAge when the patient is "5y" of age
 			- the date $currentShotDate >= $dateAt5yOfAge
-		Confirm the date evalTime is before "18-Apr-2023"
 	then
 		Set the Shot Status of $currentShot to Valid
 		Record that this dose rule was Processed for the TargetDose $currentShot
@@ -848,7 +848,7 @@ rule "COVID-19: If a monovalent vaccine is administered on or after April 18, 20
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Set the shot status of $currentShot to Invalid
-		Include the reason for shot $currentShot Invalid due to "Vaccine not Permitted for this Dose"
+		Include the reason for shot $currentShot Invalid due to "Monovalent not Authorized"
 		Mark that evaluation of shot $currentShot is complete and therefore should not be reevaluated by any other rules
         Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
