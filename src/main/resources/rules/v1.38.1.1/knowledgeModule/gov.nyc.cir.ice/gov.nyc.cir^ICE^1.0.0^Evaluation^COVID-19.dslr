@@ -1355,6 +1355,7 @@ rule "COVID-19: For patients >= 18 yrs of age, if shot in the Pfizer, Mixed Prod
 			- the administered shot number is == $administeredShotNumber-1
 			- the administration date of the shot is > $administrationDatePrior
 		Confirm the date $administrationDate is before "25-Oct-2021"
+		Confirm the date evalTime is before "18-Apr-2023"
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
         Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
