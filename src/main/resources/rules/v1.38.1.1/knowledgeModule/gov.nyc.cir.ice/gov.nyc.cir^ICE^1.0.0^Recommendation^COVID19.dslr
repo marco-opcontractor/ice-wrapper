@@ -1327,6 +1327,10 @@ rule "COVID-19: If the execution date is after 4/18/23 and the series is complet
 			- the Series is complete
 			- make note of the dose number after which the Series was marked complete as $doseNumberAfterWhichComplete
 			- the effective number of doses administered in the Series is == $doseNumberAfterWhichComplete
+		There is an administered shot $lastShotAdministered
+			- the shot belongs to the series $targetSeries
+			- that has already been evaluated and whose shot validity is VALID
+			- the vaccine administered a member of ("ICE229", "ICE300", "ICE301", "ICE302")
 		Confirm the date evalTime is on the same date or after "18-Apr-2023"
 	then
 		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
@@ -1346,6 +1350,10 @@ rule "COVID-19: If the execution date is after 4/18/23 and the series is complet
 			- the Series is complete
 			- make note of the dose number after which the Series was marked complete as $doseNumberAfterWhichComplete
 			- the effective number of doses administered in the Series is >= $doseNumberAfterWhichComplete+1
+		There is an administered shot $lastShotAdministered
+			- the shot belongs to the series $targetSeries
+			- that has already been evaluated and whose shot validity is VALID
+			- the vaccine administered a member of ("ICE229", "ICE300", "ICE301", "ICE302")
 		Confirm the date evalTime is on the same date or after "18-Apr-2023"
 	then
 		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
