@@ -134,14 +134,6 @@
 			<code>VACCINE_GROUP_CONCEPT_COVID19</code>
 			<displayName>COVID-19 vaccine group</displayName>
 		</cdsListItemConceptMapping>
-	</cdsListItem>	
-	<cdsListItem>
-		<cdsListItemKey>905</cdsListItemKey>
-		<cdsListItemValue>RSV Injection Group</cdsListItemValue>
-		<cdsListItemConceptMapping>
-			<code>VACCINE_GROUP_CONCEPT_RSV</code>
-			<displayName>RSV injection group</displayName>
-		</cdsListItemConceptMapping>
 	</cdsListItem>
 	<cdsListItem>
 		<cdsListItemKey>860</cdsListItemKey>
