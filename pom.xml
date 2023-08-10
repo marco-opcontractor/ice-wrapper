@@ -155,6 +155,8 @@
                                      basedir="${project.basedir}/src/main/resources/rules/v1.38.1.1" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.1.1.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.39.1.1" />
+                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.40.1.1.zip"
+                                     basedir="${project.basedir}/src/main/resources/rules/v1.40.1.1" />
                             </target>
                         </configuration>
                     </execution>
