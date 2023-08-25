@@ -755,7 +755,7 @@ end
                  at >= 4 months after series completion, then evaluate the shot as Valid.
 /************************************************************************************************************************************************************************************/
 
-rule "COVID-19(Administration of 1st Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
+rule "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "extraDoseCheck"
@@ -765,17 +765,7 @@ rule "COVID-19(Administration of 1st Bivalent Dose in the Pfizer Series After Se
 			- the series that the shot belongs to is complete
 			- the administration date of the shot is >= "17-Mar-2023"
 			- make note of the date this shot was administered as $currentShotDate
-			- make note of the dose number as $doseNumberCurrentShot
 			- make note of the Associated Series as $associatedTargetSeries
-		There does not exist an administered shot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520")
-			- the administration date of the shot is < "17-Mar-2023"
-		There does not exist an administered shot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the administration date of the shot is >= "19-Apr-2023"
 		There is an administered shot $priorShot
 			- the shot belongs to the series $associatedTargetSeries
 			- the administration date of the shot is < $currentShotDate
@@ -791,17 +781,55 @@ rule "COVID-19(Administration of 1st Bivalent Dose in the Pfizer Series After Se
 end
 
 
-rule "COVID-19: If the first bivalent dose on >= 3/17/2023 after series completion was administered < 8 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval"
-		extends "COVID-19(Administration of 1st Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
+rule "COVID-19: If the first bivalent dose on >= 3/17/2023 after series completion was administered < 3 weeks from the prior COVID-19 shot, include supplemental text regarding a 3 week minimum interval"
+		extends "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	when
+		There is an administered shot $sameShotAsCurrentShot
+			- that is the same shot as $currentShot
+			- make note of the dose number as $doseNumberCurrentShot
+			- the numeric $doseNumberCurrentShot is == 2
+		Confirm elapsed time between $priorShotDate and $currentShotDate < "3w"
+	then
+		Include Supplemental Text "The timing of the administration of this shot does not follow the guidelines regarding the minimum interval of 3 weeks." for Valid Shot $currentShot
+		Record that this dose rule was Processed for the TargetDose $currentShot
+        Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+
+rule "COVID-19: If the second bivalent dose on >= 3/17/2023 after series completion was administered < 4 weeks from the prior COVID-19 shot, include supplemental text regarding a 4 week minimum interval"
+		extends "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	when
+		There is an administered shot $sameShotAsCurrentShot
+			- that is the same shot as $currentShot
+			- make note of the dose number as $doseNumberCurrentShot
+			- the numeric $doseNumberCurrentShot is == 3
+		Confirm elapsed time between $priorShotDate and $currentShotDate < "4w"
+	then
+		Include Supplemental Text "The timing of the administration of this shot does not follow the guidelines regarding the minimum interval of 4 weeks." for Valid Shot $currentShot
+		Record that this dose rule was Processed for the TargetDose $currentShot
+        Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+rule "COVID-19: If the third or greater bivalent dose on >= 3/17/2023 after series completion was administered < 8 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval"
+		extends "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	when
+		There is an administered shot $sameShotAsCurrentShot
+			- that is the same shot as $currentShot
+			- make note of the dose number as $doseNumberCurrentShot
+			- the numeric $doseNumberCurrentShot is >= 4
 		Confirm elapsed time between $priorShotDate and $currentShotDate < "8w"
 	then
 		Include Supplemental Text "The timing of the administration of this shot does not follow the guidelines regarding the minimum interval of 8 weeks." for Valid Shot $currentShot
 		Record that this dose rule was Processed for the TargetDose $currentShot
         Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
+
 
 
 rule "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After Series Completion): If a shot is administered on >= 4/19/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 4/19/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
@@ -815,18 +843,7 @@ rule "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After 
 			- the series that the shot belongs to is complete
 			- the administration date of the shot is >= "19-Apr-2023"
 			- make note of the date this shot was administered as $currentShotDate
-			- make note of the dose number as $doseNumberCurrentShot
 			- make note of the Associated Series as $associatedTargetSeries
-		There does not exist an administered shot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520")
-			- the administration date of the shot is < "19-Apr-2023"
-		There does not exist an administered shot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the administration date of the shot is >= "19-Apr-2023"
-			- the vaccine administered a member of ("ICE207", "ICE208", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520")
 		There is an administered shot $priorShot
 			- the shot belongs to the series $associatedTargetSeries
 			- the administration date of the shot is < $currentShotDate
@@ -842,11 +859,32 @@ rule "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After 
 end
 
 
-rule "COVID-19: If the first bivalent dose on >= 4/19/2023 after series completion was administered < 8 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval"
+rule "COVID-19: If the first or second bivalent dose on >= 4/19/2023 after series completion was administered < 4 weeks from the prior COVID-19 shot, include supplemental text regarding an 4 week minimum interval"
 		extends "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After Series Completion): If a shot is administered on >= 4/19/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 4/19/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	when
+		There is an administered shot $sameShotAsCurrentShot
+			- that is the same shot as $currentShot
+			- make note of the dose number as $doseNumberCurrentShot
+			- the numeric $doseNumberCurrentShot is <= 3
+		Confirm elapsed time between $priorShotDate and $currentShotDate < "4w"
+	then
+		Include Supplemental Text "The timing of the administration of this shot does not follow the guidelines regarding the minimum interval of 4 weeks." for Valid Shot $currentShot
+		Record that this dose rule was Processed for the TargetDose $currentShot
+        Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+
+rule "COVID-19: If the first or second bivalent dose on >= 4/19/2023 after series completion was administered >= 4 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval"
+		extends "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After Series Completion): If a shot is administered on >= 4/19/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 4/19/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	when
+		There is an administered shot $sameShotAsCurrentShot
+			- that is the same shot as $currentShot
+			- make note of the dose number as $doseNumberCurrentShot
+			- the numeric $doseNumberCurrentShot is >= 4
 		Confirm elapsed time between $priorShotDate and $currentShotDate < "8w"
 	then
 		Include Supplemental Text "The timing of the administration of this shot does not follow the guidelines regarding the minimum interval of 8 weeks." for Valid Shot $currentShot
@@ -1192,6 +1230,39 @@ end
 // If the shot is Valid and the series was not complete, mark the series complete.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+rule "COVID-19: If 2 or more bivalent doses were administered >= 6 months of age in the Moderna Product series, then the 3rd dose is not required and the series is complete"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	when
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19ModernaSeries"
+			- the series is not complete
+		The patient information $oEvaluatedPerson must be known to complete writing this rule
+			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
+		There is an Administered Shot $firstDose
+			- the Shot belongs to the Series $targetSeries
+			- that has already been evaluated and whose shot validity is VALID
+			- the dose number in the Series is == 1
+			- the administration date of the shot is >= $dtAtAge6m
+			- the vaccine administered a member of ("ICE229", "ICE230")
+		There is an Administered Shot $secondDose
+			- the Shot belongs to the Series $targetSeries
+			- that has already been evaluated and whose shot validity is VALID
+			- the dose number in the Series is == 2
+			- the administration date of the shot is >= $dtAtAge6m
+			- the vaccine administered a member of ("ICE229", "ICE230")
+		There does not exist an administered shot
+			- the Shot belongs to the Series $targetSeries
+			- that has already been evaluated
+			- the dose number in the Series is > 2
+	then
+		Mark the Series $targetSeries complete
+		/////// Refresh all Facts in the Series $targetSeries for evaluation
+		Record that this dose rule was Processed for the TargetDose $secondDose
+		Log that this dose rule fired for the dose $secondDose in the Series $targetSeries
+end
+
 
 rule "COVID-19: If 2 or more doses were administered >= 5 years of age in the Pfizer or Mixed Product series, then the 3rd dose is not required and the series is complete"
 	dialect "mvel"
@@ -1418,83 +1489,7 @@ rule "COVID-19: For patients >= 18 yrs of age, if shot in the Pfizer, Mixed Prod
 end
 
 
-rule "COVID-19: If a shot is administered in the Moderna series >= 4/19/2023 and dose 1 was administered at >= 6 years of age, the absolute minimum interval between dose 1 and dose 2 is 8 weeks- 4 days"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
-	activation-group "doseIntervalCheck"
-	when
-		There is an Administered Shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850" and the Series with name "COVID19ModernaSeries"
-			- the administered shot number is > 1
-			- the dose number in the series is == 2
-			- make note of the administered shot number as $administeredShotNumber
-			- make note of the date this shot was administered as $administrationDate
-			- the date $administrationDate >= "19-Apr-2023"
-			- make note of the associated series as $associatedTargetSeries
-		There is an Administered Shot $priorShot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated
-			- the administered shot number is == $administeredShotNumber-1
-			- make note of the date this shot was administered as $administrationDatePrior
-		There does not exist an Administered Shot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated
-			- the administered shot number is == $administeredShotNumber-1
-			- the administration date of the shot is > $administrationDatePrior
-		There is an Administered Shot $priorDose
-			- the shot belongs to the series $associatedTargetSeries
-			- the dose number in the series is == 1
-			- that has already been evaluated and whose shot validity is VALID
-			- make note of the date this shot was administered as $administrationDatePriorDose
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtDateAtAge6y when the patient is "6y" of age
-		Confirm the date $administrationDatePriorDose is on the same date or after $dtDateAtAge6y
-		Confirm elapsed time between $administrationDatePrior and $administrationDate < "8w-4d"
-	then
-		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
-		Record that this dose rule was Processed for the TargetDose $currentShot
-		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
-end
 
-
-rule "COVID-19: If a shot is administered in the Pfizer or Mixed Product series >= 4/19/2023 and dose 1 was administered at >= 5 years of age, the absolute minimum interval between dose 1 and dose 2 is 8 weeks- 4 days"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
-	activation-group "doseIntervalCheck"
-	when
-		There is an Administered Shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries")
-			- the administered shot number is > 1
-			- the dose number in the series is == 2
-			- make note of the administered shot number as $administeredShotNumber
-			- make note of the date this shot was administered as $administrationDate
-			- the date $administrationDate >= "19-Apr-2023"
-			- make note of the associated series as $associatedTargetSeries
-		There is an Administered Shot $priorShot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated
-			- the administered shot number is == $administeredShotNumber-1
-			- make note of the date this shot was administered as $administrationDatePrior
-		There does not exist an Administered Shot
-			- the shot belongs to the series $associatedTargetSeries
-			- that has already been evaluated
-			- the administered shot number is == $administeredShotNumber-1
-			- the administration date of the shot is > $administrationDatePrior
-		There is an Administered Shot $priorDose
-			- the shot belongs to the series $associatedTargetSeries
-			- the dose number in the series is == 1
-			- that has already been evaluated and whose shot validity is VALID
-			- make note of the date this shot was administered as $administrationDatePriorDose
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtDateAtAge5y when the patient is "5y" of age
-		Confirm the date $administrationDatePriorDose is on the same date or after $dtDateAtAge5y
-		Confirm elapsed time between $administrationDatePrior and $administrationDate < "8w-4d"
-	then
-		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
-		Record that this dose rule was Processed for the TargetDose $currentShot
-		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
-end
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Moderna: absolute minimum interval from a prior Moderna shot to the current shot is 24 days
@@ -1621,3 +1616,4 @@ end
  END If the patient receives a shot below the absolute minimum age, or below the absolute minimum interval prior to 10/25/2021, override vaccine minimum age and series intervals
  and evaluate the shot as Valid
 /************************************************************************************************************************************************************************************/
+
