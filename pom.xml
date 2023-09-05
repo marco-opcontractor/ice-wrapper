@@ -6,12 +6,12 @@
 
     <groupId>com.connexin.immunization</groupId>
     <artifactId>ice-wrapper</artifactId>
-    <version>1.5.0</version>
-
+    <version>1.6.1</version>
+  
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <kotlin.version>1.6.10</kotlin.version>
+        <kotlin.version>1.8.21</kotlin.version>
     </properties>
 
     <distributionManagement>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.redundent</groupId>
             <artifactId>kotlin-xml-builder</artifactId>
-            <version>1.7.4</version>
+            <version>1.9.0</version>
         </dependency>
         <!-- End Kotlin Dependencies -->
 
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.opencds</groupId>
             <artifactId>opencds-ice-service</artifactId>
-            <version>1.37.2.2</version>
+            <version>1.39.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.opencds</groupId>
@@ -147,20 +147,16 @@
                         </goals>
                         <configuration>
                             <target>
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.36.1.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.36.1" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.36.1.1.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.36.1.1" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.1.1.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.1.1" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.1.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.2.1" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.2.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.2.2" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.3.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.37.2.3" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.4.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.37.2.4" />
+                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.38.1.1.zip"
+                                     basedir="${project.basedir}/src/main/resources/rules/v1.38.1.1" />
+                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.1.1.zip"
+                                     basedir="${project.basedir}/src/main/resources/rules/v1.39.1.1" />
+                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.40.1.1.zip"
+                                     basedir="${project.basedir}/src/main/resources/rules/v1.40.1.1" />
                             </target>
                         </configuration>
                     </execution>
