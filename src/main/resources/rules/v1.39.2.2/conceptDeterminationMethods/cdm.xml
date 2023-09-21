@@ -1462,6 +1462,102 @@
 				<concept code="206" displayName="Monkeypox Smallpox (JYNNEOS), Vaccinia, live" />
 			</fromConcepts>
 		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="519" displayName="COVID-19, mRNA bivalent, Non-US (Spikevax Bivalent)" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE308" displayName="COVID-19, mRNA, 2023-2024 Formula, 6 mos-4 yrs, Pfizer" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="308" displayName="COVID-19, mRNA, 2023-2024 Formula, 6 mos-4 yrs, Pfizer" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE309" displayName="COVID-19, mRNA, 2023-2024 Formula, 12+ yrs, Pfizer" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="309" displayName="COVID-19, mRNA, 2023-2024 Formula, 12+ yrs, Pfizer" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE310" displayName="COVID-19, mRNA, 2023-2024 Formula, 5-11 yrs, Pfizer" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="310" displayName="COVID-19, mRNA, 2023-2024 Formula, 5-11 yrs, Pfizer" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE311" displayName="COVID-19, mRNA, 2023-2024 Formula, 6 mos-11 yrs, Moderna" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="311" displayName="COVID-19, mRNA, 2023-2024 Formula, 6 mos-11 yrs, Moderna" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE312" displayName="COVID-19, mRNA, 2023-2024 Formula, 12+ yrs, Moderna" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="312" displayName="COVID-19, mRNA, 2023-2024 Formula, 12+ yrs, Moderna" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+					   codeSystemName="OpenCDS concepts" code="ICE313" displayName="Novavax COVID-19 Vaccine, Adjuvanted" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+						  codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="313" displayName="Novavax COVID-19 Vaccine, Adjuvanted" />
+			</fromConcepts>
+		</conceptMapping>
 		<timestamp>2022-08-15T00:00:00.606-05:00</timestamp>
 		<userId>daryl</userId>
 	</conceptDeterminationMethod>
