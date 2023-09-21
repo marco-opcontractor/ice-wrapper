@@ -1008,7 +1008,7 @@ rule "COVID-19: If CVX 218, CVX 219, CVX 227, CVX 228, CVX 229, CVX 230, CVX 301
 	when
 		There is an administered shot $administeredShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the vaccine administered a member of  ("ICE218", "ICE219", "ICE227", "ICE228", "ICE229", "ICE230", "ICE301", "ICE302")
+			- the vaccine administered a member of  ("ICE218", "ICE219", "ICE227", "ICE228", "ICE229", "ICE230", "ICE301", "ICE302", "ICE308", "ICE310", "ICE311")
 			- that has already been evaluated and whose Shot Validity Status is not VALID
 			- the shot is not ignored
 			- make note of all evaluation reasons for this shot as $collectionOfStrReasons
