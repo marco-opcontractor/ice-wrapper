@@ -104,11 +104,11 @@ end
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-// START ACCEPTED vaccines for Fall 2023-2024 Season
-// Vaccines given on or after 9/12/2023 that are not in the Fall 2023-24 vaccine list always get evaluated as INVALID/VACCINE_NOT_APPROVED_IN_US_OR_BY_WHO.
+// START INVALID vaccines for Fall 2023-2024 Season
+// Vaccines given on or after 9/12/2023 that are not in the Fall 2023-24 vaccine list always get evaluated as INVALID/VACCINE_NO_LONGER_RECOMMENDED_ON_DATE_SPECIFIED.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19: If a vaccine that is not a Fall 2023-24 vaccine is given on or after 9/12/2023, and the series is not complete, evaluate it as INVALID/VACCINE_NOT_APPROVED_IN_US_OR_BY_WHO"
+rule "COVID-19: If a vaccine that is not a Fall 2023-24 vaccine is given on or after 9/12/2023, and the series is not complete, evaluate it as INVALID/VACCINE_NO_LONGER_RECOMMENDED_ON_DATE_SPECIFIED"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "allowableVaccineCheck"
@@ -120,13 +120,13 @@ rule "COVID-19: If a vaccine that is not a Fall 2023-24 vaccine is given on or a
 			- the series that the shot belongs to is not complete
 			- make note of the associated series as $targetSeries
 	then
-		Include the reason for shot $currentShot Invalid due to "Vaccine Not Approved for Use in the U.S. or by the WHO"
+		Include the reason for shot $currentShot Invalid due to "Vaccine no longer recommended on date specified."
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
 end
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-// END ACCEPTED vaccines in a wrong FDA-approved series
+// END INVALID vaccines for Fall 2023-2024 Season
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1029,8 +1029,7 @@ end
 // START- Fall 2023 Covid Shots
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-//6m to 4y received no Fall 2023 vaccine, so mark series incomplete
-rule "COVID-19: If the patient has not received a Fall 2023 vaccine at >= 6 months of age and the series is complete, mark the series not complete"
+rule "COVID-19: If the patient has not received a valid Fall 2023 vaccine and the series is complete, mark the series not complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
@@ -1042,18 +1041,9 @@ rule "COVID-19: If the patient has not received a Fall 2023 vaccine at >= 6 mont
 		There is a Series $targetSeries identified by $associatedTargetSeries
 			- the name of the Series a member of ("COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Janssen1DoseSeries")
 			- the series is complete
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
-			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
-		There is an Administered Shot $firstDose
-			- the Shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the dose number in the Series is == 1
-			- the administration date of the shot is >= $dtAtAge6m
-			- the administration date of the shot is < $dtAtAge5y
 		There does not exist an administered shot
 			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated
+			- that has already been evaluated and whose shot validity is VALID
 			- the vaccine administered a member of ("ICE308", "ICE309", "ICE310", "ICE311", "ICE312")
 			- the administration date of the shot is >= "12-Sep-2023"
 		There does not exist an administered shot
@@ -1066,72 +1056,9 @@ rule "COVID-19: If the patient has not received a Fall 2023 vaccine at >= 6 mont
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
-//5y to 11y received no Fall 2023 vaccine, so mark series incomplete
-rule "COVID-19: If the patient has not received a Fall 2023 vaccine at >= 5 years of age and < 12 years of age and the series is complete, mark the series not complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is an administered shot $currentShot
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- that has already been evaluated
-			- make note of the date this shot was administered as $currentShotDate
-			- make note of the associated series as $associatedTargetSeries
-		There is a Series $targetSeries identified by $associatedTargetSeries
-			- the name of the Series a member of ("COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Janssen1DoseSeries")
-			- the series is complete
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-		There does not exist an administered shot
-			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated
-			- the vaccine administered a member of ("ICE309", "ICE310", "ICE311", "ICE312")
-			- the administration date of the shot is >= "12-Sep-2023"
-		There does not exist an administered shot
-			- the shot belongs to the series $associatedTargetSeries
-			- the administration date of the shot is > $currentShotDate
-		Confirm the date evalTime is on the same date or after $dtAtAge5y
-		Confirm the date evalTime is before $dtAtAge12y
-	then
-		Manually Mark the Series $targetSeries Not Complete
-		/////// Refresh all Facts in the Series $targetSeries for evaluation
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
-
-//12y+ received no Fall 2023 vaccine, so mark series incomplete
-rule "COVID-19: If the patient has not received a Fall 2023 vaccine at >= 12 years of age and the series is complete, mark the series not complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is an administered shot $currentShot
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- that has already been evaluated
-			- make note of the date this shot was administered as $currentShotDate
-			- make note of the associated series as $associatedTargetSeries
-		There is a Series $targetSeries identified by $associatedTargetSeries
-			- the name of the Series a member of ("COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Janssen1DoseSeries")
-			- the series is complete
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-		There does not exist an administered shot
-			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated
-			- the vaccine administered a member of ("ICE309", "ICE312")
-			- the administration date of the shot is >= "12-Sep-2023"
-		There does not exist an administered shot
-			- the shot belongs to the series $associatedTargetSeries
-			- the administration date of the shot is > $currentShotDate
-		Confirm the date evalTime is on the same date or after $dtAtAge12y
-	then
-		Manually Mark the Series $targetSeries Not Complete
-		/////// Refresh all Facts in the Series $targetSeries for evaluation
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
 
 //Novavax series received no Fall 2023 vaccine or <3 Novavax vaccine, so mark series incomplete
-rule "COVID-19: If the patient has not received a Fall 2023 vaccine in the Novavax Series at >= 12 years of age and < 18 years of age and the series is complete, mark the series not complete"
+rule "COVID-19: If the patient has not received a Fall 2023 vaccine in the Novavax Series and the series is complete, mark the series not complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
@@ -1143,47 +1070,10 @@ rule "COVID-19: If the patient has not received a Fall 2023 vaccine in the Novav
 		There is a Series $targetSeries identified by $associatedTargetSeries
 			- the name of the Series is "COVID19Novavax2DoseSeries"
 			- the series is complete
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-			- make note of the date as $dtAtAge18y when the Patient is "18y" of age
 		There does not exist an administered shot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is >= 3
-			- the administration date of the shot is >= $dtAtAge12y
-			- the administration date of the shot is < $dtAtAge18y
-			- the vaccine administered a member of ("ICE309", "ICE312")
-			- the administration date of the shot is >= "12-Sep-2023"
-		There does not exist an administered shot
-			- the shot belongs to the series $associatedTargetSeries
-			- the administration date of the shot is > $currentShotDate
-	then
-		Manually Mark the Series $targetSeries Not Complete
-		/////// Refresh all Facts in the Series $targetSeries for evaluation
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
-
-//Novavax series received no Fall 2023 vaccine or <3 Novavax vaccine, so mark series incomplete
-rule "COVID-19: If the patient has not received a Fall 2023 vaccine OR 3 Novavax in the Novavax Series at >= 18 years of age and < 18 years of age and the series is complete, mark the series not complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is an administered shot $currentShot
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- that has already been evaluated
-			- make note of the date this shot was administered as $currentShotDate
-			- make note of the associated series as $associatedTargetSeries
-		There is a Series $targetSeries identified by $associatedTargetSeries
-			- the name of the Series is "COVID19Novavax2DoseSeries"
-			- the series is complete
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge18y when the Patient is "18y" of age
-		There does not exist an administered shot
-			- the Shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the dose number in the Series is >= 3
-			- the administration date of the shot is >= $dtAtAge18y
 			- the vaccine administered a member of ("ICE309", "ICE312", "ICE313")
 			- the administration date of the shot is >= "12-Sep-2023"
 		There does not exist an administered shot
