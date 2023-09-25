@@ -65,7 +65,7 @@ rule "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, 
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19ModernaSeries", "COVID19Novavax2DoseSeries")
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19ModernaSeries", "COVID19Novavax2DoseSeries", "COVID19Janssen1DoseSeries")
 			- the Series is not complete
 		There is an Administered Shot $firstDose
 			- the shot belongs to the series $targetSeries
@@ -104,7 +104,8 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 	then
 		Create a Recommendation as $r_interval for the Series $targetSeries
 		Add "3w" to $lastShotAdministeredDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r_interval to $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
+		Set the recommendation Recommended Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
 		Include the Recommendation $r_interval for Consideration in the final forecast of the Series
 		Create a Recommendation as $r_age for the Series $targetSeries
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge6m and "12-Sep-2023"
@@ -122,7 +123,7 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
-		There is a Series $pfizerSeries identified by $targetSeries
+		There is a Series $modernaSeries identified by $targetSeries
 			- the name of the Series is "COVID19ModernaSeries"
 		Confirm the variable $nNumberOfPreviousDoses is == 1 && the variable $nDosesAdministered2324 is == 0
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
@@ -133,7 +134,8 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 	then
 		Create a Recommendation as $r_interval for the Series $targetSeries
 		Add "4w" to $lastShotAdministeredDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r_interval to $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
+		Set the recommendation Recommended Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
 		Include the Recommendation $r_interval for Consideration in the final forecast of the Series
 		Create a Recommendation as $r_age for the Series $targetSeries
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge6m and "12-Sep-2023"
@@ -150,7 +152,7 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
-		There is a Series $pfizerSeries identified by $targetSeries
+		There is a Series $covidSeries identified by $targetSeries
 			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19ModernaSeries")
 		Confirm the variable $nNumberOfPreviousDoses is >= 2 && the variable $nDosesAdministered2324 is == 0
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
@@ -161,7 +163,8 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 	then
 		Create a Recommendation as $r_interval for the Series $targetSeries
 		Add "8w" to $lastShotAdministeredDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r_interval to $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
+		Set the recommendation Recommended Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
 		Include the Recommendation $r_interval for Consideration in the final forecast of the Series
 		Create a Recommendation as $r_age for the Series $targetSeries
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge6m and "12-Sep-2023"
@@ -179,7 +182,7 @@ rule "COVID-19: If the patient is >= 5 years of age and < 12 years of age and ha
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
-		There is a Series $pfizerSeries identified by $targetSeries
+		There is a Series $covidSeries identified by $targetSeries
 			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19ModernaSeries")
 		Confirm the variable $nNumberOfPreviousDoses is >= 1 && the variable $nDosesAdministered2324 is == 0
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
@@ -190,10 +193,11 @@ rule "COVID-19: If the patient is >= 5 years of age and < 12 years of age and ha
 	then
 		Create a Recommendation as $r_interval for the Series $targetSeries
 		Add "8w" to $lastShotAdministeredDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r_interval to $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
+		Set the recommendation Recommended Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
 		Include the Recommendation $r_interval for Consideration in the final forecast of the Series
 		Create a Recommendation as $r_age for the Series $targetSeries
-		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge5y and "12-Sep-2023"
+		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge12y and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
 		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
@@ -207,20 +211,21 @@ rule "COVID-19: If the patient is >= 12 years of age and has had 1 or more doses
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
-		There is a Series $pfizerSeries identified by $targetSeries
+		There is a Series $covidSeries identified by $targetSeries
 			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19ModernaSeries", "COVID19Novavax2DoseSeries", "COVID19Janssen1DoseSeries")
 		Confirm the variable $nNumberOfPreviousDoses is >= 1 && the variable $nDosesAdministered2324 is == 0
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
-			- make note of the date as $dtAtAge5y when the Patient is "12y" of age
+			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
 		Confirm Elapsed time between $dtBirthDate and $firstDoseDate >= "12y"
 	then
 		Create a Recommendation as $r_interval for the Series $targetSeries
 		Add "8w" to $lastShotAdministeredDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r_interval to $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
+		Set the recommendation Recommended Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
 		Include the Recommendation $r_interval for Consideration in the final forecast of the Series
 		Create a Recommendation as $r_age for the Series $targetSeries
-		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge5y and "12-Sep-2023"
+		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge12y and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
 		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
