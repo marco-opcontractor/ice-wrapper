@@ -197,7 +197,7 @@ rule "COVID-19: If the patient is >= 5 years of age and < 12 years of age and ha
 		Set the recommendation Recommended Forecast Date for $r_interval to the latter of $dtCalculated and "12-Sep-2023"
 		Include the Recommendation $r_interval for Consideration in the final forecast of the Series
 		Create a Recommendation as $r_age for the Series $targetSeries
-		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge12y and "12-Sep-2023"
+		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge5y and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
 		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
