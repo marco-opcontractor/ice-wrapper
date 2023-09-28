@@ -169,8 +169,6 @@ rule "COVID-19: If a 2023/2024 vaccine was administered prior to 9/12/2023, eval
 			- the administration date of the shot is < "12-Sep-2023"
 			- the vaccine administered a member of ("ICE308", "ICE309", "ICE310", "ICE311", "ICE312", "ICE313")
 			- make note of all evaluation reasons for this shot as $oEvaluationReasons
-			- the collection $oEvaluationReasons does not contain "EVALUATION_REASON_CONCEPT.EXTRA_DOSE"
-			- the collection $oEvaluationReasons does not contain "EVALUATION_REASON_CONCEPT.VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
 			- make note of the associated series as $associatedTargetSeries
 	then
 		Set the shot status of $currentShot to Invalid
@@ -198,6 +196,8 @@ rule "COVID-19: Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_DOSE for s
 			- the vaccine administered is not "ICE230"
 			- make note of the administered shot number as $shotNumber
 			- make note of the associated series as $associatedTargetSeries
+			- make note of the date this shot was administered as $currentShotDate
+			- the date $currentShotDate < "12-Sep-2023"
 		There is an IceFact $iceFact
 			- that has associated series $associatedTargetSeries
 			- that has associated administered shot $currentShot

@@ -88,7 +88,7 @@ rule "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, 
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and has had 1 dose of Pfizer and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 3 weeks along with recommendation reason ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and has had 1 dose of Pfizer and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 3 weeks along with recommendation reason ADMINISTER_2023_24_FORMULATION_COVID19"
 		extends "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, __Mixed Product__, __Moderna__, or __Novavax__ COVID-19 Series"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
@@ -111,14 +111,14 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge6m and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
-		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_24_FORMULATION_COVID19"
 		Include the Recommendation $rReason for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
 
-rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and has had 1 dose of Moderna and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 4 weeks along with recommendation reason ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and has had 1 dose of Moderna and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 4 weeks along with recommendation reason ADMINISTER_2023_24_FORMULATION_COVID19"
 		extends "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, __Mixed Product__, __Moderna__, or __Novavax__ COVID-19 Series"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
@@ -141,13 +141,13 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge6m and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
-		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_24_FORMULATION_COVID19"
 		Include the Recommendation $rReason for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and has had 2 or more doses of Moderna or Pfizer and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 8 weeks along with recommendation reason ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and has had 2 or more doses of Moderna or Pfizer and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 8 weeks along with recommendation reason ADMINISTER_2023_24_FORMULATION_COVID19"
 		extends "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, __Mixed Product__, __Moderna__, or __Novavax__ COVID-19 Series"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
@@ -170,14 +170,14 @@ rule "COVID-19: If the patient is >= 6 months of age and < 5 years of age and ha
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge6m and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
-		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_24_FORMULATION_COVID19"
 		Include the Recommendation $rReason for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
 
-rule "COVID-19: If the patient is >= 5 years of age and < 12 years of age and has had 1 or more doses of any mRNA and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 8 weeks along with recommendation reason ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+rule "COVID-19: If the patient is >= 5 years of age and < 12 years of age and has had 1 or more doses of any mRNA and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 8 weeks along with recommendation reason ADMINISTER_2023_24_FORMULATION_COVID19"
 		extends "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, __Mixed Product__, __Moderna__, or __Novavax__ COVID-19 Series"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
@@ -200,13 +200,13 @@ rule "COVID-19: If the patient is >= 5 years of age and < 12 years of age and ha
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge5y and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
-		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_24_FORMULATION_COVID19"
 		Include the Recommendation $rReason for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "COVID-19: If the patient is >= 12 years of age and has had 1 or more doses of any mRNA, Novavax, or Janssen and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 8 weeks along with recommendation reason ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+rule "COVID-19: If the patient is >= 12 years of age and has had 1 or more doses of any mRNA, Novavax, or Janssen and no 2023-2024 doses, recommend 2023-2024 vaccine and recommended interval of 8 weeks along with recommendation reason ADMINISTER_2023_24_FORMULATION_COVID19"
 		extends "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, __Mixed Product__, __Moderna__, or __Novavax__ COVID-19 Series"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
@@ -228,7 +228,7 @@ rule "COVID-19: If the patient is >= 12 years of age and has had 1 or more doses
 		Set the Recommendation Recommended Forecast Date for $r_age to the latter of $dtAtAge12y and "12-Sep-2023"
 		Include the Recommendation $r_age for Consideration in the final forecast of the Series
 		Create a recommendation as $rReason for the Series $targetSeries
-		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+		Set the Recommendation Reason for $rReason to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_24_FORMULATION_COVID19"
 		Include the Recommendation $rReason for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
@@ -276,7 +276,7 @@ end
 // postCustomRecommendation checks for FDA-approved or WHO-approved series
 //////////////
 
-rule "COVID-19: If a dose is recommended in the Pfizer, Mixed Product, Moderna, Janssen or Novavax series add the recommendation reason ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+rule "COVID-19: If a dose is recommended in the Pfizer, Mixed Product, Moderna, Janssen or Novavax series add the recommendation reason ADMINISTER_2023_24_FORMULATION_COVID19"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	when
 		There is a Series $targetSeries
@@ -286,7 +286,7 @@ rule "COVID-19: If a dose is recommended in the Pfizer, Mixed Product, Moderna, 
 			- post processing on the Series forecast has not already been run
 	then
 		Create a Recommendation as $recommendation for the Series $targetSeries
-		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE"
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_2023_24_FORMULATION_COVID19"
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
