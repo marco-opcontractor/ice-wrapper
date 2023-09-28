@@ -82,7 +82,7 @@ rule "COVID-19(Abstract): Determine recommendation for not complete __Pfizer__, 
 			- that has already been evaluated
 			- the shot is not ignored
 			- the administration date of the shot is > $lastShotAdministeredDate
-		Make note of the number of doses administered $doseAccumulationPrevious in Series $targetSeries as $nNumberOfPreviousDoses where administration date < "12-Sep-2023" with vaccine a member of ("ICE207", "ICE208", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520")
+		Make note of the number of doses administered $doseAccumulationPrevious in Series $targetSeries as $nNumberOfPreviousDoses where administration date < "12-Sep-2023" with vaccine a member of ("ICE207", "ICE208", "ICE211", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520")
 		Make note of the number of doses administered $doseAccumulation2324 in Series $targetSeries as $nDosesAdministered2324 where administration date >= "12-Sep-2023" with vaccine a member of ("ICE308", "ICE309", "ICE310", "ICE311", "ICE312", "ICE313")
 	then
 		Log that this Series Rule fired for the Series $targetSeries
