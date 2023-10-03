@@ -76,7 +76,7 @@
         <cdsListItemValue>Administer COVID-19 Bivalent Vaccine</cdsListItemValue>
     </cdsListItem>
     <cdsListItem>
-        <cdsListItemKey>ADMINISTER_2023_2024_FORMULATION_COVID19_VACCINE</cdsListItemKey>
+        <cdsListItemKey>ADMINISTER_2023_24_FORMULATION_COVID19</cdsListItemKey>
         <cdsListItemValue>2023-2024 Formulation of Covid19 vaccine should be administered.</cdsListItemValue>
     </cdsListItem>
    <cdsVersion>gov.nyc.cir^ICE^1.0.0</cdsVersion>
