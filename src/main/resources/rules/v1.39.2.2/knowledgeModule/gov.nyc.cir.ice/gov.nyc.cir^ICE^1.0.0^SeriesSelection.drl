@@ -927,26 +927,7 @@ end
 // This is the only way a non-FDA, WHO-approved series can be selected (it must be complete).
 // If there is more than one series that has been complete, this rule picks one of them, and the general rules will pick the earliest completed.
 ///////// ***
-rule "SeriesSelection(COVID-19): Select already _completed_ series if a different, _incomplete_ series was previously selected"
-	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 5
-	when
-		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS)
-		$ts1 : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, isSeriesComplete() == false) 
-		$ts2 : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == false, isSeriesComplete() == true) 
-	then
-		String _RULENAME = kcontext.rule.name;
-		$ts1.setSelectedSeries(false);
-		$ts2.setSelectedSeries(true);
-		$tss.setSelectedSeriesName($ts2.seriesName);
-		// Do not mark it complete, in case there is another a series that was completed earlier than this one - rather, place it into post-processing
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Previously Selected TargetSeries Reverted. Newly selected series: " + $ts2);
-		update($tss);
-		update($ts1);
-		update($ts2);
-end
+
 
 
 rule "SeriesSelection(COVID-19): If the earliest, non-NOS (Valid) _dose_ was not found in the Pfizer, Moderna, Mixed Product or Janssen series (see related rules), then select the another (i.e. - WHO series) that has the earliest, non-NOS (Valid) _dose_ administered to it"
