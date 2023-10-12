@@ -199,7 +199,6 @@ rule "COVID-19: Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_DOSE for s
 			- make note of the administered shot number as $shotNumber
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
-			- the date $currentShotDate < "12-Sep-2023"
 		There is an IceFact $iceFact
 			- that has associated series $associatedTargetSeries
 			- that has associated administered shot $currentShot
@@ -1041,6 +1040,7 @@ rule "COVID-19: If the patient has not received a valid Fall 2023 vaccine and th
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
 		There is a Series $targetSeries identified by $associatedTargetSeries
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
 			- the series is complete
 		There does not exist an administered shot
 			- the shot belongs to the Series $targetSeries
@@ -1100,23 +1100,23 @@ rule "COVID-19: If the patient received a (valid) dose of cvx 308 in the Pfizer 
 		There is an Administered Shot $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE308"
+			- the vaccine administered a member of ("ICE308", "ICE309", "ICE310")
 			- the administration date of the shot is >= "12-Sep-2023"
+		The patient information $oEvaluatedPerson must be known to complete writing this rule
+			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
+			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
 		There is an Administered Shot $firstDose
 			- that is not the same shot as $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 1
+			- the administration date of the shot is >= $dtAtAge6m
+			- the administration date of the shot is < $dtAtAge5y
 		There is an Administered Shot $secondDose
 			- that is not the same shot as $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 2
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
-		There is an Administered Shot $validShotSame
-			- that is the same shot as $validShot
-			- the administration date of the shot is >= $dtAtAge6m
 	then
 		Mark the Series $targetSeries complete
 		/////// Refresh all Facts in the Series $targetSeries for evaluation
@@ -1125,28 +1125,25 @@ rule "COVID-19: If the patient received a (valid) dose of cvx 308 in the Pfizer 
 end
 
 
-rule "COVID-19: If the patient received a (valid) dose of ICE310 in the Pfizer series on >= 9/12/2023, with dose #1 of the series received at >= 5 years of age AND < 12 years of age, and the series is not complete, mark the series is complete"
+rule "COVID-19: If the patient age 5 years or older received a (valid) dose in the Pfizer, Moderna, or Mixed Product series on >= 9/12/2023 and the series is not complete, mark the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19PfizerSeries"
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
 			- the series is not complete
 		There is an Administered Shot $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE310"
 			- the administration date of the shot is >= "12-Sep-2023"
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
 		There is an Administered Shot $firstDose
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 1
 			- the administration date of the shot is >= $dtAtAge5y
-			- the administration date of the shot is < $dtAtAge12y
 	then
 		Mark the Series $targetSeries complete
 		/////// Refresh all Facts in the Series $targetSeries for evaluation
@@ -1155,30 +1152,6 @@ rule "COVID-19: If the patient received a (valid) dose of ICE310 in the Pfizer s
 end
 
 
-rule "COVID-19: If the patient received a (valid) dose of ICE309 in the Pfizer series at >= 12 years of age on >= 9/12/2023 and the series is not complete, mark the series is complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19PfizerSeries"
-			- the series is not complete
-		There is an Administered Shot $validShot
-			- the Shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE309"
-			- the administration date of the shot is >= "12-Sep-2023"
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-		There is an Administered Shot $validShotSame
-			- that is the same shot as $validShot
-			- the administration date of the shot is >= $dtAtAge12y
-	then
-		Mark the Series $targetSeries complete
-		/////// Refresh all Facts in the Series $targetSeries for evaluation
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
 
 
 //Moderna 6m to 4y - this rule should cover all situations, regardless of how many previous Moderna shots have been received, i.e. patient has received 2 valid Moderna shots, with at least one being ICE311 after 9/11/23
@@ -1193,19 +1166,18 @@ rule "COVID-19: If the patient received a (valid) dose of ICE311 in the Moderna 
 		There is an Administered Shot $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE311"
+			- the vaccine administered a member of ("ICE311", "ICE312")
 			- the administration date of the shot is >= "12-Sep-2023"
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
+			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
 		There is an Administered Shot $firstDose
 			- that is not the same shot as $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 1
 			- the administration date of the shot is >= $dtAtAge6m
-		There is an Administered Shot $validShotSame
-			- that is the same shot as $validShot
-			- the administration date of the shot is >= $dtAtAge6m
+			- the administration date of the shot is < $dtAtAge5y
 	then
 		Mark the Series $targetSeries complete
 		/////// Refresh all Facts in the Series $targetSeries for evaluation
@@ -1213,54 +1185,38 @@ rule "COVID-19: If the patient received a (valid) dose of ICE311 in the Moderna 
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "COVID-19: If the patient received a (valid) dose of ICE311 in the Moderna series on >= 9/12/2023, at >= 5 years of age and <12 years of age, and the series is not complete, mark the series is complete"
+
+
+
+//Mixed-Prodcut Series 6m to 4y - this rule should cover all situations, regardless of how many previous Moderna/Pfizer shots have been received.
+rule "COVID-19: If the patient received a (valid) dose of "ICE308", "ICE309", "ICE310", "ICE311", or "ICE312" in the Mixed Product series at >= 6 months of age on >= 9/12/2023 and had >=2 valid doses of Moderna or Pfizer and the series is not complete, mark the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19ModernaSeries"
+			- the name of the Series is "COVID19MixedProductSeries"
 			- the series is not complete
 		There is an Administered Shot $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE311"
+			- the vaccine administered a member of ("ICE308", "ICE309", "ICE310", "ICE311", "ICE312")
 			- the administration date of the shot is >= "12-Sep-2023"
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
+			- make note of the date as $dtAtAge6m when the Patient is "6m" of age
 			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
 		There is an Administered Shot $firstDose
+			- that is not the same shot as $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the dose number in the Series is == 1
-			- the administration date of the shot is >= $dtAtAge5y
-			- the administration date of the shot is < $dtAtAge12y
-	then
-		Mark the Series $targetSeries complete
-		/////// Refresh all Facts in the Series $targetSeries for evaluation
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-rule "COVID-19: If the patient received a (valid) dose of ICE312 in the Moderna series at >= 12 years of age on >= 9/12/2023 and the series is not complete, mark the series is complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19ModernaSeries"
-			- the series is not complete
-		There is an Administered Shot $validShot
+			- the administration date of the shot is >= $dtAtAge6m
+			- the administration date of the shot is < $dtAtAge5y
+		There is an Administered Shot $secondDose
+			- that is not the same shot as $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE312"
-			- the administration date of the shot is >= "12-Sep-2023"
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-		There is an Administered Shot $validShotSame
-			- that is the same shot as $validShot
-			- the administration date of the shot is >= $dtAtAge12y
+			- the dose number in the Series is == 2
 	then
 		Mark the Series $targetSeries complete
 		/////// Refresh all Facts in the Series $targetSeries for evaluation
@@ -1269,86 +1225,7 @@ rule "COVID-19: If the patient received a (valid) dose of ICE312 in the Moderna 
 end
 
 
-rule "COVID-19: If the patient received a (valid) dose of _any_ vaccine allowed in the Mixed Product series at >= 5 years of age and < 12 years of age, the series is not complete, and the shot was administered >= 9/12/2023, mark the series is complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19MixedProductSeries"
-			- the series is not complete
-		There is an Administered Shot $validShot
-			- the Shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the administration date of the shot is >= "12-Sep-2023"
-			- the vaccine administered a member of ("ICE309", "ICE310", "ICE311", "ICE312")
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-		There is an Administered Shot $validShotSame
-			- that is the same shot as $validShot
-			- the administration date of the shot is >= $dtAtAge5y
-			- the administration date of the shot is < $dtAtAge12y
-	then
-		Mark the Series $targetSeries complete
-		/////// Refresh all Facts in the Series $targetSeries for evaluation
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
 
-rule "COVID-19: If the patient received a (valid) dose ICE309 or ICE312 in the Mixed Product series at >= 12 years of age, the series is not complete, and the shot was administered >= 9/12/2023, mark the series is complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19MixedProductSeries"
-			- the series is not complete
-		There is an Administered Shot $validShot
-			- the Shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the administration date of the shot is >= "12-Sep-2023"
-			- the vaccine administered a member of ("ICE309", "ICE312")
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-			- make note of the date as $dtAtAge12y when the Patient is "12y" of age
-		There is an Administered Shot $validShotSame
-			- that is the same shot as $validShot
-			- the administration date of the shot is >= $dtAtAge12y
-	then
-		Mark the Series $targetSeries complete
-		/////// Refresh all Facts in the Series $targetSeries for evaluation
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-
-end
-
-rule "COVID-19: Supplemental Text- If a Fall 2023 shot is administered >= 09/12/2023  < 8 weeks after prior dose, include supplemental text that follows guidelines regarding minimum ages/intervals"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the series is complete
-		There is an administered shot $administeredShot
-			- the shot belongs to the series $targetSeries
-			- that has already been evaluated and whose Shot Validity Status is VALID
-			- the administration date of the shot is >= "12-Sep-2023"
-			- make note of the date this shot was administered as $currentShotDate
-			- make note of the associated series as $associatedTargetSeries
-		There is an administered shot $priorShot
-			- the shot belongs to the series $targetSeries
-			- the administration date of the shot is < $currentShotDate
-			- make note of the date this shot was administered as $priorShotDate
-		There does not exist an administered shot
-			- the shot belongs to the series $targetSeries
-			- the administration date of the shot is > $priorShotDate
-			- the administration date of the shot is < $currentShotDate
-		Confirm elapsed time between $priorShotDate and $currentShotDate < "8w"
-	then
-		Include Supplemental Text "The timing of the administration of this shot does not follow the guidelines regarding the minimum interval of 8 weeks required for the 1st Booster Dose." for Valid Shot $administeredShot
-		Record that this dose rule was Processed for the TargetDose $administeredShot
-        Log that this dose rule fired for the dose $administeredShot in the Series $targetSeries
-end
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // END- Fall 2023 Covid Shots
