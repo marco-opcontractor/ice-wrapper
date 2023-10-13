@@ -1189,7 +1189,7 @@ end
 
 
 //Mixed-Prodcut Series 6m to 4y - this rule should cover all situations, regardless of how many previous Moderna/Pfizer shots have been received.
-rule "COVID-19: If the patient received a (valid) dose of "ICE308", "ICE309", "ICE310", "ICE311", or "ICE312" in the Mixed Product series at >= 6 months of age on >= 9/12/2023 and had >=2 valid doses of Moderna or Pfizer and the series is not complete, mark the series is complete"
+rule "COVID-19: If the patient received a (valid) dose of ICE308, ICE309, ICE310, ICE311, or ICE312 in the Mixed Product series at >= 6 months of age on >= 9/12/2023 and had >=2 valid doses of Moderna or Pfizer and the series is not complete, mark the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
