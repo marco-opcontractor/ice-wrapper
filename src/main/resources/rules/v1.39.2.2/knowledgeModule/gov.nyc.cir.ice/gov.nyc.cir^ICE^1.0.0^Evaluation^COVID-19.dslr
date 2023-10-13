@@ -1124,8 +1124,8 @@ rule "COVID-19: If the patient received a (valid) dose of cvx 308 in the Pfizer 
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
-
-rule "COVID-19: If the patient age 5 years or older received a (valid) dose in the Pfizer, Moderna, or Mixed Product series on >= 9/12/2023 and the series is not complete, mark the series is complete"
+//Novavax will be in Mixed Product Series because a Pfizer or Moderna must be given to complete the series.
+rule "COVID-19: If the patient age 5 years or older received a (valid) Pfizer or Moderna fall 2023 dose in the Pfizer, Moderna, or Mixed Product series on >= 9/12/2023 and the series is not complete, mark the series is complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	when
@@ -1136,6 +1136,7 @@ rule "COVID-19: If the patient age 5 years or older received a (valid) dose in t
 		There is an Administered Shot $validShot
 			- the Shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
+			- the vaccine administered a member of ("ICE309", "ICE310", "ICE311", "ICE312")
 			- the administration date of the shot is >= "12-Sep-2023"
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the date as $dtAtAge5y when the Patient is "5y" of age
