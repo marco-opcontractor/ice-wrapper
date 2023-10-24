@@ -469,7 +469,7 @@ rule "Pneumococcal Child Series: Recommend PCV13 dose if series complete if no p
 			- the effective dose number in the Series is == 5
 			- the Number of Administered Shots is > 0
 			- make note of the date that the most recent shot was administered as $shotDate			
-		Verify that the Count of Doses Administered in Series $targetSeries with Vaccine a member of ("ICE133","ICE215") is == 0 
+		Verify that the Count of Doses Administered in Series $targetSeries with Vaccine a member of ("ICE133", "ICE215", "ICE216") is == 0 
 		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
 		Confirm elapsed time between $dtBirthDate and evalTime < "5y"
@@ -512,7 +512,7 @@ rule "Pneumococcal Child Series: if patient < 5yrs completed the Child series (i
 			- the effective dose number in the Series is > 4
 		There is an administered shot $shot
 			- the shot belongs to the Series $targetSeries
-			- the vaccine administered a member of ("ICE133", "ICE215")
+			- the vaccine administered a member of ("ICE133", "ICE215", "ICE216")
 			- that has already been evaluated and whose Shot Validity is VALID
 		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
@@ -806,7 +806,7 @@ rule "Pneumococcal Adult Series: Set Recommendation Date to 65y and Skip Dose to
 			- the shot belongs to the Series $targetSeries
 			- the dose number in the Series is <= 6
 			- that has already been evaluated and whose shot validity is VALID or ACCEPTED
-			- the vaccine administered a member of ("ICE133", "ICE215")
+			- the vaccine administered a member of ("ICE133", "ICE215", "ICE216")
 		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
 			- make note of the date as $dtDateAtAgeSixtyFiveYears when the Patient is "65y" of age					
@@ -836,7 +836,7 @@ rule "Pneumococcal Adult Series: Set Recommendation Date to 65y and Skip Dose to
 			- the shot belongs to the Series $targetSeries
 			- the dose number in the Series is <= 6
 			- that has already been evaluated and whose shot validity is VALID or ACCEPTED
-			- the vaccine administered a member of ("ICE133", "ICE215")
+			- the vaccine administered a member of ("ICE133", "ICE215", "ICE216")
 		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
 			- make note of the date as $dtDateAtAgeSixtyFiveYears when the Patient is "65y" of age					
