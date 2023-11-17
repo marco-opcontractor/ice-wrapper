@@ -79,6 +79,10 @@
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="216" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal conjugate PCV20"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="109" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal NOS"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
@@ -103,6 +107,10 @@
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="215" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal conjugate PCV15"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="216" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal conjugate PCV20"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
@@ -133,6 +141,10 @@
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="216" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal conjugate PCV20"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="109" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal NOS"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
@@ -160,6 +172,10 @@
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="216" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal conjugate PCV20"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="109" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal NOS"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
@@ -177,6 +193,10 @@
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="215" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal conjugate PCV15"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="216" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="pneumococcal conjugate PCV20"/>
         </ns2:doseVaccine>
     </ns2:iceSeriesDose>    
 	<ns2:iceSeriesDose>
