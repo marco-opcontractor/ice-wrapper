@@ -147,12 +147,6 @@
                         </goals>
                         <configuration>
                             <target>
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.3.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.2.3" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.4.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.2.4" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.38.1.1.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.38.1.1" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.1.1.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.39.1.1" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.2.1.zip"
