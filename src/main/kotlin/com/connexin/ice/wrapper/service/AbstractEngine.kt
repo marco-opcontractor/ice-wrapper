@@ -6,10 +6,19 @@ import org.springframework.xml.transform.StringSource
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 
+/**
+ * An abstract class representing an engine for converting a [VaccineReport] to a [VMR] model.
+ */
 abstract class AbstractEngine() {
 
     private val context = JAXBContext.newInstance(CDSInput::class.java);
 
+    /**
+     * Converts a [VaccineReport] object to a [VMR] object.
+     *
+     * @param vaccineReport The [VaccineReport] object to be converted.
+     * @return The converted [VMR] object.
+     */
     protected fun convertToIceModel(vaccineReport: VaccineReport): VMR {
         val obs = mutableListOf<VMRObservationResult>()
         val imms = mutableListOf<VMRImmunizationEvent>()

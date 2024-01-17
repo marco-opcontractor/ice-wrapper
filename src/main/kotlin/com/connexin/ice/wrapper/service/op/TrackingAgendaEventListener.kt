@@ -5,6 +5,9 @@ import org.kie.api.event.rule.DefaultAgendaEventListener
 import org.kie.api.runtime.rule.Match
 import org.slf4j.LoggerFactory
 
+/**
+ * A class that tracks the agenda events fired during drools execution.
+ */
 class TrackingAgendaEventListener() : DefaultAgendaEventListener() {
     private val matchList: MutableList<Match> = ArrayList<Match>()
 

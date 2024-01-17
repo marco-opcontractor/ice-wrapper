@@ -13,6 +13,12 @@ import org.opencds.config.api.model.impl.SSIdImpl
 import org.slf4j.LoggerFactory
 import java.util.*
 
+/**
+ * The IceEngine class is responsible for evaluating vaccines based on a given VaccineReport using the ICE decision engine.
+ *
+ * @param adapter The ICEDecisionEngineDSS7EvaluationAdapter used for evaluating the vaccines.
+ * @param knowledgeRepository The KnowledgeRepository used for retrieving facts and knowledge modules.
+ */
 class IceEngine(private val adapter: ICEDecisionEngineDSS7EvaluationAdapter,
                 private val knowledgeRepository: KnowledgeRepository) : IEngine, AbstractEngine(){
 

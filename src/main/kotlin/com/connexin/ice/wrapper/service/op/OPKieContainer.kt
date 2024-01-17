@@ -112,6 +112,15 @@ class OPKieContainer {
         return kie
     }
 
+    /**
+     * Retrieves the list of rules files to add to the knowledge base.
+     *
+     * @param pRequestedKmId The ID of the requested KM.
+     * @param pDSLRFileDirectory The directory where the DSLR files are located.
+     * @param pFilesToExcludeFromKB The list of files to exclude from the knowledge base.
+     * @return The list of DSLR files to add to the knowledge base.
+     * @throws MissingKnowledgeCommonDirectoryException If the DSLR file directory is missing or not a directory.
+     */
     private fun getRules(pRequestedKmId:String, pDSLRFileDirectory: File?, pFilesToExcludeFromKB:List<File>):List<File>{
 
         if (pDSLRFileDirectory == null || !pDSLRFileDirectory.exists() || !pDSLRFileDirectory.isDirectory) {

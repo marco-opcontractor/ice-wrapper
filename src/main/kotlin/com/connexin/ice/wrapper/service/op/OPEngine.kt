@@ -54,6 +54,12 @@ class OPEngine(private val kieContainer: KieContainer,
         File(commonModuleDirectory)
     )
 
+    /**
+     * Evaluates the given vaccine report and returns the evaluation result.
+     *
+     * @param vaccineReport The vaccine report to be evaluated.
+     * @return The evaluation result as a mutable map with string keys and mutable list values.
+     */
     override fun evaluateRaw(vaccineReport: VaccineReport):  MutableMap<String, MutableList<*>> {
         log.info("Evaluating vaccine report with vaccine count:{} indicator: {} for gender {} and birthdate:{}",
             vaccineReport.vaccines.size,vaccineReport.indicators.size,vaccineReport.gender,vaccineReport.dateOfBirth)
@@ -108,6 +114,13 @@ class OPEngine(private val kieContainer: KieContainer,
         return convertExecutionResult(result,namedObject.toMap())
     }
 
+    /**
+     * Converts the execution results and named objects into a mutable map.
+     *
+     * @param results The execution results containing the original objects passed in via CMD.
+     * @param namedObjects The map of named objects returned by the rules.
+     * @return The converted result as a mutable map with string keys and mutable list values.
+     */
     private fun convertExecutionResult(results: ExecutionResults, namedObjects: Map<String, Any>): MutableMap<String, MutableList<*>> {
         val resultFactLists = mutableMapOf<String, MutableList<*>>()
 
@@ -148,6 +161,14 @@ class OPEngine(private val kieContainer: KieContainer,
         return resultFactLists
     }
 
+    /**
+     * Builds a map of facts for evaluation.
+     *
+     * @param report The vaccine report.
+     * @param evalTime The evaluation time.
+     * @param payload The payload containing the CDSInput.
+     * @return A map of facts where the key is the class type and the value is a list of instances of that class type.
+     */
     private fun buildFactList(report:VaccineReport, evalTime: Date, payload: JAXBElement<CDSInput>):Map<Class<*>,List<*>>{
         //Avoid using the MappingUtility where possible, its fine to use it as static, but it has stateful fields which can cause a lot of issues.
 
@@ -220,6 +241,14 @@ class OPEngine(private val kieContainer: KieContainer,
     }
 
 
+    /**
+     * Retrieves a list of age facts for a person at a specific evaluation time.
+     *
+     * @param birthTime The birth date of the person.
+     * @param evalTime The evaluation time.
+     * @param personId The ID of the person.
+     * @return A list of EvaluatedPersonAgeAtEvalTime objects representing the person's age at the evaluation time.
+     */
     private fun getAgeFacts(birthTime : LocalDate, evalTime: LocalDateTime, personId:String):List<EvaluatedPersonAgeAtEvalTime>{
 
         return listOf(
@@ -248,6 +277,14 @@ class OPEngine(private val kieContainer: KieContainer,
 
     }
 
+    /**
+     * Builds an EvaluatedPersonAgeAtEvalTime object representing a person's age at the evaluation time.
+     *
+     * @param value The age value.
+     * @param ageUnit The age unit.
+     * @param personId The ID of the person.
+     * @return An EvaluatedPersonAgeAtEvalTime object representing the person's age at the evaluation time.
+     */
     private fun buildAgeFact(value:Int,ageUnit:String, personId:String): EvaluatedPersonAgeAtEvalTime {
         val personAgeInUnit = EvaluatedPersonAgeAtEvalTime()
         personAgeInUnit.age = value

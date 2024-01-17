@@ -10,6 +10,12 @@ object Engine {
     private val tempDirectory =  System.getProperty("java.io.tmpdir")
     private val separator = System.getProperty("file.separator")
 
+    /**
+     * Creates an instance of the OP Engine.
+     * @param rulesVersion The version of the rules to be used.
+     * @param enableDebugLogging Whether to enable debug logging. Default value is false.
+     * @return An instance of the OP Engine.
+     */
     fun createOpEngine(rulesVersion:String,enableDebugLogging:Boolean=false):IEngine{
         val rules = if(!rulesVersion.startsWith("v")){
             "v${rulesVersion}"
