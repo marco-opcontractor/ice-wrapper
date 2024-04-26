@@ -40,7 +40,7 @@ abstract class AbstractEngine() {
             obs.add(
                 VMRObservationResult(it.code,it.system,
                      when(it.interpretation){
-                        Interpretation.REFUSED,Interpretation.IS_IMMUNE -> ObservationConcept.PROOF_OF_IMMUNITY
+                        Interpretation.REFUSED,Interpretation.IS_IMMUNE,Interpretation.DEFERRED -> ObservationConcept.PROOF_OF_IMMUNITY
                         Interpretation.DISEASE -> ObservationConcept.DISEASE_DOCUMENTED
                     },it.interpretation,it.date)
             )
