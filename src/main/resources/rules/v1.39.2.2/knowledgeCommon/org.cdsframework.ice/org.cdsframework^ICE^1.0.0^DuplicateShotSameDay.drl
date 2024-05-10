@@ -59,7 +59,7 @@ rule "Duplicate Shots/Same Day Overview Rule #1: If both shots are of the same C
 	auto-focus true
 	when
 		// All valid duplicate, valid shots on same day have the same CVX code
-		$td: TargetDose(hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false)
+		$td: TargetDose(hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, administeredVaccine.isCombinationVaccine() == false, administeredVaccine.cdsConceptName not in ("ICE316"))
 		$tdother : TargetDose(this != $td, administrationDate == $td.administrationDate, hasBeenEvaluated == true, status == DoseStatus.VALID, isDoseStatusOverridden() == false, associatedTargetSeries == $td.associatedTargetSeries, 
 			administeredVaccine.cdsConceptName == $td.administeredVaccine.cdsConceptName, doseNumberInSeries == $td.doseNumberInSeries, administeredShotNumberInSeries > $td.administeredShotNumberInSeries,
 			isDuplicateShotSameDayCheckCompleted() == false || $td.isDuplicateShotSameDayCheckCompleted() == false)
