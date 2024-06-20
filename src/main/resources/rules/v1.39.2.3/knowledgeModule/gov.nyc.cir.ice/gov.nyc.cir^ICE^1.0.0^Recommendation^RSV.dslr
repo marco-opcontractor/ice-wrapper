@@ -40,48 +40,274 @@ import org.cdsframework.ice.util.TimePeriod
 import org.cdsframework.ice.util.TimePeriod.DurationType
 
 global java.util.Date evalTime
+global org.joda.time.MonthDay rsvSeasonStartMonthDay
+global org.joda.time.MonthDay rsvSeasonEndMonthDay
 
 expander ../../knowledgeCommon/org.cdsframework.ice/org.cdsframework^ICE^1.0.0.dsl
 
-// If the patient is currently >2 months, 0 days, or will be >2 months, 0 days __as of the recommended date due__, then RSV is not recommended, and the reason is Too_Old
+// If the patient is currently >2 years, 0 days, or will be >2 years, 0 days __as of the recommended date due__, then RSV is not recommended, and the reason is Too_Old
 // (display text: "Not recommended at this age").
-rule "RSV: Series is Complete if Over 2 Years of Age or Will Be as of the Routine Recommendation Date"
+rule "RSV: No longer recommend RSV Immunization starting 20 months old if no doses were given this season"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	activation-group "RSVCustomRecommendation"
+	salience 75
 	when
 		There is a Series $targetSeries
 			- a forecast for the Series has been made and a recommendation date has been determined
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
-			- make note of the recommendation date as $recommendationDate
 			- post processing on the Series forecast has not already been run
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthDate
-		Confirm elapsed time between $birthDate and evalTime > "2y0d" || elapsed time between $birthDate and $recommendationDate > "2y0d"
+		Confirm elapsed time between $birthDate and evalTime >= "20m"
 	then
 		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
 		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.TOO_OLD"
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
 		Mark the Series $targetSeries Complete
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "RSV: If the patient < 2yrs and no doses on record, recommendation is CONDITIONAL/HIGH_RISK"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+rule "RSV: Bypass No longer recommend RSV Immunization starting 20 months old if no doses were given this season when Synagis was given on same season"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	activation-group "RSVCustomRecommendation"
+	salience 100
 	when
-		There is a Series $targetSeries that needs forecasting
+		There is a Series $evaluatedTargetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
-			- the number of doses administered is == 0
+			- post processing on the Series forecast has not already been run
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
 		The Patient information $patientInfo must be known to complete writing this rule
-			- make note of the Patient's birthdate as $birthdate
-		Confirm elapsed time between $birthdate and evalTime < "2y"
+			- make note of the Patient's birthdate as $birthDate
+		There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+			- the vaccine administered a member of ("ICE93", "ICE71")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - make note of the date this shot was administered as $latestShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    There does not exist an administered shot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+			- the vaccine administered a member of ("ICE93", "ICE71")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the administration date of the shot is > $latestShotAdministrationDate
+    The Given date evalTime falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+		Confirm elapsed time between $latestShotAdministrationDate and evalTime < "6m"
+		Confirm elapsed time between $birthDate and evalTime < "2y0d"
+	then
+		Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $evaluatedTargetSeries
+    Log that this Series Rule fired for the Series $evaluatedTargetSeries
+end
+
+
+rule "RSV: When off-season, by default set high-risk complete"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 0
+	activation-group "RSVCustomRecommendation"
+	when
+		There is a Series $targetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- post processing on the Series forecast has not already been run
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+    The Given date evalTime does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
 	then
 		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
-		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.HIGH_RISK"
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE_HIGH_RISK"
 		Set the recommendation Earliest Forecast Date for $recommendation to evalTime
 		Set the recommendation Recommended Forecast Date for $recommendation to evalTime
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV: If baby was born off-season and we are evaluating on first 6 months, it is always 1st season forecasting"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 20
+	activation-group "RSVCustomRecommendation"
+	when
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		There is a Series $targetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- post processing on the Series forecast has not already been run
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+    The Given date $birthdate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+		Confirm elapsed time between $birthdate and evalTime <= "6m"
+	then
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
+
+rule "RSV: If baby was born on-season and we are evaluating on first 6 months, if we are on-season keep recommending"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 20
+	activation-group "RSVCustomRecommendation"
+	when
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		There is a Series $targetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- post processing on the Series forecast has not already been run
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+    The Given date $birthdate falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    The Given date evalTime falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+		Confirm elapsed time between $birthdate and evalTime <= "6m"
+	then
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+rule "RSV: We are on 2nd season RSV, baby born off-season, if we received a Beyfortus valid vaccine, set to SC"
+  dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	salience 35
+	activation-group "RSVCustomRecommendation"
+	when
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+	  There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+  		- the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - make note of the date this shot was administered as $latestShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    The Given date $birthdate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    The Given date evalTime falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    Confirm elapsed time between $birthdate and evalTime > "1y0d"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Mark Forecasting of the Series $targetSeries Complete
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+rule "RSV: We are on 2nd season RSV, baby born on-season, if we received a Beyfortus valid vaccine, set to SC"
+  dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	salience 35
+	activation-group "RSVCustomRecommendation"
+	when
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+	  There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+  		- the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - make note of the date this shot was administered as $latestShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    The Given date $birthdate falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    The Given date evalTime falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    Confirm elapsed time between $birthdate and evalTime > "6m"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Mark Forecasting of the Series $targetSeries Complete
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV: We are on 2nd season RSV, baby born off-season, set high risk by default"
+  dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 25
+	activation-group "RSVCustomRecommendation"
+	when
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		There is a Series $targetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- post processing on the Series forecast has not already been run
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+    The Given date $birthdate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    The Given date evalTime falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    Confirm elapsed time between $birthdate and evalTime > "1y0d"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE_HIGH_RISK"
+		Set the recommendation Earliest Forecast Date for $recommendation to evalTime
+		Set the recommendation Recommended Forecast Date for $recommendation to evalTime
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV: We are on 2nd season RSV, baby born on-season, set high risk by default"
+  dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 25
+	activation-group "RSVCustomRecommendation"
+	when
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		There is a Series $targetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- post processing on the Series forecast has not already been run
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+    The Given date $birthdate falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    The Given date evalTime falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    Confirm elapsed time between $birthdate and evalTime > "6m"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE_HIGH_RISK"
+		Set the recommendation Earliest Forecast Date for $recommendation to evalTime
+		Set the recommendation Recommended Forecast Date for $recommendation to evalTime
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+rule "RSV: If patient received previous Beyfortus dose on this season, move to complete high risk recommendation"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	salience 25
+	activation-group "RSVCustomRecommendation"
+	when
+	  There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+  		- the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - make note of the date this shot was administered as $latestShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+		There is a Series $targetSeries identified by $associatedTargetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+    The Given date evalTime falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+		Confirm elapsed time between $latestShotAdministrationDate and evalTime <= "6m"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE_HIGH_RISK"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end

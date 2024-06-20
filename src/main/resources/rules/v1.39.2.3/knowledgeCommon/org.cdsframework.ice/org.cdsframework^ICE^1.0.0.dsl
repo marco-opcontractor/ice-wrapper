@@ -29,6 +29,12 @@
 [consequence][]Make [Nn]ote of the [Pp]atient's [Ii]mmunity to {ddOpenCdsDiseaseConcept} with [Ii]mmunity [Dd]ate as {assign_oDate} and [Ee]valuation [Rr]eason {ddEvaluationReason} and [Rr]ecommendation [Rr]eason {ddRecommendationReason}=Date {assign_oDate} = ICELogicHelper.extractSingularDateValueFromIVLDate($or.getObservationEventTime()); DiseaseImmunity diseaseImmunity = new DiseaseImmunity({ddOpenCdsDiseaseConcept}, {assign_oDate}, {ddEvaluationReason}, {ddRecommendationReason}); insert(diseaseImmunity);
 [consequence][]Log that [Ii]mmunity was noted for {sDiseaseName} and [Ii]mmunity [Dd]ate {refer_oDate}=ICELogicHelper.logDRLDebugMessage(drools.getRule().getName(), "Added {sDiseaseName} Immunity as of date " + {refer_oDate}.toString());
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Date Utils
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+[condition][]The Given [Dd]ate {refer_oTargetDate} does not [Ff]all within the ranges of {refer_oStartMonthDate} and {refer_oEndMonthDate}=eval(Season.monthAndDayFallsWithinRange(LocalDate.fromDateFields({refer_oTargetDate}).getMonthOfYear(), LocalDate.fromDateFields({refer_oTargetDate}).getDayOfMonth(), {refer_oStartMonthDate}, {refer_oEndMonthDate}) == false)
+[condition][]The Given [Dd]ate {refer_oTargetDate} [Ff]alls within the ranges of {refer_oStartMonthDate} and {refer_oEndMonthDate}=eval(Season.monthAndDayFallsWithinRange(LocalDate.fromDateFields({refer_oTargetDate}).getMonthOfYear(), LocalDate.fromDateFields({refer_oTargetDate}).getDayOfMonth(), {refer_oStartMonthDate}, {refer_oEndMonthDate}) == true)
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetDose
