@@ -1365,7 +1365,7 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot wa
 end
 
 
-rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot was administered prior to target dose 1 (prior season) and the prior season's series is complete, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot was administered prior to target dose 1 (prior season) and the prior season's series is complete, the absolute minimum interval from the prior shot to the current shot is 8w"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
@@ -1397,7 +1397,7 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot wa
 			- the administration date of the shot is > $previousShotDate
 			- the shot is not ignored
 			- the administration date of the shot is < "12-Sep-2023"
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
+		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w"
 	then
 	  Set the shot status of $currentShot to Invalid
     Remove all evaluation reasons from shot $currentShot
@@ -1439,7 +1439,7 @@ rule "COVID-19(Sep2023 Pfizer Product < 5yrs Series): If 2 valid pfizer shots we
 end
 
 
-rule "COVID-19(Sep2023 Pfizer Product < 5yrs Series): If 1 valid pfizer shots was administered before, the absolute minimum interval from the prior shot to the current shot is 21 days"
+rule "COVID-19(Sep2023 Pfizer Product < 5yrs Series): If 1 valid pfizer shots was administered before, the absolute minimum interval from the prior shot to the current shot is 17 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
@@ -1458,7 +1458,7 @@ rule "COVID-19(Sep2023 Pfizer Product < 5yrs Series): If 1 valid pfizer shots wa
 			- the administration date of the shot is < "12-Sep-2023"
 			- the shot is not ignored
 			- make note of the date this shot was administered as $previousShotDate
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < "21d"
+		Confirm Elapsed time between $previousShotDate and $currentShotDate < "17d"
 	then
 	  Set the shot status of $currentShot to Invalid
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
@@ -1619,7 +1619,7 @@ rule "COVID-19(Sep2023 COVID >= 5yrs Series): If 1 valid shot was administered b
 end
 
 
-rule "COVID-19(COVID19Sep2023gte5Series): If a CVX 313 was the only dose on record. Absolute minimum interval to a mRNA CVX (CVX 213, CVX 309, CVX 310, CVX 311, CVX 312) = 8 weeks - 4 days"
+rule "COVID-19(COVID19Sep2023gte5Series): If a CVX 313 was the only dose on record. Absolute minimum interval to a mRNA CVX (CVX 213, CVX 309, CVX 310, CVX 311, CVX 312) = 8 weeks"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseIntervalCheck"
@@ -1647,7 +1647,7 @@ rule "COVID-19(COVID19Sep2023gte5Series): If a CVX 313 was the only dose on reco
 		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 		  - the administration date of the shot is < $previousShotDate
 			- that has already been evaluated and whose shot validity is VALID
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
+		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w"
 	then
 	  Set the shot status of $currentShot to Invalid
 	  Refresh all facts in the shot $currentShot
