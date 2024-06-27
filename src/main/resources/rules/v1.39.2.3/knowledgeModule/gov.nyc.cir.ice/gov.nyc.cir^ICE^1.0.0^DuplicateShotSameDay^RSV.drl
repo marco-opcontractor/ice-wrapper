@@ -69,12 +69,12 @@ rule "Duplicate Shots/Same Day RSV: If given 2 shots of Beyfortus on or after 8 
 		modify($td) {
 			setStatus(DoseStatus.ACCEPTED),
 			setDuplicateShotSameDayCheckCompleted(true),
-			addAcceptedReason("EVALUATION_REASON_CONCEPT.OUTSIDE_ROUTINE_SERIES")
+			addAcceptedReason("EVALUATION_REASON_CONCEPT.EXTRA_DOSE")
 		}
 		modify($tdother) {
 			setStatus(DoseStatus.ACCEPTED),
 			setDuplicateShotSameDayCheckCompleted(true),
-			addAcceptedReason("EVALUATION_REASON_CONCEPT.OUTSIDE_ROUTINE_SERIES")
+			addAcceptedReason("EVALUATION_REASON_CONCEPT.EXTRA_DOSE")
 		}
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries with Duplicate CVX 307 Accepted Shots: " + $td.associatedTargetSeries);
 end
