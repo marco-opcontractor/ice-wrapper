@@ -1397,7 +1397,7 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot wa
 			- the administration date of the shot is > $previousShotDate
 			- the shot is not ignored
 			- the administration date of the shot is < "12-Sep-2023"
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w"
+		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
 	then
 	  Set the shot status of $currentShot to Invalid
     Remove all evaluation reasons from shot $currentShot
@@ -1458,7 +1458,7 @@ rule "COVID-19(Sep2023 Pfizer Product < 5yrs Series): If 1 valid pfizer shots wa
 			- the administration date of the shot is < "12-Sep-2023"
 			- the shot is not ignored
 			- make note of the date this shot was administered as $previousShotDate
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < "17d"
+		Confirm Elapsed time between $previousShotDate and $currentShotDate < "21d"
 	then
 	  Set the shot status of $currentShot to Invalid
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
@@ -1647,7 +1647,7 @@ rule "COVID-19(COVID19Sep2023gte5Series): If a CVX 313 was the only dose on reco
 		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 		  - the administration date of the shot is < $previousShotDate
 			- that has already been evaluated and whose shot validity is VALID
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w"
+		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
 	then
 	  Set the shot status of $currentShot to Invalid
 	  Refresh all facts in the shot $currentShot
@@ -1692,7 +1692,7 @@ rule "COVID-19(COVID19Sep2023gte5Series): If series was completed due to special
 		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 		  - the administration date of the shot is < $previousShotDate
 			- that has already been evaluated and whose shot validity is VALID
-		Confirm Elapsed time between $previousShotDate and $currentShotDate >= "8w"
+		Confirm Elapsed time between $previousShotDate and $currentShotDate >= "8w-4d"
 	then
 	  Set the shot status of $currentShot to Valid
 	  Refresh all facts in the shot $currentShot
