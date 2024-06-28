@@ -77,7 +77,7 @@
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="161" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, injectable, quadrivalent, preservative free, pediatric"/>
-        </ns2:doseVaccine>        
+        </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="166" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, intradermal, quadrivalent, preservative free, injectable"/>
@@ -121,6 +121,10 @@
         <ns2:doseVaccine>
             <ns2:preferred>false</ns2:preferred>
             <ns2:vaccine code="231" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="influenza, Southern Hemisphere, high-dose, quadrivalent"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="320" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, injectable, MDCK, preservative"/>
         </ns2:doseVaccine>
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
@@ -184,7 +188,7 @@
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="161" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, injectable, quadrivalent, preservative free, pediatric"/>
-        </ns2:doseVaccine>        
+        </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="166" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, intradermal, quadrivalent, preservative free, injectable"/>
@@ -228,6 +232,10 @@
         <ns2:doseVaccine>
             <ns2:preferred>false</ns2:preferred>
             <ns2:vaccine code="231" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="influenza, Southern Hemisphere, high-dose, quadrivalent"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="320" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, injectable, MDCK, preservative"/>
         </ns2:doseVaccine>
 	</ns2:iceSeriesDose>
     <ns2:seasonCode>DefaultInfluenzaSeason</ns2:seasonCode>
