@@ -17,9 +17,9 @@
     <ns2:vaccineGroup code="850" codeSystem="2.16.840.1.113883.3.795.12.100.1" codeSystemName="ICE Vaccine Group" displayName="COVID-19"/>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>1</ns2:doseNumber>
-		<ns2:absoluteMinimumAge>12y-4d</ns2:absoluteMinimumAge>
-		<ns2:minimumAge>12y</ns2:minimumAge>
-		<ns2:earliestRecommendedAge>12y</ns2:earliestRecommendedAge>
+		<ns2:absoluteMinimumAge>5y-4d</ns2:absoluteMinimumAge>
+		<ns2:minimumAge>5y</ns2:minimumAge>
+		<ns2:earliestRecommendedAge>5y</ns2:earliestRecommendedAge>
 		<ns2:doseVaccine>
         	<ns2:preferred>false</ns2:preferred>
             <ns2:vaccine code="211" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Novavax COVID-19 Vaccine"/>
@@ -32,8 +32,8 @@
     <ns2:iceSeriesDose>
         <ns2:doseNumber>2</ns2:doseNumber>
 		<ns2:absoluteMinimumAge>5y</ns2:absoluteMinimumAge>
-        <ns2:minimumAge>12y</ns2:minimumAge>
-        <ns2:earliestRecommendedAge>12y</ns2:earliestRecommendedAge>
+        <ns2:minimumAge>5y</ns2:minimumAge>
+        <ns2:earliestRecommendedAge>5y</ns2:earliestRecommendedAge>
 		<ns2:doseVaccine>
         	<ns2:preferred>false</ns2:preferred>
             <ns2:vaccine code="211" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Novavax COVID-19 Vaccine"/>
