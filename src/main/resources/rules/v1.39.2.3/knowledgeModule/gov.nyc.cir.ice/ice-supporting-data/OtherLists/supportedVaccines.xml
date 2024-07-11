@@ -337,10 +337,10 @@
     </cdsListItem>
 		<cdsListItem>
 			<cdsListItemKey>320</cdsListItemKey>
-			<cdsListItemValue>Influenza, injectable, MDCK, preservative</cdsListItemValue>
+			<cdsListItemValue>Influenza, MDCK, trivalent, preservative</cdsListItemValue>
 			<cdsListItemConceptMapping>
 				<code>ICE320</code>
-				<displayName>Influenza, injectable, MDCK, preservative</displayName>
+				<displayName>Influenza, MDCK, trivalent, preservative</displayName>
 			</cdsListItemConceptMapping>
 		</cdsListItem>
     <cdsListItem>

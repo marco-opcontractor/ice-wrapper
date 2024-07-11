@@ -210,13 +210,10 @@
     </conceptMapping>
     <conceptMapping>
       <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-        codeSystemName="OpenCDS concepts" code="ICE320"
-        displayName="influenza, injectable, MDCK, preservative"/>
+        codeSystemName="OpenCDS concepts" code="ICE320" displayName="Influenza, MDCK, trivalent, preservative"/>
       <fromConcepts codeSystem="2.16.840.1.113883.12.292"
-        codeSystemName="Vaccines administered (CVX)"
-        displayName="influenza, injectable, MDCK, preservative">
-        <concept code="320"
-          displayName="influenza, injectable, MDCK, preservative"/>
+        codeSystemName="Vaccines administered (CVX)" displayName="Influenza, MDCK, trivalent, preservative">
+        <concept code="320" displayName="Influenza, MDCK, trivalent, preservative"/>
       </fromConcepts>
     </conceptMapping>
     <conceptMapping>
