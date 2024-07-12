@@ -335,6 +335,14 @@
     		<displayName>Influenza, seasonal trivalent, adjuvanted, preservative free</displayName>
     	</cdsListItemConceptMapping>
     </cdsListItem>
+		<cdsListItem>
+			<cdsListItemKey>320</cdsListItemKey>
+			<cdsListItemValue>Influenza, MDCK, trivalent, preservative</cdsListItemValue>
+			<cdsListItemConceptMapping>
+				<code>ICE320</code>
+				<displayName>Influenza, MDCK, trivalent, preservative</displayName>
+			</cdsListItemConceptMapping>
+		</cdsListItem>
     <cdsListItem>
     	<cdsListItemKey>170</cdsListItemKey>
     	<cdsListItemValue>DTaP-IPV-Hib</cdsListItemValue>
