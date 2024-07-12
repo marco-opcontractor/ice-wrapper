@@ -124,5 +124,9 @@
     	<cdsListItemKey>SUPPLEMENTAL_TEXT</cdsListItemKey>
     	<cdsListItemValue>Supplemental text is available for this immunization event.</cdsListItemValue>
     </cdsListItem>
+    <cdsListItem>
+        <cdsListItemKey>SPECIAL_RULE</cdsListItemKey>
+        <cdsListItemValue>This vaccine is valid for primary series; valid thanks to a special rule.</cdsListItemValue>
+    </cdsListItem>
 	<cdsVersion>org.cdsframework^ICE^1.0.0</cdsVersion>
 </ns2:cdsListSpecificationFile>
