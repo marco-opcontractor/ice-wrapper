@@ -7,16 +7,16 @@
     <ns2:doseInterval>
         <ns2:fromDoseNumber>1</ns2:fromDoseNumber>
         <ns2:toDoseNumber>2</ns2:toDoseNumber>
-        <ns2:absoluteMinimumInterval>3d</ns2:absoluteMinimumInterval>
+        <ns2:absoluteMinimumInterval>7d</ns2:absoluteMinimumInterval>
         <ns2:minimumInterval>7d</ns2:minimumInterval>
         <ns2:earliestRecommendedInterval>7d</ns2:earliestRecommendedInterval>
     </ns2:doseInterval>
     <ns2:doseInterval>
         <ns2:fromDoseNumber>2</ns2:fromDoseNumber>
         <ns2:toDoseNumber>3</ns2:toDoseNumber>
-        <ns2:absoluteMinimumInterval>11d</ns2:absoluteMinimumInterval>
-        <ns2:minimumInterval>14d</ns2:minimumInterval>
-        <ns2:earliestRecommendedInterval>14d</ns2:earliestRecommendedInterval>
+        <ns2:absoluteMinimumInterval>17d</ns2:absoluteMinimumInterval>
+        <ns2:minimumInterval>3w</ns2:minimumInterval>
+        <ns2:earliestRecommendedInterval>3w</ns2:earliestRecommendedInterval>
     </ns2:doseInterval>
     <ns2:doseInterval>
         <ns2:fromDoseNumber>3</ns2:fromDoseNumber>

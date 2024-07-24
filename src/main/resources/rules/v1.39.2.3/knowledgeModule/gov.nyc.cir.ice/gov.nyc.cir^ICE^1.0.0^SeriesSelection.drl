@@ -2095,7 +2095,7 @@ rule "SeriesSelection.SelectHepATwinrixSeries for HepA when not completed and va
 	  // EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesComplete == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
@@ -2115,12 +2115,12 @@ rule "SeriesSelection.SelectHepBTwinrixSeries for HepB when not completed and va
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
 	salience 120
-	activation-group "HepABSeriesSelectionCheck"
+	activation-group "HepBSeriesSelectionCheck"
 	when
 	  // EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesComplete == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
@@ -2140,11 +2140,11 @@ rule "SeriesSelection.SelectHepATwinrixAcceleratedSeries for HepA when not compl
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
 	salience 200
-	activation-group "HepABSeriesSelectionCheck"
+	activation-group "HepASeriesSelectionCheck"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesComplete == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td.administrationDate)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
@@ -2169,11 +2169,11 @@ rule "SeriesSelection.SelectHepBTwinrixAcceleratedSeries for HepB when not compl
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
 	salience 200
-	activation-group "HepABSeriesSelectionCheck"
+	activation-group "HepBSeriesSelectionCheck"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesComplete == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 	  not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td.administrationDate)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
