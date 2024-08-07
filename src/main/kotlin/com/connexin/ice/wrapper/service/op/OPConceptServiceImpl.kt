@@ -12,8 +12,20 @@ import org.opencds.config.schema.ConceptDeterminationMethods
 import java.io.File
 import javax.xml.bind.JAXBContext
 
+/**
+ * Implementation of the [ConceptService] interface that retrieves the concept views based on the provided concept maps.
+ *
+ * @param conceptMaps A map of concepts to their corresponding concept maps.
+ */
 class OPConceptServiceImpl(private val conceptMaps:Map<Concept, List<ConceptMap>>) : ConceptService {
 
+    /**
+     * Retrieves a list of ConceptView objects based on the specified code system and code.
+     *
+     * @param codeSystem The code system to search in.
+     * @param code The code to match against.
+     * @return A mutable list of ConceptView objects.
+     */
     override fun getConceptViews(codeSystem: String, code: String): MutableList<ConceptView> {
         val conceptViews = mutableListOf<ConceptView>()
         val concepts = this.conceptMaps[ConceptImpl.create(code, codeSystem, null,null)]
@@ -32,6 +44,13 @@ class OPConceptServiceImpl(private val conceptMaps:Map<Concept, List<ConceptMap>
     }
 
     companion object{
+        /**
+         * Builds a ConceptService from the given CDM (Concept Determination Methods) file.
+         *
+         * @param cdmFile The CDM file to build the ConceptService from.
+         * @return The built ConceptService.
+         * @throws MissingCDMFileException if the CDM file does not exist.
+         */
         fun build(cdmFile: File):ConceptService{
             val cdms = mutableListOf<Any?>()
             val unmarshaller = JAXBContext.newInstance("org.opencds.config.schema").createUnmarshaller()

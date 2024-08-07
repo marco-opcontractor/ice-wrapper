@@ -6,7 +6,7 @@
 
     <groupId>com.connexin.immunization</groupId>
     <artifactId>ice-wrapper</artifactId>
-    <version>1.6.4</version>
+    <version>1.7.0-SNAPSHOT</version> <!--Do not change me -->
   
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -147,18 +147,14 @@
                         </goals>
                         <configuration>
                             <target>
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.3.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.2.3" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.37.2.4.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.37.2.4" />
-                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.38.1.1.zip"
-                                     basedir="${project.basedir}/src/main/resources/rules/v1.38.1.1" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.1.1.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.39.1.1" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.2.1.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.39.2.1" />
                                 <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.2.2.zip"
                                      basedir="${project.basedir}/src/main/resources/rules/v1.39.2.2" />
+                                <zip destfile="${project.basedir}/src/main/resources/rules/packaged/v1.39.2.3.zip"
+                                     basedir="${project.basedir}/src/main/resources/rules/v1.39.2.3" />
                             </target>
                         </configuration>
                     </execution>

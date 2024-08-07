@@ -5,6 +5,11 @@ import java.io.Reader
 import java.io.StringReader
 import javax.xml.transform.stream.StreamSource
 
+/**
+ * A class that represents a source of string content for a stream.
+ *
+ * @property content The string content.
+ */
 class StrSource(private val content: String) : StreamSource() {
 
     override fun getReader(): Reader {
