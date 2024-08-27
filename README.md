@@ -7,7 +7,6 @@ the engine as a simple jar. By encapsulated the engines complexities as a jar, i
 ## Getting Started
 
 You will need:
-
 1. Java 8+
 2. Maven
 
