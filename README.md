@@ -21,7 +21,6 @@ You will need:
 
 1. Regardless of what engine you use, you will need the Drools files from the ICE project. They can be found in the ice3/opnecds-ice-service/src/main/resources/. The entire director is needed as is.
 2. Ice Engine
-   1. 
 
 
 ### Good to know
