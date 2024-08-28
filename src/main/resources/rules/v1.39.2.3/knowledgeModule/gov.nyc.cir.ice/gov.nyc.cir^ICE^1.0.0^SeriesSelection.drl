@@ -2032,7 +2032,7 @@ end
 rule "SeriesSelection.HepADoNOTSelectAlreadyCompleteSeriesWithFewestDosesIfExistsAndOtherSeriesPreviouslySelected"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 100
+	salience 200
 	activation-group "SeriesSelectionFewestDoses"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
@@ -2049,7 +2049,7 @@ end
 rule "SeriesSelection.SelectByDefaultHepA2DoseSeries"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 100
+	salience 10
 	activation-group "HepASeriesSelectionCheck"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
@@ -2071,9 +2071,10 @@ rule "SeriesSelection.SelectHepAAdult3DoseSeries when 2 dose series is not suffi
 	salience 80
 	activation-group "HepASeriesSelectionCheck"
 	when
+	  EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesComplete == true)
+		exists TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", administrationDate >= $dateAt18yrs)
 		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepAAdult3DoseSeries",	selectedSeries == false)
 	then
 		String _RULENAME = kcontext.rule.name;
