@@ -19,7 +19,8 @@ enum class Interpretation{
     IS_IMMUNE,
     REFUSED,
     DISEASE,
-    DEFERRED
+    DEFERRED,
+    PREGNANCY_VACCINATED,
 }
 
 enum class ObservationConcept{

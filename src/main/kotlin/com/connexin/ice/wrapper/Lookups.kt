@@ -40,6 +40,7 @@ object Lookups {
             Interpretation.REFUSED -> OID_IS_IMMUNE
             Interpretation.DISEASE -> OID_IS_IMMUNE
             Interpretation.DEFERRED -> OID_IS_IMMUNE
+            else -> OID_IS_IMMUNE
         }
     }
 
