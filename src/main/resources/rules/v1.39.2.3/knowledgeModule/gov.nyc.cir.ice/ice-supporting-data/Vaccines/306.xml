@@ -6,7 +6,7 @@
     <ns2:vaccineActive>true</ns2:vaccineActive>
     <ns2:tradeName>Beyfortus</ns2:tradeName>
     <ns2:manufacturerCode/>
-    <ns2:validMaximumAgeForUse>8m</ns2:validMaximumAgeForUse>
+    <ns2:validMaximumAgeForUse>8m-1d</ns2:validMaximumAgeForUse>
     <vaccineComponent code="306" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV, mAb, nirsevimab-alip, 0.5 mL"/>
     <diseaseImmunity code="079.6" codeSystem="2.16.840.1.113883.6.103" codeSystemName="ICD9CM Diagnosis" displayName="Respiratory syncytial virus"/>
     <openCdsMembership code="ICE306" displayName="RSV, mAb, nirsevimab-alip, 0.5 mL"/>

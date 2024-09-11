@@ -48,10 +48,11 @@ import org.cdsframework.ice.util.TimePeriod.DurationType
 import org.cdsframework.ice.service.Vaccine
 
 global java.util.Date evalTime
+global java.lang.Boolean isRSVHighRisk
 
 
-// If one of the duplicate shots is an RSV Beyfortus combination of 2 shots of 307 (1ml Beyfortus) after 8 months old, put as accepted
-rule "Duplicate Shots/Same Day RSV: If given 2 shots of Beyfortus on or after 8 months old, evaluate them as accepted high risk"
+// If one of the duplicate shots is an RSV Beyfortus combination of 2 shots of 307 (1ml Beyfortus) after 8 months old, and high risk, these are valid
+rule "Duplicate Shots/Same Day RSV: If given 2 shots of Beyfortus on or after 8 months old, pass evaluation and keep original evaluation"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^duplicateShotSameDay"
 	auto-focus true
@@ -64,17 +65,14 @@ rule "Duplicate Shots/Same Day RSV: If given 2 shots of Beyfortus on or after 8 
 			isDoseStatusOverridden() == false, vaccineComponent.cdsConceptName == "ICE307",
 			isDuplicateShotSameDayCheckCompleted() == false || $td.isDuplicateShotSameDayCheckCompleted() == false)
 		eval($td.getAdministrationDate() >= $patientAt8Months)
+		eval(isRSVHighRisk == true)
 	then
 		String _RULENAME = kcontext.rule.name;
 		modify($td) {
-			setStatus(DoseStatus.ACCEPTED),
-			setDuplicateShotSameDayCheckCompleted(true),
-			addAcceptedReason("EVALUATION_REASON_CONCEPT.EXTRA_DOSE")
+			setDuplicateShotSameDayCheckCompleted(true)
 		}
 		modify($tdother) {
-			setStatus(DoseStatus.ACCEPTED),
-			setDuplicateShotSameDayCheckCompleted(true),
-			addAcceptedReason("EVALUATION_REASON_CONCEPT.EXTRA_DOSE")
+			setDuplicateShotSameDayCheckCompleted(true)
 		}
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries with Duplicate CVX 307 Accepted Shots: " + $td.associatedTargetSeries);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries with Duplicate CVX 307 Valid Shots: " + $td.associatedTargetSeries);
 end
