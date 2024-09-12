@@ -13,6 +13,8 @@ abstract class AbstractEngine() {
 
     private val context = JAXBContext.newInstance(CDSInput::class.java);
 
+    private val supportedIceWrapperInterpretations = setOf(Interpretation.REFUSED, Interpretation.IS_IMMUNE, Interpretation.DEFERRED, Interpretation.DISEASE)
+
     /**
      * Converts a [VaccineReport] object to a [VMR] object.
      *
@@ -25,39 +27,44 @@ abstract class AbstractEngine() {
 
         //get the dosing by grouping the vaccines and sorting by date
         val vaccines = vaccineReport.vaccines.groupBy { it.cvx }
-        for(v in vaccines.values){
+        for (v in vaccines.values) {
             v.sortedBy { it.date }
         }
-        for(v in vaccines) {
+        for (v in vaccines) {
             v.value.forEachIndexed { index, vaccine ->
                 imms.add(
-                    VMRImmunizationEvent(vaccine.id,
-                        CodeSystem.CVX, vaccine.cvx, vaccine.name, index + 1, vaccine.date)
+                    VMRImmunizationEvent(
+                        vaccine.id,
+                        CodeSystem.CVX, vaccine.cvx, vaccine.name, index + 1, vaccine.date
+                    )
                 )
             }
         }
         vaccineReport.indicators.forEach {
             obs.add(
-                VMRObservationResult(it.code,it.system,
-                     when(it.interpretation){
-                        Interpretation.REFUSED,Interpretation.IS_IMMUNE,Interpretation.DEFERRED -> ObservationConcept.PROOF_OF_IMMUNITY
+                VMRObservationResult(
+                    it.code, it.system,
+                    when (it.interpretation) {
+                        Interpretation.REFUSED, Interpretation.IS_IMMUNE, Interpretation.DEFERRED -> ObservationConcept.PROOF_OF_IMMUNITY
                         Interpretation.DISEASE -> ObservationConcept.DISEASE_DOCUMENTED
-                    },it.interpretation,it.date)
+                        else -> ObservationConcept.PROOF_OF_IMMUNITY
+                    }, it.interpretation, it.date
+                )
             )
         }
         return VMR(
-            demographics = VMRDemographic(vaccineReport.dateOfBirth,convertGender(vaccineReport.gender)),
+            demographics = VMRDemographic(vaccineReport.dateOfBirth, convertGender(vaccineReport.gender)),
             obs = obs,
             imms = imms
         )
     }
 
-    protected fun unmarshal(vmr:VMR): JAXBElement<CDSInput> {
+    protected fun unmarshal(vmr: VMR): JAXBElement<CDSInput> {
         //Not threadsafe, so we need to create a new one everytime, we could pool it, but I'm not sure of the gains there
         return context.createUnmarshaller().unmarshal(StrSource(vmr.toXML()), CDSInput::class.java)
     }
 
-    private fun convertGender(gender:Gender):String{
+    private fun convertGender(gender: Gender): String {
         return gender.name.first().uppercase()
     }
 

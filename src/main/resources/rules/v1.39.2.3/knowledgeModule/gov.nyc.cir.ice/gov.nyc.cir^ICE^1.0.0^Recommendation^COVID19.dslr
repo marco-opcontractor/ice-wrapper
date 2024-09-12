@@ -1577,7 +1577,7 @@ end
  ===> Series: ALL; Prior formulation administered in this season
 *************************************************************************************************************************************************************************************/
 
-rule "COVID-19(Sep2023 >=5yrs; Pfizer/Moderna/Mixed Product < 5yrs): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
+rule "COVID-19(Pfizer/Moderna/Mixed Product < 5yrs): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	activation-group "recommendationIntervalCheck"
@@ -1585,7 +1585,7 @@ rule "COVID-19(Sep2023 >=5yrs; Pfizer/Moderna/Mixed Product < 5yrs): If a prior 
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19Sep2023gte5Series", "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries")
+			- the name of the Series a member of ("COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries")
 			- the Series is not Complete
 			- the effective dose number in the Series is == 1
 		There is an administered shot $priorShot
@@ -1911,7 +1911,7 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): For target d
 		Add $oLatestRecommendedInterval to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedLatestRecommended
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedMinimum
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
-		Set the recommendation Overdue Forecast Date for $r to $dtCalculatedLatestRecommended
+		////// Set the recommendation Overdue Forecast Date for $r to $dtCalculatedLatestRecommended
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
