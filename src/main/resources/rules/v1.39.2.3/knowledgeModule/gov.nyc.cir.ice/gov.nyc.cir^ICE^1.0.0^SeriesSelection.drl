@@ -2094,13 +2094,13 @@ rule "SeriesSelection.SelectHepATwinrixSeries for HepA when not completed and va
 	activation-group "HepABSeriesSelectionCheck"
 	when
 	  // EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
+	  $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepATwinrixSeries",	selectedSeries == false)
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepATwinrixSeries",	selectedSeries == false)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
@@ -2119,13 +2119,13 @@ rule "SeriesSelection.SelectHepBTwinrixSeries for HepB when not completed and va
 	activation-group "HepBSeriesSelectionCheck"
 	when
 	  // EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
+	  $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesRules.seriesName == "HepBTwinrixSeries",	selectedSeries == false)
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesRules.seriesName == "HepBTwinrixSeries",	selectedSeries == false)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
@@ -2143,14 +2143,14 @@ rule "SeriesSelection.SelectHepATwinrixAcceleratedSeries for HepA when not compl
 	salience 200
 	activation-group "HepASeriesSelectionCheck"
 	when
+	  $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepATwinrixAcceleratedSeries",	selectedSeries == false)
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td.administrationDate)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepATwinrixAcceleratedSeries",	selectedSeries == false)
 	  $td2 : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate > $td.administrationDate)
     not TargetDose(this != $td, associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", associatedSeriesName == "HepATwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td2.administrationDate)
 		$tdNormalSeries: TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixSeries", status != DoseStatus.VALID && status != DoseStatus.ACCEPTED, administrationDate == $td2.administrationDate)
@@ -2172,15 +2172,15 @@ rule "SeriesSelection.SelectHepBTwinrixAcceleratedSeries for HepB when not compl
 	salience 200
 	activation-group "HepBSeriesSelectionCheck"
 	when
-		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
+		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesRules.seriesName == "HepBTwinrixAcceleratedSeries",	selectedSeries == false)
+    $tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", selectedSeries == true)
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
 		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
 	  not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td.administrationDate)
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
 		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesRules.seriesName == "HepBTwinrixAcceleratedSeries",	selectedSeries == false)
-    $td2 : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate > $td.administrationDate)
+		$td2 : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate > $td.administrationDate)
     not TargetDose(this != $td, associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td2.administrationDate)
 		$tdNormalSeries: TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixSeries", status != DoseStatus.VALID && status != DoseStatus.ACCEPTED, administrationDate == $td2.administrationDate)
 
