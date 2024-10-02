@@ -534,6 +534,10 @@ end
 
 ///////// ***
 // General Design rule... Do not Edit
+// For each series that was identified as relevant, initialize each TargetSeries with TargetDoses. TargetDoses are created/initialized for all
+// shots administered where the vaccine is used by the vaccine group, even if the Series itself does not permit that kind of vaccine to be used
+// in any of its doses. This is so that shots administered with a vaccine present in the Vaccine Group will still be evaluated with a decision
+// should that TargetSeries be selected from which to forecast.
 ///////// ***
 rule "CandidateDosesIdentification: Initialize TargetDose in *Seasonal* TargetSeries" ruleflow-group "CandidateDosesIdentification"
 	dialect "mvel"
@@ -1191,6 +1195,26 @@ end
 ///////// ***
 // General Design rule... Do not Edit
 ///////// ***
+rule "EarlySeriesSelection: Insert TargetSeriesSelection (Tracker) on to the Fact List for each Vaccine Group/Season" ruleflow-group "EarlySeriesSelection"
+	dialect "java"
+	salience 10
+	when
+		$tseries : TargetSeries($vg : getVaccineGroup(), $tseason : getTargetSeason(), $vg == "VACCINE_GROUP_CONCEPT.850")
+		not (TargetSeriesSelection(getSeriesSelectionVaccineGroup() == $vg, getSeriesSelectionSeason() == $tseason))
+	then
+		String _RULENAME = drools.getRule().getName();
+		TargetSeriesSelection tss = new TargetSeriesSelection($vg, $tseason, schedule);
+		insert(tss);
+		modify (tss) {
+      setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_IN_PREPROCESS);
+    }
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeriesSelection added to fact list: " + tss.toString());
+end
+
+
+///////// ***
+// General Design rule... Do not Edit
+///////// ***
 rule "SeriesSelection: Initialize Next Non-Seasonal TargetSeriesSelection" ruleflow-group "SeriesSelection"
 	dialect "mvel"
 	when
@@ -1240,6 +1264,22 @@ rule "SeriesSelection: Default Series Selection Preprocess rule: invoke custom r
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Invoking Series Selection rules for vaccine group: " + $tss.seriesSelectionVaccineGroup);
 		update($tss);
 		setFocus("SeriesSelection^customSeriesSelectionRules");
+end
+
+
+///////// ***
+// General Design rule... Do not Edit
+///////// ***
+rule "EarlySeriesSelection: Default Early Series Selection Preprocess rule: invoke custom rules" ruleflow-group "EarlySeriesSelection"
+	dialect "mvel"
+	when
+		$tss : TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PREPROCESS)
+	then
+		String _RULENAME = kcontext.rule.name;
+		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Invoking Early Series Selection rules for vaccine group: " + $tss.seriesSelectionVaccineGroup);
+		update($tss);
+		setFocus("EarlySeriesSelection^customSeriesSelectionRules");
 end
 
 
@@ -1327,6 +1367,29 @@ rule "SeriesSelection: Change Series Selection Status To Complete" ruleflow-grou
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeriesSelection: " + $tss.toString() + "; *Series* *Selected* " + $tss.getSelectedSeriesName());
 end
 
+
+///////// ***
+// General Design rule... Do not Edit
+// Retracts all TargetSeries and corresponding TargetDoses in a vaccine group that remain (i.e. - were not chosen).
+// For Seasonal Series, since recommendations are only made on the current season
+///////// ***
+rule "EarlySeriesSelection: Retract All Series Not Selected in Vaccine Group" ruleflow-group "EarlySeriesSelection"
+	dialect "mvel"
+	salience 50
+	when
+		$tss : TargetSeriesSelection($ssvg : seriesSelectionVaccineGroup, $sss : seriesSelectionSeason,
+			seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS ||	seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_COMPLETE)
+		$selected : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == true, targetSeason == $sss)
+		$ts : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == false, targetSeason == $sss)
+	then
+		String _RULENAME = kcontext.rule.name;
+		for (TargetDose d : $ts.targetDoses) {
+			ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetDose Retracted: " + d);
+			retract(d);
+		}
+		retract($ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries Retracted: " + $ts);
+end
 
 ///////// ***
 // General Design rule... Do not Edit 

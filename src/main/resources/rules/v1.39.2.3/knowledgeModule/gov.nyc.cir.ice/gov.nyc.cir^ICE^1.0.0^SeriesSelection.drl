@@ -934,87 +934,34 @@ end
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Series selection rules pertaining to Sep 2023 season
+// EARLY Series selection rules pertaining to Sep 2023 season
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "SeriesSelect(COVID-19): Catch All-- In Sep2023 season, select the Mixed Product Series if no other series applies"
-	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	when
-		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS, seriesSelectionSeason!.seasonName == "COVID19Sep2023Season")
-		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023MixedProductLT5ySeries")
-	then
-		String _RULENAME = kcontext.rule.name;
-		$ts.setSelectedSeries(true);
-		$tss.setSelectedSeriesName($ts.seriesName);
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS);
-		update($tss);
-		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
-end
 
-
-rule "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
+rule "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
 	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS, seriesSelectionSeason!.seasonName == "COVID19Sep2023Season")
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
 		$person : EvaluatedPerson($birthDate : demographics.birthTime,  $dateAt5yrs : TimePeriod.addTimePeriod(demographics.birthTime, "5y"))
+	  exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", administrationDate < $dateAt5yrs)
+	  or
+	  eval(evalTime.compareTo($dateAt5yrs) < 0)
 	then
 		String _RULENAME = kcontext.rule.name;
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection")
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection");
 end
 
 
-rule "SeriesSelection(COVID-19): In Sep2023 season, select the Mixed Product < 5 yrs series if any doses were administered in the current season prior to 5 yrs of age, and there are a mix of products used"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
-	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 25
-	when
-		exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", isValid == true, administrationDate < $dateAt5yrs, associatedTargetSeries.seriesRules.seriesName == "COVID19Sep2023MixedProductLT5ySeries", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason)
-		(
-			// Moderna-only check
-			exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, vaccineComponent.cdsConceptName in ("ICE311", "ICE312"))
-			and 
-			exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, vaccineComponent.cdsConceptName not in ("ICE311", "ICE312"))
-			or
-			// Pfizer-only check
-			exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, vaccineComponent.cdsConceptName in ("ICE308", "ICE309", "ICE310"))
-			and
-			exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, vaccineComponent.cdsConceptName not in ("ICE308", "ICE309", "ICE310"))
-			or
-			// Novavax-only check
-			exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, vaccineComponent.cdsConceptName in ("ICE211", "ICE313"))
-			and
-			exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, vaccineComponent.cdsConceptName not in ("ICE211", "ICE313"))
-			or
-			// NOS administered
-			exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, vaccineComponent.isUnspecifiedFormulation() == true)
-		)
-		$tsmixedproduct : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023MixedProductLT5ySeries")
-	then
-		String _RULENAME = kcontext.rule.name;
-		$tsmixedproduct.setSelectedSeries(true);
-		$tss.setSelectedSeriesName($tsmixedproduct.seriesName);
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
-		update($tss);
-		update($tsmixedproduct);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $tsmixedproduct);
-end
 
-
-rule "SeriesSelect(COVID-19): In Sep2023 season, select the COVID-19 Mixed Product < 5y series if patient is < 5 years of age and there are no doses on record in the current season"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
+rule "EarlySeriesSelection(COVID-19): In Sep2023 season, if patient is >= 5 years of age, select GTE 5 years by default if no other series was selected before"
 	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 25
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	when
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023MixedProductLT5ySeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
-		not TargetDose(associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, administrationDate < $dateAt5yrs)
-		eval(evalTime.compareTo($dateAt5yrs) < 0)
+		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS, seriesSelectionSeason!.seasonName == "COVID19Sep2023Season")
+    not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
+    $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023gte5Series", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.setSelectedSeries(true);
@@ -1022,86 +969,26 @@ rule "SeriesSelect(COVID-19): In Sep2023 season, select the COVID-19 Mixed Produ
 		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
 		update($tss);
 		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection Complete: TargetSeries " + $ts);
 end
 
 
-rule "SeriesSelection(COVID-19): If a Novavax 2023 Series is completed but the previously selected >= 5y Series is not, then the Novavax 2023 Series applies"
+rule "EarlySeriesSelection(COVID-19): In the Sep2023 season, if the first dose administered is the Novavax vaccine at >= 5 years of age and there are no doses in the prior season, then the Novavax 2023 Series applies"
 	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 26
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
+	salience 20
 	when
-		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionSeason!.seasonName == "COVID19Sep2023Season", seriesSelectionStatus in (SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS, SeriesSelectionStatus.SERIES_SELECTION_COMPLETE))
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023gte5Series", selectedSeries == true, isSeriesComplete() == false)
-		$tsnovavax : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023NovavaxSeries", selectedSeries == false, isSeriesComplete() == true)
-	then
-		String _RULENAME = kcontext.rule.name;
-		$tsnovavax.setSelectedSeries(true);
-		$ts.setSelectedSeries(false);
-		$tss.setSelectedSeriesName($tsnovavax.seriesName);
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
-		update($tss);
-		update($ts);
-		update($tsnovavax);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
-end	
-
-
-rule "SeriesSelection(COVID-19): In the Sep2023 season, if the patient is >= 5 years of age and there are no doses on record at >= 5 years in the current season, then COVID-19 >= 5y Series applies"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
-	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 27
-	when
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023gte5Series", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
-		not TargetDose(associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, administrationDate >= $dateAt5yrs)
-		eval(evalTime.compareTo($dateAt5yrs) >= 0)
-	then
-		String _RULENAME = kcontext.rule.name;
-		$ts.setSelectedSeries(true);
-		$tss.setSelectedSeriesName($ts.seriesName);
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
-		update($tss);
-		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
-end
-
-
-rule "SeriesSelect(COVID-19): In Sep2023 season, if patient is >= 5 years of age and there are no doses on record at < 5 years of age in the current season, then the COVID-19 >= 5y series"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
-	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	activation-group "GreaterThan5YearSeriesSelection"
-	salience 27
-	when
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023gte5Series", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
-		not TargetDose(associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, isValid == true, administrationDate < $dateAt5yrs)
-		eval(evalTime.compareTo($dateAt5yrs) >= 0)
-	then
-		String _RULENAME = kcontext.rule.name;
-		$ts.setSelectedSeries(true);
-		$tss.setSelectedSeriesName($ts.seriesName);
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
-		update($tss);
-		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
-end
-
-
-rule "SeriesSelection(COVID-19): In the Sep2023 season, if the first dose administered is the Novavax vaccine at >= 5 years of age and there are no doses in the prior season, then the Novavax 2023 Series applies"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
-	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 28
-	when
-		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023NovavaxSeries")
+		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS, seriesSelectionSeason!.seasonName == "COVID19Sep2023Season")
+    not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
+    $person : EvaluatedPerson($birthDate : demographics.birthTime,  $dateAt5yrs : TimePeriod.addTimePeriod(demographics.birthTime, "5y"))
+    $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023NovavaxSeries")
 		// Confirm that there are no valid doses in a prior season
-		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason != $tss.seriesSelectionSeason, isValid == true)
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason != $tss.seriesSelectionSeason)
 		// Identify the first (valid) dose in this series (the Novavax 2023 series)
-		$td : TargetDose(associatedTargetSeries == $ts, administrationDate >= $dateAt5yrs, isValid == true)
+		$td : TargetDose(associatedTargetSeries == $ts, administrationDate >= $dateAt5yrs, vaccineComponent.cdsConceptName in ("ICE211", "ICE313"))
 		/////// EvaluatedPerson($dateAt12yrs : TimePeriod.addTimePeriod(demographics.birthTime, "12y-4d"))
 		// Check that the first (valid) dose administered in the Novavax 2023 is indeed the first... i.e. - there are no valid non-Novavax doses in another series during the current season prior to the Novavax
-		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, vaccineComponent.cdsConceptName not in ("ICE211", "ICE313"), isValid == true)
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, vaccineComponent.cdsConceptName not in ("ICE211", "ICE313"))
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.setSelectedSeries(true);
@@ -1109,36 +996,16 @@ rule "SeriesSelection(COVID-19): In the Sep2023 season, if the first dose admini
 		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
 		update($tss);
 		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection Complete: TargetSeries " + $ts);
 end
 
-
-/*
- * If the patient is < 5 years of age as of 9/12/23,
- *   If all the prior season doses (if any) are all Moderna, and all shots in the current season are Moderna, then the Moderna series applies.
- *   If all the prior season doses (if any) are all Pfizer, and all shots in the current season are Pfizer, then the Pfizer series applies.
- *   and neither of the above two conditions are true, then the Sept 2023 Mixed Product COVID-19 Series (< 5 years) applies.
- */
-
-rule "SeriesSelection(COVID-19): In Sep2023 season, select the Mixed Product Series < 5 yrs if at least one dose (if any) in the prior season doses was administered at < 5 yrs of age, all doses (if any) in the prior season are a mix of vaccines, and all shots (if any) in the current season are a mix of 2023 vaccines"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
+rule "EarlySeriesSelection(COVID-19): In Sep2023 season, select Mixed series when patient is < 5 years old and Pfizer or Moderna do not apply"
+		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
 	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 29
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
+	salience 25
 	when
 		$ts : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023MixedProductLT5ySeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
-		and
-		(
-			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
-			or
-			(
-				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, isSeriesComplete() == false, targetSeason.startsBeforeStartDate($ts.targetSeason, false))
-				and
-				exists TargetDose(associatedTargetSeries == $tspriorseasonseries, isValid == true, administrationDate < $dateAt5yrs)
-				and
-				not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", this != $tspriorseasonseries, targetSeason != null, targetSeason.startsAfterStartDate($tspriorseasonseries.targetSeason, false), targetSeason.startsBeforeStartDate($ts.targetSeason, false))
-			)
-		)
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.setSelectedSeries(true);
@@ -1146,78 +1013,67 @@ rule "SeriesSelection(COVID-19): In Sep2023 season, select the Mixed Product Ser
 		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
 		update($tss);
 		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection Complete: TargetSeries " + $ts);
 end
 
 
-rule "SeriesSelection(COVID-19): In Sep2023 season, select the Pfizer < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the prior season are Pfizer vaccines, and all shots (if any) are in the current season are a Pfizer vaccine"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
+rule "EarlySeriesSelection(COVID-19): In Sep2023 season, select the Pfizer < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the prior season are Pfizer vaccines, and all shots (if any) are in the current season are a Pfizer vaccine"
+		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
 	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	salience 30
 	when
 		$ts : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023PfizerLT5ySeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
 		and
-		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", isValid == true, associatedTargetSeries!.targetSeason != $tss.seriesSelectionSeason, associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false), 
-			vaccineComponent.cdsConceptName not in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE520"))
-		and
-		not TargetDose(associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, vaccineComponent.cdsConceptName not in ("ICE308", "ICE309", "ICE310", "ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE520"))
-		and
-		(
-			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
-			or
-			(
-				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, targetSeason!.seasonName == "COVID19Dec2020Season" )
-				and
-				exists TargetDose(associatedTargetSeries == $tspriorseasonseries, isValid == true, administrationDate < $dateAt5yrs)
-				and
-				not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", this != $tspriorseasonseries, targetSeason != null, targetSeason.startsAfterStartDate($tspriorseasonseries!.targetSeason, false), targetSeason.startsBeforeStartDate($ts!.targetSeason, false))
-			)
-		)
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", vaccineComponent.cdsConceptName not in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520"))
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.setSelectedSeries(true);
 		$tss.setSelectedSeriesName($ts.seriesName);
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS);
+		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
 		update($tss);
 		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection Complete: TargetSeries " + $ts);
 end
 
 
-rule "SeriesSelection(COVID-19): In Sep2023 season, select the Moderna < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the prior season are Moderna vaccines, and all shots (if any) in the current season are a Moderna vaccine"
-		extends "SeriesSelection(COVID-19 Abstract): In Sep2023 season, determine date at which patients turns 5 years of age"
+rule "EarlySeriesSelection(COVID-19): In Sep2023 season, select the Moderna < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the prior season are Moderna vaccines, and all shots (if any) in the current season are a Moderna vaccine"
+		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
 	dialect "mvel"
-	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	salience 30
 	when
 		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023ModernaLT5ySeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
 		and
-		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", isValid == true, associatedTargetSeries!.targetSeason != $tss.seriesSelectionSeason, associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false),
-			vaccineComponent.cdsConceptName not in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE519"))
-		and
-		not TargetDose(associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, vaccineComponent.cdsConceptName not in ("ICE311", "ICE312", "ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE519"))
-		and
-		(
-			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
-			or
-			(
-				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, targetSeason!.seasonName == "COVID19Dec2020Season" )
-				and
-				exists TargetDose(associatedTargetSeries == $tspriorseasonseries, isValid == true, administrationDate < $dateAt5yrs)
-				and
-				not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", this != $tspriorseasonseries, targetSeason != null, targetSeason.startsAfterStartDate($tspriorseasonseries!.targetSeason, false), targetSeason.startsBeforeStartDate($ts!.targetSeason, false))
-			)
-		)
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", vaccineComponent.cdsConceptName not in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519"))
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.setSelectedSeries(true);
 		$tss.setSelectedSeriesName($ts.seriesName);
-		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS);
+		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
 		update($tss);
 		update($ts);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection Complete: TargetSeries " + $ts);
 end
+
+//rule "CovidSeriesSelection: Retract All Series Not Selected in Vaccine Group for efficient evaluation"
+//	dialect "mvel"
+//	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
+//	salience 50
+//	when
+//		$tss : TargetSeriesSelection($ssvg : seriesSelectionVaccineGroup, $sss : seriesSelectionSeason,
+//			seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS ||	seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_COMPLETE)
+//		$selected : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == true, targetSeason == $sss)
+//		$ts : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == false, targetSeason == $sss)
+//	then
+//		String _RULENAME = kcontext.rule.name;
+//		for (TargetDose d : $ts.targetDoses) {
+//			ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetDose Retracted: " + d);
+//			retract(d);
+//		}
+//		retract($ts);
+//		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries Retracted: " + $ts);
+//end
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
