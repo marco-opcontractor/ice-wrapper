@@ -12,11 +12,13 @@ class TrackingAgendaEventListener() : DefaultAgendaEventListener() {
     private val matchList: MutableList<Match> = ArrayList<Match>()
 
     override fun afterMatchFired(event: AfterMatchFiredEvent) {
-        log.debug("Rule: {} Matched",event.match.rule)
-       /* val rule: Rule = event.match.rule
-        val ruleName: String = rule.getName()
-        val ruleMetaDataMap: Map<String, Any> = rule.getMetaData()
-        matchList.add(event.match)*/
+        if (log.isDebugEnabled) {
+            val seriesName = if (event.match.factHandles.toString().contains("getSeriesName()=")) event.match.factHandles.toString()
+                .substringAfter("getSeriesName()=")
+                .substringBefore(",")
+                .trim() else "All series"
+            log.debug("Rule: {} For Series: {} Matched", event.match.rule, seriesName)
+        }
     }
 
     fun isRuleFired(ruleName: String?): Boolean {
