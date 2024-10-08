@@ -2032,7 +2032,7 @@ end
 rule "SeriesSelection.HepADoNOTSelectAlreadyCompleteSeriesWithFewestDosesIfExistsAndOtherSeriesPreviouslySelected"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 100
+	salience 200
 	activation-group "SeriesSelectionFewestDoses"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
@@ -2049,7 +2049,7 @@ end
 rule "SeriesSelection.SelectByDefaultHepA2DoseSeries"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	salience 100
+	salience 10
 	activation-group "HepASeriesSelectionCheck"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
@@ -2063,6 +2063,134 @@ rule "SeriesSelection.SelectByDefaultHepA2DoseSeries"
 		update($ts);	
 end
 
+// Select 3-dos series if 2 dose series is not eligible anymore due to patient being an adult
+// in all circumstances when needed.
+rule "SeriesSelection.SelectHepAAdult3DoseSeries when 2 dose series is not sufficient"
+	dialect "mvel"
+	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	salience 80
+	activation-group "HepASeriesSelectionCheck"
+	when
+	  EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
+		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
+		exists TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", administrationDate >= $dateAt18yrs)
+		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepAAdult3DoseSeries",	selectedSeries == false)
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		$ts.setSelectedSeries(true);
+		$tss.setSelectedSeriesName($ts.seriesName);
+		update($ts);
+end
+
+
+// Select twinrix series when no completed HepA series and latest valid vaccine 18+ is Twinrix.
+// in all circumstances when needed.
+rule "SeriesSelection.SelectHepATwinrixSeries for HepA when not completed and valid Twinrix latest vaccine"
+	dialect "mvel"
+	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	salience 120
+	activation-group "HepABSeriesSelectionCheck"
+	when
+	  // EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
+	  $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepATwinrixSeries",	selectedSeries == false)
+		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
+		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		$ts.setSelectedSeries(true);
+		$tss.setSelectedSeriesName($ts.seriesName);
+		update($ts);
+end
+
+
+// Select twinrix series when no completed HepA series and latest valid vaccine 18+ is Twinrix.
+// in all circumstances when needed.
+rule "SeriesSelection.SelectHepBTwinrixSeries for HepB when not completed and valid Twinrix latest vaccine"
+	dialect "mvel"
+	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	salience 120
+	activation-group "HepBSeriesSelectionCheck"
+	when
+	  // EvaluatedPerson($dateAt18yrs : TimePeriod.addTimePeriod(demographics.birthTime, "18y-4d"))
+	  $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesRules.seriesName == "HepBTwinrixSeries",	selectedSeries == false)
+		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", selectedSeries == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
+		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		$ts.setSelectedSeries(true);
+		$tss.setSelectedSeriesName($ts.seriesName);
+		update($ts);
+end
+
+
+// Select twinrix series when no completed HepA series and latest valid vaccine 18+ is Twinrix.
+// in all circumstances when needed.
+rule "SeriesSelection.SelectHepATwinrixAcceleratedSeries for HepA when not completed and valid Twinrix latest vaccine"
+	dialect "mvel"
+	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	salience 200
+	activation-group "HepASeriesSelectionCheck"
+	when
+	  $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepATwinrixAcceleratedSeries",	selectedSeries == false)
+		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepATwinrix"))
+		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td.administrationDate)
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+	  $td2 : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate > $td.administrationDate)
+    not TargetDose(this != $td, associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", associatedSeriesName == "HepATwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td2.administrationDate)
+		$tdNormalSeries: TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",  associatedSeriesName == "HepATwinrixSeries", status != DoseStatus.VALID && status != DoseStatus.ACCEPTED, administrationDate == $td2.administrationDate)
+
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		$ts.setSelectedSeries(true);
+		$tss.setSelectedSeriesName($ts.seriesName);
+		update($ts);
+end
+
+
+// Select twinrix series when no completed HepA series and latest valid vaccine 18+ is Twinrix.
+// in all circumstances when needed.
+rule "SeriesSelection.SelectHepBTwinrixAcceleratedSeries for HepB when not completed and valid Twinrix latest vaccine"
+	dialect "mvel"
+	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	salience 200
+	activation-group "HepBSeriesSelectionCheck"
+	when
+		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesRules.seriesName == "HepBTwinrixAcceleratedSeries",	selectedSeries == false)
+    $tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.100", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", selectedSeries == true)
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", $ts.seriesComplete == false && seriesComplete == true && !seriesRules.seriesName.contains("HepBTwinrix"))
+		$td : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED)
+	  not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td.administrationDate)
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+		not TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, vaccineComponent.cdsConceptName not in ("ICE104") && administeredVaccine.cdsConceptName not in ("ICE104"))
+		$td2 : TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate > $td.administrationDate)
+    not TargetDose(this != $td, associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100", associatedSeriesName == "HepBTwinrixAcceleratedSeries", status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, administrationDate < $td2.administrationDate)
+		$tdNormalSeries: TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.100",  associatedSeriesName == "HepBTwinrixSeries", status != DoseStatus.VALID && status != DoseStatus.ACCEPTED, administrationDate == $td2.administrationDate)
+
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+		$ts.setSelectedSeries(true);
+		$tss.setSelectedSeriesName($ts.seriesName);
+		update($ts);
+end
 
 ///////////////////////////////////////////////////////////// Hep B-Specific Series Selection Rules Start Here /////////////////////////////////////////////////////////////
 

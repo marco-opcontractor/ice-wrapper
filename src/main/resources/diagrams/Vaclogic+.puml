@@ -1,0 +1,43 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam wrapWidth 80
+skinparam maxMessageSize 120
+
+participant OP
+
+
+participant HotIce [
+                       =HotIce
+                       ----
+                       ""evaluateXml""
+                   ]
+participant evaluateOP
+participant evaluateRaw
+participant IceWrapper #898EDE
+collections KnowledgeModule
+
+
+
+
+autonumber
+
+OP -> HotIce: Sends vaccine data as VaccineReport
+
+HotIce -> evaluateOP: calls evaluateOP
+evaluateOP -> evaluateRaw: calls evaluateRaw
+evaluateRaw -> IceWrapper: calls ice-wrapper evaluation
+IceWrapper -> IceWrapper: evaluates each vaccine using Knowledge Module
+note over IceWrapper
+  Runs ICE Engine as a library
+endnote
+IceWrapper -> evaluateRaw: Returns Evaluation result on different arrays
+evaluateRaw -> evaluateOP: Returns raw evaluation
+|||
+evaluateOP -> evaluateOP: Organizes raw evaluation into OPResult
+|||
+evaluateOP -> evaluateOP: Runs postprocessors
+evaluateOP -> HotIce: Returns OPResult
+HotIce -> OP: Returns Formatted XML forecast
+
+@enduml
