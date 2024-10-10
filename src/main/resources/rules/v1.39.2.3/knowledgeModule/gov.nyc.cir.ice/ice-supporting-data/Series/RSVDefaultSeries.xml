@@ -88,7 +88,7 @@
         <ns2:absoluteMinimumAge>0d</ns2:absoluteMinimumAge>
         <ns2:minimumAge>0d</ns2:minimumAge>
         <ns2:earliestRecommendedAge>0d</ns2:earliestRecommendedAge>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -108,7 +108,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>2</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -128,7 +128,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>3</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -148,7 +148,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>4</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -168,7 +168,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>5</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -188,7 +188,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>6</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -208,7 +208,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>7</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -228,7 +228,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>8</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -248,7 +248,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>9</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -268,7 +268,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>10</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -288,7 +288,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>11</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -300,7 +300,7 @@
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>12</ns2:doseNumber>
-        <ns2:latestRecommendedAge>2y</ns2:latestRecommendedAge>
+        <ns2:latestRecommendedAge>20m</ns2:latestRecommendedAge>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="93" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV monoclonal antibody (palivizumab)"/>
@@ -310,5 +310,4 @@
             <ns2:vaccine code="71" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV immune globulin"/>
         </ns2:doseVaccine>
     </ns2:iceSeriesDose>
-<!--    <ns2:seasonCode>DefaultRSVSeason</ns2:seasonCode>-->
 </ns2:iceSeriesSpecificationFile>
