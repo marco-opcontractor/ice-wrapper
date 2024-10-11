@@ -1056,24 +1056,24 @@ rule "EarlySeriesSelection(COVID-19): In Sep2023 season, select the Moderna < 5 
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection Complete: TargetSeries " + $ts);
 end
 
-//rule "CovidSeriesSelection: Retract All Series Not Selected in Vaccine Group for efficient evaluation"
-//	dialect "mvel"
-//	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
-//	salience 50
-//	when
-//		$tss : TargetSeriesSelection($ssvg : seriesSelectionVaccineGroup, $sss : seriesSelectionSeason,
-//			seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS ||	seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_COMPLETE)
-//		$selected : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == true, targetSeason == $sss)
-//		$ts : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == false, targetSeason == $sss)
-//	then
-//		String _RULENAME = kcontext.rule.name;
-//		for (TargetDose d : $ts.targetDoses) {
-//			ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetDose Retracted: " + d);
-//			retract(d);
-//		}
-//		retract($ts);
-//		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries Retracted: " + $ts);
-//end
+rule "CovidSeriesSelection: Retract All Series Not Selected in Vaccine Group for efficient evaluation"
+	dialect "mvel"
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
+	salience 50
+	when
+		$tss : TargetSeriesSelection($ssvg : seriesSelectionVaccineGroup, $sss : seriesSelectionSeason,
+			seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS ||	seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_COMPLETE)
+		$selected : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == true, targetSeason == $sss)
+		$ts : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == false, targetSeason == $sss)
+	then
+		String _RULENAME = kcontext.rule.name;
+		for (TargetDose d : $ts.targetDoses) {
+			ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetDose Retracted: " + d);
+			retract(d);
+		}
+		retract($ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries Retracted: " + $ts);
+end
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
