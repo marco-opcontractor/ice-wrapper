@@ -45,7 +45,8 @@
     <sequenceFlow id="_1-_3" sourceRef="_1" targetRef="_3" />
     <sequenceFlow id="_7-_4" sourceRef="_7" targetRef="_4" />
     <sequenceFlow id="_11-_5" sourceRef="_11" targetRef="_5" />
-    <sequenceFlow id="_9-_12" sourceRef="_9" targetRef="_12" />
+    <sequenceFlow id="_9-_12" sourceRef="_9" targetRef="_12" conditionExpression="${ TargetSeries(getVaccineGroup() == 'VACCINE_GROUP_CONCEPT.850') }"/>
+    <sequenceFlow id="_9-_6" sourceRef="_9" targetRef="_6" conditionExpression="${ TargetSeries(getVaccineGroup() != 'VACCINE_GROUP_CONCEPT.850') }"/>
     <sequenceFlow id="_12-_6" sourceRef="_12" targetRef="_6" />
     <sequenceFlow id="_8-_7" sourceRef="_8" targetRef="_7" />
     <sequenceFlow id="_6-_8" sourceRef="_6" targetRef="_8" />
