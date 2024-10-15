@@ -1351,5 +1351,21 @@
 			<displayName>Novavax COVID-19 Vaccine, Adjuvanted</displayName>
 		</cdsListItemConceptMapping>
 	</cdsListItem>
+	<cdsListItem>
+		<cdsListItemKey>306</cdsListItemKey>
+		<cdsListItemValue>RSV, mAb, nirsevimab-alip, 0.5 mL, Beyfortus</cdsListItemValue>
+		<cdsListItemConceptMapping>
+			<code>ICE306</code>
+			<displayName>RSV, mAb, nirsevimab-alip, 0.5 mL, Beyfortus</displayName>
+		</cdsListItemConceptMapping>
+	</cdsListItem>
+	<cdsListItem>
+		<cdsListItemKey>307</cdsListItemKey>
+		<cdsListItemValue>RSV, mAb, nirsevimab-alip, 1 mL, Beyfortus</cdsListItemValue>
+		<cdsListItemConceptMapping>
+			<code>ICE307</code>
+			<displayName>RSV, mAb, nirsevimab-alip, 1 mL, Beyfortus</displayName>
+		</cdsListItemConceptMapping>
+	</cdsListItem>
 	<cdsVersion>gov.nyc.cir^ICE^1.0.0</cdsVersion>
 </ns2:cdsListSpecificationFile>

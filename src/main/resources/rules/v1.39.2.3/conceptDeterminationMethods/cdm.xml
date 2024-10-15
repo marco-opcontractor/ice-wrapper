@@ -1566,6 +1566,38 @@
         <concept code="313" displayName="Novavax COVID-19 Vaccine, Adjuvanted"/>
       </fromConcepts>
     </conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+				codeSystemName="OpenCDS concepts" code="ICE93" displayName="Synagis(R)" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+				codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="93" displayName="Synagis(R)" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+				codeSystemName="OpenCDS concepts" code="ICE71" displayName="RSV-IGIV" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+				codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="71" displayName="RSV-IGIV" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+				codeSystemName="OpenCDS concepts" code="ICE306" displayName="RSV, mAb, nirsevimab-alip, 0.5 mL, Beyfortus" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+				codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="306" displayName="RSV, mAb, nirsevimab-alip, 0.5 mL, Beyfortus" />
+			</fromConcepts>
+		</conceptMapping>
+		<conceptMapping>
+			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+				codeSystemName="OpenCDS concepts" code="ICE307" displayName="RSV, mAb, nirsevimab-alip, 1 mL, Beyfortus" />
+			<fromConcepts codeSystem="2.16.840.1.113883.12.292"
+				codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+				<concept code="307" displayName="RSV, mAb, nirsevimab-alip, 1 mL, Beyfortus" />
+			</fromConcepts>
+		</conceptMapping>
     <timestamp>2022-08-15T00:00:00.606-05:00</timestamp>
     <userId>daryl</userId>
   </conceptDeterminationMethod>

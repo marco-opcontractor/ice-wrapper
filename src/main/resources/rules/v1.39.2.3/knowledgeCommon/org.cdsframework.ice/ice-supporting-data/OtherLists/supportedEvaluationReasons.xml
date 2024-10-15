@@ -128,5 +128,13 @@
         <cdsListItemKey>SPECIAL_RULE</cdsListItemKey>
         <cdsListItemValue>This vaccine is valid for primary series; valid thanks to a special rule.</cdsListItemValue>
     </cdsListItem>
+    <cdsListItem>
+        <cdsListItemKey>VACCINE_NOT_RECOMMENDED_UNLESS_HIGH_RISK</cdsListItemKey>
+        <cdsListItemValue>This vaccine is recommended solely for high risk patients for this disease</cdsListItemValue>
+    </cdsListItem>
+    <cdsListItem>
+        <cdsListItemKey>VACCINE_NOT_RECOMMENDED_MOTHER_VACCINE_DOCUMENTED</cdsListItemKey>
+        <cdsListItemValue>This vaccine is not recommended at this date due to mother vaccine documented</cdsListItemValue>
+    </cdsListItem>
 	<cdsVersion>org.cdsframework^ICE^1.0.0</cdsVersion>
 </ns2:cdsListSpecificationFile>

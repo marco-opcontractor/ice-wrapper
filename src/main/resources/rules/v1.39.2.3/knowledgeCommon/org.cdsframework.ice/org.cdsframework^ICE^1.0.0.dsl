@@ -29,6 +29,12 @@
 [consequence][]Make [Nn]ote of the [Pp]atient's [Ii]mmunity to {ddOpenCdsDiseaseConcept} with [Ii]mmunity [Dd]ate as {assign_oDate} and [Ee]valuation [Rr]eason {ddEvaluationReason} and [Rr]ecommendation [Rr]eason {ddRecommendationReason}=Date {assign_oDate} = ICELogicHelper.extractSingularDateValueFromIVLDate($or.getObservationEventTime()); DiseaseImmunity diseaseImmunity = new DiseaseImmunity({ddOpenCdsDiseaseConcept}, {assign_oDate}, {ddEvaluationReason}, {ddRecommendationReason}); insert(diseaseImmunity);
 [consequence][]Log that [Ii]mmunity was noted for {sDiseaseName} and [Ii]mmunity [Dd]ate {refer_oDate}=ICELogicHelper.logDRLDebugMessage(drools.getRule().getName(), "Added {sDiseaseName} Immunity as of date " + {refer_oDate}.toString());
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Date Utils
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+[condition][]The [Gg]iven [Dd]ate {refer_oTargetDate} does not [Ff]all within the ranges of {refer_oStartMonthDate} and {refer_oEndMonthDate}=eval(Season.monthAndDayFallsWithinRange(LocalDate.fromDateFields({refer_oTargetDate}).getMonthOfYear(), LocalDate.fromDateFields({refer_oTargetDate}).getDayOfMonth(), {refer_oStartMonthDate}, {refer_oEndMonthDate}) == false)
+[condition][]The [Gg]iven [Dd]ate {refer_oTargetDate} [Ff]alls within the ranges of {refer_oStartMonthDate} and {refer_oEndMonthDate}=eval(Season.monthAndDayFallsWithinRange(LocalDate.fromDateFields({refer_oTargetDate}).getMonthOfYear(), LocalDate.fromDateFields({refer_oTargetDate}).getDayOfMonth(), {refer_oStartMonthDate}, {refer_oEndMonthDate}) == true)
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetDose
@@ -80,6 +86,7 @@
 [condition][]- [Tt]hat has not already been [Ee]valuated=status == DoseStatus.EVALUATION_NOT_STARTED
 [condition][]- [Tt]he [Aa]dministration [Dd]ate of the [Ss]hot is {aOp:[\=\\<\\>\\!]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=administrationDate {aOp} {strDate}
 [condition][]- [Tt]he [Aa]dministration [Dd]ate of the [Ss]hot is {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=administrationDate {aOp} {dtOtherDate}
+[condition][]- [Tt]he [Aa]dministration [Dd]ate of the [Ss]hot [Ff]alls within the ranges of {refer_oStartMonthDate} and {refer_oEndMonthDate}=eval(Season.monthAndDayFallsWithinRange(LocalDate.fromDateFields(administrationDate).getMonthOfYear(), LocalDate.fromDateFields(administrationDate).getDayOfMonth(), {refer_oStartMonthDate}, {refer_oEndMonthDate}) == true)
 [condition][]- [Tt]he [Rr]ule {sRuleName} has not been executed before for this [Dd]ose=containsRuleProcessed({sRuleName}) == false
 [condition][]- [Tt]he [Rr]ule {sRuleName} has been executed before for this [Dd]ose=containsRuleProcessed({sRuleName}) == true
 [condition][]- [Tt]he [Ss]hot has not already been marked as a [Ll]ive [Vv]irus [Cc]onflict \(as we do not want this [Rr]ule executing more than necessary\)=containsInvalidReason(BaseDataEvaluationReason._TOO_EARLY_LIVE_VIRUS.getCdsListItemName()) == false
@@ -306,6 +313,9 @@
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid for this [Ss]eries={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.UNSPECIFIED_REASON"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Nn]ot [Ee]valuated due to "Vaccine Not Supported"={refer_oTargetDose}.addNotEvalatedReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_SUPPORTED");
 [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Outside RSV Season"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.OUTSIDE_SEASON"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Not Recommended unless High Risk"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_RECOMMENDED_UNLESS_HIGH_RISK"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Not Recommended due to Mother Vaccine Documented"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.VACCINE_NOT_RECOMMENDED_MOTHER_VACCINE_DOCUMENTED"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
+[consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to "Above Recommended Age for Series"={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.ABOVE_REC_AGE_SERIES"); {refer_oTargetDose}.setRuleName(drools.getRule().getName());
 ////////////// DO NOT USE [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Aa]ccepted due to {oReason:[\\$]?[a-zA-Z0-9\\.\\_\\(\\)\\/\\"]+}={refer_oTargetDose}.addAcceptedReason({oReason});
 ////////////// DO NOT USE [consequence][][Ii]nclude the [Rr]eason for [Ss]hot {refer_oTargetDose} [Ii]nvalid due to {oReason:[\\$]?[a-zA-Z0-9\\.\\_\\(\\)\\/\\"]+}={refer_oTargetDose}.addInvalidReason({oReason});
 [consequence][][Rr]emove [Ee]valuation [Rr]eason {strReason:[\\"]{1}[a-zA-Z0-9\\.\\_\\ ]+[\\"]{1}} from [Ss]hot {refer_oTargetDose:[\\$]?[a-zA-Z0-9\\.\\_\\]+}={refer_oTargetDose}.removeEvaluationReasonFromAllReasonSets({strReason});
@@ -379,6 +389,10 @@
 [consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Oo]verdue [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRuleName(drools.getRule().getName()); {assign_oRecommendation}.setOverdueDate({dtForecastDate}); insert({assign_oRecommendation});
 [consequence][][Ii]nclude the [Rr]ecommendation {refer_oRecommendation} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries=insert({refer_oRecommendation});
 [consequence][][Ll]ogically [Ii]nsert the [Rr]ecommendation {refer_oRecommendation} into [Ww]orking [Mm]emory for [Pp]otential [Cc]onsideration in the final [Ff]orecast of the [Ss]eries=insertLogical({refer_oRecommendation});
+[consequence][][Ss]et the final recommended date for the series {refer_oTargetSeries} to the monthday of {ref_oMonthDay} on the same year={refer_oTargetSeries}.setFinalRecommendationDate(new Date({refer_oTargetSeries}.getFinalRecommendationDate().getYear(), {ref_oMonthDay}.getMonthOfYear() - 1, {ref_oMonthDay}.getDayOfMonth()));
+[consequence][][Ss]et the final earliest date date for the series {refer_oTargetSeries} to the monthday of {ref_oMonthDay} on the same year={refer_oTargetSeries}.setFinalEarliestDate(new Date({refer_oTargetSeries}.getFinalEarliestDate().getYear(), {ref_oMonthDay}.getMonthOfYear() - 1, {ref_oMonthDay}.getDayOfMonth()));
+[consequence][][Ss]et the final recommended date for the series {refer_oTargetSeries} to the date of {ref_oNewDate}={refer_oTargetSeries}.setFinalRecommendationDate({ref_oNewDate});
+[consequence][][Ss]et the final earliest date date for the series {refer_oTargetSeries} to the date of {ref_oNewDate}={refer_oTargetSeries}.setFinalEarliestDate({ref_oNewDate});
 
 // Consider adding reevaluation of all shots in the series
 /////// [consequence][][Rr]eevaluate all [Ss]hots in the [Ss]eries {refer_oTargetSeries}=

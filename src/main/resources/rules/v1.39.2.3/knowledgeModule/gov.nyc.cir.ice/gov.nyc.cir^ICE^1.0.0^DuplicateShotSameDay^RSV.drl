@@ -1,0 +1,78 @@
+/**
+ * Copyright (C) 2024 New York City Department of Health and Mental Hygiene, Bureau of Immunization
+ * Contributions by HLN Consulting, LLC
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. You should have received a copy of the GNU Lesser
+ * General Public License along with this program. If not, see <http://www.gnu.org/licenses/> for more
+ * details.
+ *
+ * The above-named contributors (HLN Consulting, LLC) are also licensed by the New York City
+ * Department of Health and Mental Hygiene, Bureau of Immunization to have (without restriction,
+ * limitation, and warranty) complete irrevocable access and rights to this project.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; THE
+ *
+ * SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING,
+ * BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS, IF ANY, OR DEVELOPERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES, OR OTHER LIABILITY OF ANY KIND, ARISING FROM, OUT OF, OR IN CONNECTION WITH
+ * THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * For more information about this software, see http://www.hln.com/ice or send
+ * correspondence to ice@hln.com.
+ */
+ 
+package knowledgeModule.gov.nyc.cir.ice
+
+import java.util.Date
+import java.util.Iterator
+import java.util.List
+import java.util.Set
+import org.opencds.vmr.v1_0.internal.EvalTime
+import org.opencds.vmr.v1_0.internal.EvaluatedPerson
+import org.cdsframework.ice.service.DiseaseImmunity
+import org.cdsframework.ice.service.DoseStatus
+import org.cdsframework.ice.service.ICEFactTypeFinding
+import org.cdsframework.ice.service.ICELogicHelper
+import org.cdsframework.ice.service.Recommendation
+import org.cdsframework.ice.service.RecommendationStatus
+import org.cdsframework.ice.service.SeriesRules
+import org.cdsframework.ice.supportingdata.BaseDataEvaluationReason
+import org.cdsframework.ice.supportingdatatmp.SupportedFactConcept
+import org.cdsframework.ice.service.TargetDose
+import org.cdsframework.ice.service.TargetSeries
+import org.cdsframework.ice.util.TimePeriod
+import org.cdsframework.ice.util.TimePeriod.DurationType
+import org.cdsframework.ice.service.Vaccine
+
+global java.util.Date evalTime
+global java.lang.Boolean isRSVHighRisk
+
+
+// If one of the duplicate shots is an RSV Beyfortus combination of 2 shots of 307 (1ml Beyfortus) after 8 months old, and high risk, these are valid
+rule "Duplicate Shots/Same Day RSV: If given 2 shots of Beyfortus on or after 8 months old, pass evaluation and keep original evaluation"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^duplicateShotSameDay"
+	auto-focus true
+	salience 10		// This rule should run before the general duplicate shots/same day rules
+	when
+	  $evaluatedPatient: EvaluatedPerson($patientAt8Months: TimePeriod.addTimePeriod(demographics.birthTime, "8m"))
+		$td: TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.905", hasBeenEvaluated == true, status == DoseStatus.VALID || status == DoseStatus.ACCEPTED, isDoseStatusOverridden() == false,
+			vaccineComponent.cdsConceptName == "ICE307")
+		$tdother : TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.905", this != $td, hasBeenEvaluated == true, administrationDate == $td.administrationDate, status == DoseStatus.VALID,
+			isDoseStatusOverridden() == false, vaccineComponent.cdsConceptName == "ICE307",
+			isDuplicateShotSameDayCheckCompleted() == false || $td.isDuplicateShotSameDayCheckCompleted() == false)
+		eval($td.getAdministrationDate() >= $patientAt8Months)
+		eval(isRSVHighRisk == true)
+	then
+		String _RULENAME = kcontext.rule.name;
+		modify($td) {
+			setDuplicateShotSameDayCheckCompleted(true)
+		}
+		modify($tdother) {
+			setDuplicateShotSameDayCheckCompleted(true)
+		}
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries with Duplicate CVX 307 Valid Shots: " + $td.associatedTargetSeries);
+end
