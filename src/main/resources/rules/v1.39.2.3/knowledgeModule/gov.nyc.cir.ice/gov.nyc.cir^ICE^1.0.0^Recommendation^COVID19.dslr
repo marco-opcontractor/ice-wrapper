@@ -54,6 +54,34 @@ global java.util.Date evalTime
 global org.cdsframework.ice.service.Schedule schedule
 
 
+rule "COVID-19: Focus on custom recommendation sub-group only when evaluating VACCINE_GROUP 850"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	salience 999
+	no-loop true
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+	then
+		Set the Agenda Group Focus to "RecommendationForecast^customCovidRecommendationRule"
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "COVID-19: Focus on post custom recommendation sub-group only when evaluating VACCINE_GROUP 850"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 999
+	no-loop true
+	when
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+	then
+		Set the Agenda Group Focus to "RecommendationForecast^postCustomCovidRecommendationCheck"
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
 /*************************************************************************************************************************************************************************************
  START ____Series Completion Special Rules____ - First Booster Dose
 /************************************************************************************************************************************************************************************/
@@ -68,7 +96,7 @@ global org.cdsframework.ice.service.Schedule schedule
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y and < 18y of age and has completed the Moderna Series along with no extra doses, then recommend CONDITIONAL / COMPLETE_HIGH_RISK"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -97,7 +125,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y has completed the Moderna Series along with no extra doses, then recommend a booster dose at earliest/recommended age of 18y w/ earliest/recommended interval of 5 months"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -140,7 +168,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y has completed the Series along with no extra doses in the Pfizer or Mixed Product series, then recommend a booster dose at earliest/recommended age of 5y w/ earliest/recommended interval of 5 months"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -186,7 +214,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 12y has completed the Janssen Series and no extra doses have been administered, then recommend the _1st_ booster dose at recommended age 12y w/ recommended interval of 8 weeks, whichever is later"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -231,7 +259,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 12y of age and has completed the Novavax Series along with no extra doses, then recommend a booster dose at earliest/recommended age of 12y w/ earliest/recommended interval of 5 months"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -275,7 +303,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y has completed a WHO-approved series along with no extra doses, then recommend a booster dose at earliest/recommended age of 5y w/ recommended interval of 5 months"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -333,7 +361,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y and < 50y has completed the Moderna Series along with one extra dose, then recommend CONDITIONAL / COMPLETE_HIGH_RISK"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -378,7 +406,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y and < 50 years has completed the Series along with one extra dose in the Pfizer, Mixed Product or WHO-approved series, then recommend CONDITIONAL / COMPLETE_HIGH_RISK"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -413,7 +441,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 50y has completed the Series along with one extra dose in the Pfizer, Moderna, Mixed Product or WHO-approved series, then recommend a 2nd booster dose at earliest/recommended age of 50y w/ earliest/recommended interval of 4 months"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -465,7 +493,7 @@ end
 ////////////////////////////
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y has completed the Janssen Series and 1 extra dose of a non-mRNA vaccine, then recommend the _2nd_ booster dose at earliest age 18y/recommended age 18y or recommended interval of 4 months, whichever is later"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -518,7 +546,7 @@ end
 ////////////////////////////
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y and < 50y has completed the Janssen Series and 1 extra dose of an mRNA vaccine, then recommend CONDITIONAL / COMPLETE_HIGH_RISK"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -566,7 +594,7 @@ end
 ////////////////////////////
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient >= 50y has completed the Janssen Series and 1 extra dose of an mRNA vaccine, then recommend the _2nd_ booster dose at earliest age 50y/recommended age 50y or recommended interval of 4 months, whichever is later"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -624,7 +652,7 @@ end
 
 rule "COVID-19: If the execution date is < 9/2/2022 and the patient has completed the the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series and 2 extra doses has been administered, then recommend NOT_RECOMMENDED / COMPLETE"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -652,7 +680,7 @@ end
 
 rule "COVID-19: If the execution date is anytime (before, on, or after 9/2/2022), the patient >= 5y and < 12y has completed the Janssen Series, and 0 or 1 one extra dose has been administered, then recommend Not Recommended / COMPLETE_HIGH_RISK"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -681,7 +709,7 @@ end
 
 rule "COVID-19(Abstract): If the execution date is >= 9/2/2022, determine recommendation for completed the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series along with up to an additional dose and/or 3 extra doses"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -711,7 +739,8 @@ end
 rule "COVID-19: If the execution date is >= 12/8/2022 and < 4/19/2023, the patient >= __6 months__, and has completed the __Moderna__ Series along with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 6 month & 12/8/2022 w/ earliest/recommended interval of 8 weeks"
 		extends "COVID-19(Abstract): If the execution date is >= 9/2/2022, determine recommendation for completed the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series along with up to an additional dose and/or 3 extra doses"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
+	no-loop true
 	when
 		There is a Series $inheritedSeries identified by $targetSeries
 			- the name of the Series is "COVID19ModernaSeries"
@@ -742,7 +771,8 @@ end
 rule "COVID-19: If the execution date is >= 10/12/2022 and < 12/8/2022, the patient >= __5y__, and has completed the __Moderna__ Series along with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 5y & 10/12/2022 w/ earliest/recommended interval of 8 weeks"
 		extends "COVID-19(Abstract): If the execution date is >= 9/2/2022, determine recommendation for completed the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series along with up to an additional dose and/or 3 extra doses"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
+	no-loop true
 	when
 		There is a Series $inheritedSeries identified by $targetSeries
 			- the name of the Series is "COVID19ModernaSeries"
@@ -775,7 +805,8 @@ end
 rule "COVID-19: If the execution date is >= 10/12/2022 and < 4/19/2023, the patient >= __5y__, and has completed the __Pfizer__, __Mixed Product__ or __WHO-approved__ series along with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 5y & 10/12/2022 w/ earliest/recommended interval of 8 weeks"
 		extends "COVID-19(Abstract): If the execution date is >= 9/2/2022, determine recommendation for completed the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series along with up to an additional dose and/or 3 extra doses"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
+	no-loop true
 	when
 		There is a Series $inheritedSeries identified by $targetSeries
 			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
@@ -808,7 +839,8 @@ end
 rule "COVID-19: If the execution date is >= 9/2/2022 and < 4/19/2023, the patient >= __12y__ and has completed the __Pfizer__, __Mixed Product__, __Moderna__, __Novavax__, __Janssen__ or __WHO-approved__ Series  with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 5y & 9/2/2022 w/ earliest/recommended interval of 8 weeks"
 		extends "COVID-19(Abstract): If the execution date is >= 9/2/2022, determine recommendation for completed the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series along with up to an additional dose and/or 3 extra doses"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
+	no-loop true
 	when
 		There is a Series $inheritedSeries identified by $targetSeries
 			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Novavax2DoseSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
@@ -849,7 +881,7 @@ end
 // Abstract rule to assist in determining if a booster dose completes the series on or after 9/2/2022
 rule "COVID-19(Abstract): Prior booster dose was administered in the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series on or after 9/2/2022"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -875,7 +907,7 @@ end
 rule "COVID-19: If a prior booster dose was administered >= 12/8/2022 when the patient is >= __6 months__ of age in the __Moderna__ Series, the execution date is < 4/19/2023, recommend Not Recommended / COMPLETE"
 		extends "COVID-19(Abstract): Prior booster dose was administered in the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series on or after 9/2/2022"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	salience 30
 	when
 		There exists an administered shot
@@ -900,7 +932,7 @@ end
 rule "COVID-19: If a prior booster dose was administered >= 10/12/2022 when the patient is >= __5 yrs__ in the __Pfizer__ Series, and the execution date is < 3/17/2023, recommend Not Recommended / COMPLETE"
 		extends "COVID-19(Abstract): Prior booster dose was administered in the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series on or after 9/2/2022"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	salience 20
 	when
 		There exists an administered shot
@@ -926,7 +958,7 @@ end
 rule "COVID-19: If a prior booster dose was administered >= 10/12/2022 when the patient is >= __5 yrs__ in the __Mixed Product__, __Moderna__ or __WHO-approved__ series and the execution date is < 4/19/2023, recommend Not Recommended / COMPLETE"
 		extends "COVID-19(Abstract): Prior booster dose was administered in the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series on or after 9/2/2022"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	salience 20
 	when
 		There exists an administered shot
@@ -951,7 +983,7 @@ end
 rule "COVID-19: If a prior booster dose was administered >= 9/2/2022 when the patient is >= 12 yrs of age in the __Pfizer__ Series, and the execution date is < 3/17/2023, recommend Not Recommended / COMPLETE"
 		extends "COVID-19(Abstract): Prior booster dose was administered in the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series on or after 9/2/2022"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	salience 10
 	when
 		There exists an administered shot
@@ -976,7 +1008,7 @@ end
 rule "COVID-19: If a prior booster dose was administered >= 9/2/2022 in the __Mixed Product__, __Moderna__, Novavax, Janssen or WHO-approved Series when the patient is >= __12 yrs__ of age and the execution date is < 4/19/2023, recommend Not Recommended / COMPLETE"
 		extends "COVID-19(Abstract): Prior booster dose was administered in the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series on or after 9/2/2022"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	salience 10
 	when
 		There exists an administered shot
@@ -1006,7 +1038,7 @@ end
 
 rule "COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1032,7 +1064,7 @@ end
 rule "COVID-19: If the execution date is >= 4/19/2023, patient is >= 65 yrs of age and has had 2 or more prior doses with a bivalent vaccine or 2 or more doses at >= 4/19/2023, recommend Not Recommended / COMPLETE"
 		extends "COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		Confirm that the following is true: $nNumberOfBivalentDoses + $nDosesAdministeredAfter041923 >= 2
 		Confirm the date evalTime is on the same date or after "19-Apr-2023"
@@ -1054,7 +1086,7 @@ end
 rule "COVID-19: If the execution date is >= 4/19/2023, patient is >= 65 yrs of age, and has had 1 prior dose with a bivalent vaccine or 1 prior dose at >= 4/19/2023 in the Moderna series, recommend Not Recommended / COMPLETE_HIGH_RISK"
 		extends "COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		Confirm the variable $nNumberOfBivalentDoses is == 1 || the variable $nDosesAdministeredAfter041923 is == 1
 		Confirm the date evalTime is on the same date or after "19-Apr-2023"
@@ -1075,7 +1107,7 @@ end
 rule "COVID-19: If the execution date is >= 4/19/2023, patient is < 65 years of age and has had at least 1 prior dose with a bivalent vaccine or at least 1 dose administered at >= 4/19/2023, recommend Not Recommended / COMPLETE"
 		extends "COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		Confirm the variable $nNumberOfBivalentDoses is >= 1 || the variable $nDosesAdministeredAfter041923 is >= 1
 		Confirm the date evalTime is on the same date or after "19-Apr-2023"
@@ -1096,7 +1128,7 @@ end
 rule "COVID-19: If the execution date is >= 4/19/2023 for the Mixed Product, Moderna, Janssen or Novavax COVID-19 series, the patient has not had any bivalent doses or any doses administered at >= 4/19/2023, recommend a bivalent vaccine at age 6 months and recommended interval of 8 weeks along with recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE"
 		extends "COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $pfizerSeries identified by $targetSeries
 			- the name of the Series a member of ("COVID19MixedProductSeries", "COVID19ModernaSeries", "COVID19Janssen1DoseSeries", "COVID19Novavax2DoseSeries")
@@ -1124,7 +1156,7 @@ end
 rule "COVID-19: If the execution date is >= 4/19/2023 for the Pfizer COVID-19 series, the patient is >= 5 yrs of age, and has not had any bivalent doses or any doses administered at >= 4/19/2023, recommend a bivalent vaccine at age 6 months and recommended interval of 8 weeks along with recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE"
 		extends "COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $pfizerSeries identified by $targetSeries
 			- the name of the Series is "COVID19PfizerSeries"
@@ -1155,7 +1187,7 @@ end
 rule "COVID-19: If the child < 5 years of age completes the Pfizer series, the execution date is >= 3/17/2023, and neither a bivalent vaccine dose has been admininstered nor a dose administered >= 4/19/2023, recommend at the vaccine group level with recommended interval of 8 weeks or on 3/17/2023, whichever is latest, along with recommended reason ADMINISTER_COVID19_BIVALENT_VACCINE"
 		extends "COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $pfizerSeries identified by $targetSeries
 			- the name of the Series is "COVID19PfizerSeries"
@@ -1195,7 +1227,7 @@ end
 //////////////
 
 rule "COVID-19: If a dose is recommended in the Pfizer series for patient < 5 years and the execution date is >= 3/17/2023, add the recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1216,7 +1248,7 @@ end
 
 
 rule "COVID-19: If a dose is recommended in the Pfizer series for patient >= 5 years and the execution date is >= 3/17/2023 and < 4/19/2023, add the recommendation reason BOOSTER_DOSE"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1238,7 +1270,7 @@ end
 
 
 rule "COVID-19: If a dose is recommended in the Pfizer, Mixed Product, Moderna, Janssen or Novavax series and the execution date is >= 4/19/2023, add the recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1257,7 +1289,7 @@ end
 
 // Because the COVID-19 series have been configured as a recurring dose series; if a recommendation date is forecasted after the either of those series is already complete, add the recommendation reason "BOOSTER_DOSE"
 rule "COVID-19: If a dose is recommended in the Pfizer series, the series is complete and the execution date is < 3/17/2023, add the recommendation reason BOOSTER_DOSE"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1277,7 +1309,7 @@ end
 
 // Because the COVID-19 series have been configured as a recurring dose series; if a recommendation date is forecasted after the either of those series is already complete, add the recommendation reason "BOOSTER_DOSE"
 rule "COVID-19: If a dose is recommended in the Moderna, Mixed Product, Janssen, Novavax or FDA-authorized/WHO series, the series is complete and the execution date is < 4/19/2023, add the recommendation reason BOOSTER_DOSE"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1296,7 +1328,7 @@ end
 
 
 rule "COVID-19: If the recommendation is NOT_RECOMMENDED, the current season series is complete and there is not already a recommendation reason supplied, add evaluation reason COMPLETE"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1313,7 +1345,7 @@ rule "COVID-19: If the recommendation is NOT_RECOMMENDED, the current season ser
 end
 
 rule "COVID-19: 2024 2025 Season where if the Sept 2023 season is complete, manually mark it as incomplete and add 8 weeks of recommendation"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	salience -50
 	activation-group "specialDoseRulesCheck"
 	when
@@ -1362,7 +1394,7 @@ rule "COVID-19: 2024 2025 Season where if the Sept 2023 season is complete, manu
 end
 
 rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is below 8 weeks and patient is 5 years old non novavax, adjust recommendation"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	salience -50
 	when
 		There is a Series $targetSeries
@@ -1392,7 +1424,7 @@ rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is be
 end
 
 rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is below 8 weeks and 2 successful COVID shots were administered, adjust recommendation"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	salience -50
 	when
 		There is a Series $targetSeries
@@ -1430,7 +1462,7 @@ rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is be
 end
 
 rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is below newer 2024 season, adjust its date"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	salience -999
 	when
 		There is a Series $targetSeries
@@ -1448,7 +1480,7 @@ rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is be
 end
 
 rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is below newer 2024 season, adjust its date (Novavax)"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	salience -999
 	when
 		There is a Series $targetSeries
@@ -1466,7 +1498,7 @@ rule "COVID-19: 2024 2025 Season where if the earliest recommendation date is be
 end
 
 rule "COVID-19: If a dose is recommended in the Pfizer, Mixed Product, Moderna, Janssen or Novavax series add the recommendation reason ADMINISTER_2023_24_FORMULATION_COVID19"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1481,7 +1513,7 @@ rule "COVID-19: If a dose is recommended in the Pfizer, Mixed Product, Moderna, 
 end
 
 rule "COVID-19: If an overdue date is recommended as well as the recommended date, change overdue date to null"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	agenda-group "RecommendationForecast^postCustomCovidRecommendationCheck"
 	no-loop true
 	when
 		There is a Series $targetSeries
@@ -1509,7 +1541,7 @@ end
 
 rule "COVID-19: If the patient has no doses on record and is >= 6 months, recommend on today's date"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1530,7 +1562,7 @@ end
 
 rule "COVID-19: If the patient has no doses on record and is < 6 months old, recommend at 6 months of age"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1558,7 +1590,7 @@ end
 
 // If the series is not complete and the last shot administered is CVX 213 or shot not authorized by the FDA, recommend earliest and routine interval of 28 days to the next dose
 rule "COVID-19: If the Series is not complete and the last shot administered was CVX 213 or shot not authorized by the FDA, recommend earliest and recommended interval of 28 days"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1582,7 +1614,7 @@ end
 
 rule "COVID-19: If the Series is not complete and the last shot administered was a WHO-approved vaccine not authorized by the FDA, override default earliest interval rule to not fire"
 		extends "COVID-19: If the Series is not complete and the last shot administered was CVX 213 or shot not authorized by the FDA, recommend earliest and recommended interval of 28 days"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "earliestIntervalCheck"
 	when
 		There exists an Administered Shot
@@ -1596,7 +1628,7 @@ end
 
 rule "COVID-19: If the Series is not complete and the last shot administered was a WHO-approved vaccine not authorized by the FDA, override default recommendation interval rule to not fire"
 		extends "COVID-19: If the Series is not complete and the last shot administered was CVX 213 or shot not authorized by the FDA, recommend earliest and recommended interval of 28 days"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationIntervalCheck"
 	when
 		There exists an Administered Shot
@@ -1617,7 +1649,7 @@ end
 
 rule "COVID-19(Abstract): If dose 1 was administered at >= 6 yrs of age in the Moderna Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	///////activation-group "earliestIntervalCheck"
 	when
 		There is a Series $targetSeries that needs forecasting
@@ -1640,7 +1672,7 @@ end
 rule "COVID-19: If dose 1 was administered at >= 6 yrs of age and and the execution date >= 4/19/2023, override default earliest interval and recommend earliest interval of 8 weeks"
 		extends "COVID-19(Abstract): If dose 1 was administered at >= 6 yrs of age in the Moderna Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "earliestIntervalCheck"
 	when
 		// Condition met for earliest interval change
@@ -1655,7 +1687,7 @@ end
 rule "COVID-19: If dose 1 was administered at >= 6 yrs of age and and the execution date >= 4/19/2023, override default recommended interval and recommend recommended interval of 8 weeks"
 		extends "COVID-19(Abstract): If dose 1 was administered at >= 6 yrs of age in the Moderna Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationIntervalCheck"
 	when
 		// Condition met for recommended interval change
@@ -1669,7 +1701,7 @@ end
 
 rule "COVID-19(Abstract): If dose 1 was administered at >= 5 yrs of age in the Pfizer or Mixed Product Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
@@ -1691,7 +1723,7 @@ end
 rule "COVID-19: If dose 1 was administered at >= 5 yrs of age and and the execution date >= 4/19/2023, override default earliest interval and recommend earliest interval of 8 weeks"
 		extends "COVID-19(Abstract): If dose 1 was administered at >= 5 yrs of age in the Pfizer or Mixed Product Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "earliestIntervalCheck"
 	when
 		// Condition met for earliest interval change
@@ -1706,7 +1738,7 @@ end
 rule "COVID-19: If dose 1 was administered at >= 5 yrs of age and and the execution date >= 4/19/2023, override default recommended interval and recommend recommended interval of 8 weeks"
 		extends "COVID-19(Abstract): If dose 1 was administered at >= 5 yrs of age in the Pfizer or Mixed Product Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationIntervalCheck"
 	when
 		// Condition met for recommended interval change
@@ -1732,7 +1764,7 @@ end
 
 rule "COVID-19(Pfizer/Moderna/Mixed Product < 5yrs): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationIntervalCheck"
 	salience 9
 	when
@@ -1766,7 +1798,7 @@ end
 
 rule "COVID-19(Sep2023 Novavax Series): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationIntervalCheck"
 	salience 10
 	when
@@ -1807,7 +1839,7 @@ end
 
 rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot was administered prior to target dose 1 (prior season) but has never received any (valid) doses, the minimum intervals from the prior shot to the current shot is 8w"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationAgeCheck"
 	salience 20
 	when
@@ -1853,7 +1885,7 @@ end
 
 rule "COVID-19(Sep2023 >= 5yrs): If there are no shots administered, set the earliest/recommended/overdue age to the latter of age 6 months or 9/12/2023 (*recommendationAgeCheck*)"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationAgeCheck"
 	when
 		There is a Series $targetSeries that needs forecasting
@@ -1879,7 +1911,7 @@ end
 
 rule "COVID-19(Sep2023 >= 5yrs): If 8 weeks from the last administered shot elapsed prior to the patient turning 5 years of age, set the earliest and recommended age to 8w from the last administered shot (*recommendationAgeCheck*)"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationAgeCheck"
 	when
 		// Series Table Recommended Age will be overridden by this rule and not be enforced
@@ -1918,7 +1950,7 @@ end
 rule "COVID-19(Sep2023 >= 5yrs): If 8 weeks from the last administered shot elapsed prior to the patient turning 5 years of age, set earliest and recommended age to 8w from the last administered shot (*earliestAgeCheck*)"
 		extends "COVID-19(Sep2023 >= 5yrs): If 8 weeks from the last administered shot elapsed prior to the patient turning 5 years of age, set the earliest and recommended age to 8w from the last administered shot (*recommendationAgeCheck*)"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "earliestAgeCheck"
 	when
 		// Series Table Earliest Age will be overridden by this rule and will not be enforced
@@ -1930,7 +1962,7 @@ end
 
 rule "COVID-19: If we attempt to forecast when being before 6m old"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	salience 50
 	activation-group "earliestAgeCheck"
 	when
@@ -1951,7 +1983,7 @@ end
 /////// rule "COVID-19(Sep2023 >= 5yrs): If there are no shots in the current season and only ignored shots in the prior season, set the earlest and recommended age date to 9/12/2023 (*recommendationAgeCheck*)"
 rule "COVID-19(Sep2023): If there are no shots in the current season by default set the earliest and recommended date to the latter of age 6 months or 9/12/2023 (*recommendationAgeCheck*)"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationAgeCheck"
 	salience -50
 	when
@@ -1975,7 +2007,7 @@ end
 
 rule "COVID-19(Sep2023 >= 5yrs): If an unignored shot was administered (regardless of whether it is in the past season or present season) and the series is not complete, recommend earliest and recommended interval of 8w to the next target dose"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationIntervalCheck"
 	when
 		There is a Series $targetSeries that needs forecasting
@@ -2006,7 +2038,7 @@ end
 rule "COVID-19(Sep2023 >= 5yrs): activation-group extension => if a shot was administered (regardless of whether it is in the past season or present season) but the series is not complete, recommend earliest and recommended interval of 8w to the next target dose"
 		extends "COVID-19(Sep2023 >= 5yrs): If an unignored shot was administered (regardless of whether it is in the past season or present season) and the series is not complete, recommend earliest and recommended interval of 8w to the next target dose"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "earliestIntervalCheck"
 	when
 		// No condition required for this extension
@@ -2034,7 +2066,7 @@ end
 
 rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): For target dose 1 of the current series' season: no shots have been administered in the current season but there have been shots administered in the prior season. Enforce the earliest/recommended recommendation interval for the current series dose from the most recent shot in the prior season"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
@@ -2073,8 +2105,8 @@ end
 
 rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): For target dose > 1: If no shots have been administered in the current season. Enforce the earliest/recommended recommendation interval for the current series dose from the most recent shot in the previous season"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
-	activation-group "RecommendationForecast^customRecommendationRule^CustomIntervals"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
+	activation-group "RecommendationForecast^customCovidRecommendationRule^CustomIntervals"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
@@ -2120,8 +2152,8 @@ end
 
 rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or more doses were administered in the prior season, earliest/recommended interval to the next dose is 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
-	activation-group "RecommendationForecast^customRecommendationRule^CustomIntervals"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
+	activation-group "RecommendationForecast^customCovidRecommendationRule^CustomIntervals"
 	no-loop true
 	salience 10
 	when
@@ -2191,7 +2223,7 @@ end
 
 rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient has 1 dose of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, set the recommendation dose number to 2"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	no-loop true
 	when
 		There is a Series $targetSeries that needs forecasting
@@ -2262,7 +2294,7 @@ end
 
 rule "COVID-19(Sep2023 __Mixed Product__ < 5yrs Series): If CVX 313 was administered, recommend Minimum/Recommended interval of 8 weeks to the next dose"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -2300,7 +2332,7 @@ end
 
 rule "COVID-19(Sep2023 Novavax Series): If a shot was administered for any dose number and the series is not complete, recommend earliest and recommended interval of 8w to the next target dose"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
@@ -2331,7 +2363,7 @@ end
 
 rule "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "recommendationAgeCheck"
 	when
 		There is a Series $targetSeries that needs forecasting
@@ -2367,7 +2399,7 @@ end
 rule "COVID-19(Sep2023 Novavax Series):activation-group extension => If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs, recommend earliest/recommended interval of 8 weeks from dose 1"
 		extends "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	activation-group "earliestAgeCheck"
 	when
 		// No condition required for this extension
@@ -2379,7 +2411,7 @@ end
 
 rule "COVID-19(Sep2023 Novavax Series): If the patient has 2 doses of 211 on or after 2023-09-12 but no doses of CVX 313, recommend 8 weeks"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^customCovidRecommendationRule"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
