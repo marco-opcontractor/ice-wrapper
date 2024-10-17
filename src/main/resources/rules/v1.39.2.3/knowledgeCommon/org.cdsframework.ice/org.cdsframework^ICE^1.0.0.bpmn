@@ -133,9 +133,6 @@
         <di:waypoint x="346" y="47" />
         <di:waypoint x="720" y="46" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape bpmnElement="g_1">
-          <dc:Bounds x="400" y="200" width="50" height="50" />
-      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 
