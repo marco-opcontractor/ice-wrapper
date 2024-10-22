@@ -48,6 +48,36 @@ expander ../../knowledgeCommon/org.cdsframework.ice/org.cdsframework^ICE^1.0.0.d
 
 global java.util.Date evalTime
 
+rule "COVID-19: Focus on custom evaluation sub-group only when evaluating VACCINE_GROUP 850"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	salience 999
+	no-loop true
+	when
+		There is an administered shot $currentShot
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- make note of the associated series as $targetSeries
+	then
+		Set the Agenda Group Focus to "HistoryEvaluation^customCovidEvaluationRule"
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+
+rule "COVID-19: Focus on post evaluation sub-group only when evaluating VACCINE_GROUP 850"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	salience 999
+	no-loop true
+	when
+		There is an administered shot $currentShot
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- make note of the associated series as $targetSeries
+	then
+		Set the Agenda Group Focus to "HistoryEvaluation^postCovidEvaluationCheck"
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Evaluation of vaccines not authorized by the FDA or WHO
@@ -56,7 +86,7 @@ global java.util.Date evalTime
 
 rule "COVID-19: If the vaccine administered is authorized neither by the FDA nor WHO, evaluate the shot as INVALID/VACCINE_NOT_APPROVED_IN_US_OR_BY_WHO"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "allowableVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -77,7 +107,7 @@ end
 
 rule "COVID-19: If an FDA-approved, NOS or WHO-approved vaccine, the vaccine is not permitted be default for the series and there are no other shots following it, and the series is not complete, evaluate it as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "allowableVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -109,7 +139,7 @@ end
 
 rule "COVID-19: If a bivalent vaccine was administered prior to 9/2/2022, evaluate the shot as Invalid / VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	no-loop true
 	when
 		There is an administered shot $currentShot
@@ -132,7 +162,7 @@ end
 
 rule "COVID-19: If a 2023/2024 vaccine was administered prior to 9/12/2023, evaluate the shot as Invalid / VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	no-loop true
 	when
 		There is an administered shot $currentShot
@@ -156,7 +186,7 @@ end
 
 rule "COVID-19: If a CVX 313 vaccine was administered prior to 10/04/2023, evaluate the shot as Invalid / VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	no-loop true
 	when
 		There is an administered shot $currentShot
@@ -185,7 +215,7 @@ end
 
 rule "COVID-19: Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_DOSE for shots administered before the series is complete (excluding CVX 230 on >= 4/19/2023)"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	when
 		There is an administered shot $currentShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -218,7 +248,7 @@ end
 
 rule "COVID-19: If the series is complete, override allowable vaccine check, as the allowable vaccines for additional and booster doses are verified by each rule"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "allowableVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -241,7 +271,7 @@ end
 
 rule "COVID-19: If the shot administration date is < 9/2/2022 and at >= 5 yrs and < 18 yrs of age for an Additional Dose is administered in the __Moderna Series__, the shot is permitted"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -269,7 +299,7 @@ end
 
 rule "COVID-19: If the shot administration date is < 9/2/2022 and at >= 18 yrs and < 50 yrs of age for an Additional Dose and/or 1st Booster Dose is administered in the __Moderna Series__, the shot is permitted"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -297,12 +327,12 @@ end
 
 rule "COVID-19: If the shot administration date < 9/2/2022 and at >= 5 yrs and < 50 yrs of age for an Additional Dose and/or 1st Booster Dose in the __Pfizer, Mixed Product, Janssen or Series not authorized by the FDA but authorized by the WHO__, the shot is permitted"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Novavax2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries", "COVID19Novavax2DoseSeries")
 			- the vaccine administered a member of ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520")
 			- make note of the date this shot was administered as $currentShotDate
 			- the date $currentShotDate < "02-Sep-2022"
@@ -325,12 +355,12 @@ end
 
 rule "COVID-19: If the shot administration date is < 9/2/2022 and at >= 50 yrs of age for an Additional Dose, 1st Booster Dose or 2nd Booster Dose in the __Pfizer, Moderna, Mixed Product, Janssen, Novavax or Series not authorized by the FDA but authorized by the WHO__, the shot is permitted"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Novavax2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries", "COVID19Novavax2DoseSeries")
 			- the vaccine administered a member of ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE519", "ICE520")
 			- make note of the date this shot was administered as $currentShotDate
 			- the date $currentShotDate < "02-Sep-2022"
@@ -362,12 +392,12 @@ end
 
 rule "COVID-19: If the shot administration date >= 9/2/2022 and < 9/12/2023 and at >= 5 yrs of age and an Additional (monovalent) Dose is administered in the __Pfizer, Moderna, Mixed Product, Janssen or Series not authorized by the FDA but authorized by the WHO__, the shot is permitted"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Novavax2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries", "COVID19Novavax2DoseSeries")
 			- the vaccine administered a member of ("ICE207", "ICE208", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228")
 			- make note of the date this shot was administered as $currentShotDate
 			- the date $currentShotDate >= "02-Sep-2022"
@@ -389,7 +419,7 @@ end
 
 rule "COVID-19(Abstract): Determination if additional dose and/or up to 3 booster dose(s) is permitted when administered < 4/19/2023 and >= 9/2/22 for >= 12 yrs of age, >= 10/12/2022 for >=5 yrs of age and < 12 yrs of age, or >= 12/8/2022 for >= 6 months of age in the Moderna Series"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -416,7 +446,7 @@ end
 rule "COVID-19: If the shot administration date is >= 9/2/2022 at >= 12 yr of age and have had an Additional Dose and/or 3 Booster Doses is administered in the __Pfizer, Moderna, Mixed Product, Janssen, Novavax or WHO-approved Series__, with not more than 1 booster after 9/2/2022, the shot is permitted"
 		extends "COVID-19(Abstract): Determination if additional dose and/or up to 3 booster dose(s) is permitted when administered < 4/19/2023 and >= 9/2/22 for >= 12 yrs of age, >= 10/12/2022 for >=5 yrs of age and < 12 yrs of age, or >= 12/8/2022 for >= 6 months of age in the Moderna Series"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $sameShotAsCurrentShot0902
@@ -440,7 +470,7 @@ end
 rule "COVID-19: If the shot administration date is >= 10/12/2022 at >= 5 yr of age and have had an Additional Dose and/or 3 Booster Doses is administered in the __Pfizer, Moderna, Mixed Product, Janssen, Novavax or WHO-approved Series__, with not more than 1 booster after 9/2/2022, the shot is permitted"
 		extends "COVID-19(Abstract): Determination if additional dose and/or up to 3 booster dose(s) is permitted when administered < 4/19/2023 and >= 9/2/22 for >= 12 yrs of age, >= 10/12/2022 for >=5 yrs of age and < 12 yrs of age, or >= 12/8/2022 for >= 6 months of age in the Moderna Series"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $sameShotAsCurrentShot1012
@@ -464,7 +494,7 @@ end
 rule "COVID-19: If the shot administration date is >= 12/8/2022 at >= 6 months of age and have had an Additional Dose and/or 3 Booster Doses is administered in the __Moderna Series__, with not more than 1 booster after 9/2/2022, the shot is permitted"
 		extends "COVID-19(Abstract): Determination if additional dose and/or up to 3 booster dose(s) is permitted when administered < 4/19/2023 and >= 9/2/22 for >= 12 yrs of age, >= 10/12/2022 for >=5 yrs of age and < 12 yrs of age, or >= 12/8/2022 for >= 6 months of age in the Moderna Series"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an administered shot $sameShotAsCurrentShot1208
@@ -505,11 +535,11 @@ end
 
 rule "COVID-19: Supplemental Text- If an additional and/or 1st booster dose is administered < 4/19/2023 to an already completed __Janssen Series or Novavax Series__ < 8 weeks after prior dose, include supplemental text that follows guidelines regarding minimum ages/intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19Janssen1DoseSeries", "COVID19Novavax2DoseSeries")
+			- the name of the Series a member of ("COVID19OtherBrandsSeries", "COVID19Novavax2DoseSeries")
 			- the series is complete
 			- make note of the dose number after which the Series was marked complete as $numberOfDosesRequired
 			- the effective number of doses administered in the Series is == $numberOfDosesRequired+1
@@ -542,11 +572,11 @@ end
 
 rule "COVID-19: Supplemental Text- If the shot administration date is < 9/2/2022 and an additional dose and/or 1st booster dose is administered to an already completed __Pfizer, Mixed Product, Moderna or WHO  Series__ < 5 months, include supplemental text that follow guidelines regarding minimum ages/intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries")
 			- the series is complete
 			- make note of the dose number after which the Series was marked complete as $numberOfDosesRequired
 			- the effective number of doses administered in the Series is == $numberOfDosesRequired+1
@@ -578,11 +608,11 @@ end
 
 rule "COVID-19: Supplemental Text- If the shot administration date is >= 9/2/2022 & < 4/19/2023 and that additional dose and/or 1st booster dose was administered to an already completed __Pfizer, Mixed Product, Moderna or WHO  Series__ < 8 weeks, include supplemental text that follow guidelines regarding minimum ages/intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries")
 			- the series is complete
 			- make note of the dose number after which the Series was marked complete as $numberOfDosesRequired
 			- the effective number of doses administered in the Series is == $numberOfDosesRequired+1
@@ -622,11 +652,11 @@ end
 
 rule "COVID-19: Supplemental Text- If the shot administration date is < 9/2/2022 and that 2nd booster dose was administered to an already completed __Pfizer, Moderna, Mixed Product, Janssen or WHO  Series__ < 4 months, include supplemental text that follow guidelines regarding minimum ages/intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries")
 			- the series is complete
 			- make note of the dose number after which the Series was marked complete as $numberOfDosesRequired
 			- the effective number of doses administered in the Series is == $numberOfDosesRequired+2
@@ -658,11 +688,11 @@ end
 
 rule "COVID-19: Supplemental Text- If the shot administration date is >= 9/2/2022 & < 4/19/2023 and that 2nd booster dose was administered to an already completed __Pfizer, Moderna, Mixed Product, Janssen or WHO  Series__ < 8 weeks, include supplemental text that follow guidelines regarding minimum ages/intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the name of the Series a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries")
 			- the series is complete
 			- make note of the dose number after which the Series was marked complete as $numberOfDosesRequired
 			- the effective number of doses administered in the Series is == $numberOfDosesRequired+2
@@ -702,12 +732,12 @@ end
 
 rule "COVID-19: If the 3rd booster dose is administered >= 9/2/2022 & < 4/19/2023 to an already completed __Pfizer, Moderna, Mixed Product, Janssen or WHO  Series__ < 8 weeks - 4 days, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the series that the shot belongs to is complete
-			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19AstraZeneca2DoseSeries", "COVID19BIBPSinopharm2DoseSeries", "COVID19CoronaVacSinovac2DoseSeries", "COVID19COVAXIN2DoseSeries", "COVID19Medicago2DoseSeries")
+			- the shot belongs to the Series with name a member of ("COVID19PfizerSeries", "COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries")
 			- the administration date of the shot is >= "02-Sep-2022"
 			- the administration date of the shot is < "19-Apr-2023"
 			- make note of the date this shot was administered as $currentShotDate
@@ -761,7 +791,7 @@ end
 
 rule "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023 and < 9/12/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
@@ -788,7 +818,7 @@ end
 rule "COVID-19: If the first bivalent dose on >= 3/17/2023 and < 9/12/2023 after series completion was administered < 3 weeks from the prior COVID-19 shot, include supplemental text regarding a 3 week minimum interval"
 		extends "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023 and < 9/12/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an administered shot $sameShotAsCurrentShot
 			- that is the same shot as $currentShot
@@ -805,7 +835,7 @@ end
 rule "COVID-19: If the second bivalent dose on >= 3/17/2023 and < 9/12/2023 after series completion was administered < 4 weeks from the prior COVID-19 shot, include supplemental text regarding a 4 week minimum interval"
 		extends "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023 and < 9/12/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an administered shot $sameShotAsCurrentShot
 			- that is the same shot as $currentShot
@@ -821,7 +851,7 @@ end
 rule "COVID-19: If the third or greater bivalent dose on >= 3/17/2023 and < 9/12/2023 after series completion was administered < 8 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval"
 		extends "COVID-19(Administration of Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023 and < 9/12/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an administered shot $sameShotAsCurrentShot
 			- that is the same shot as $currentShot
@@ -834,16 +864,14 @@ rule "COVID-19: If the third or greater bivalent dose on >= 3/17/2023 and < 9/12
         Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
-
-
 rule "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After Series Completion): If a shot is administered on >= 4/19/2023 and < 9/12/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 4/19/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19Janssen1DoseSeries", "COVID19Novavax2DoseSeries")
+			- the shot belongs to the Series with name a member of ("COVID19ModernaSeries", "COVID19MixedProductSeries", "COVID19OtherBrandsSeries", "COVID19Novavax2DoseSeries")
 			- the administration date of the shot is >= "19-Apr-2023"
 			- the administration date of the shot is < "12-Sep-2023"
 			- make note of the date this shot was administered as $currentShotDate
@@ -866,7 +894,7 @@ end
 rule "COVID-19: If the first or second bivalent dose on >= 4/19/2023 and < 9/12/2023 after series completion was administered < 4 weeks from the prior COVID-19 shot, include supplemental text regarding an 4 week minimum interval"
 		extends "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After Series Completion): If a shot is administered on >= 4/19/2023 and < 9/12/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 4/19/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an administered shot $sameShotAsCurrentShot
 			- that is the same shot as $currentShot
@@ -883,7 +911,7 @@ end
 rule "COVID-19: If the first or second bivalent dose on >= 4/19/2023 and < 9/12/2023 after series completion was administered >= 4 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval"
 		extends "COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After Series Completion): If a shot is administered on >= 4/19/2023 and < 9/12/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 4/19/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an administered shot $sameShotAsCurrentShot
 			- that is the same shot as $currentShot
@@ -900,7 +928,7 @@ end
 // or, alternatively, any prior dose was administered on >= 4/19/2023 and < 9/12/2023, evaluate the shot as Accepted / EXTRA_DOSE"
 rule "COVID-19: If a shot was administered to a patient >= 65 yrs of age, and if 1 bivalent dose was previously administered or, alternatively, 1 was prior dose was administered on >= 4/19/2023, evaluate the shot as Valid"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "extraDoseCheck"
 	salience 10
 	when
@@ -933,7 +961,7 @@ end
 
 rule "COVID-19: If a 2nd bivalent dose was administered to a patient >= 65 yrs of age at < 4 months from the previous shot, include supplemental text regarding a 4 month minimum intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	when
 		There is an administered shot $latestShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -978,7 +1006,7 @@ end
 
 rule "COVID-19: If CVX 302 or CVX 308 is admininstered for target dose 3 in the Pfizer series, there is no absolute maximum age for the vaccine"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "maximumAgeVaccineCheck"
 	when
 		There is an administered shot $administeredShot that needs to be evaluated
@@ -1000,7 +1028,7 @@ end
 
 rule "COVID-19: If CVX 218, CVX 219, CVX 227, CVX 228, CVX 229, CVX 230, CVX 301 or CVX 302 was evaluated and Not Valid due to ABOVE_MAXIMUM_AGE_VACCINE, ignore the shot when calculating intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience 999
 	when
 		There is an administered shot $administeredShot
@@ -1035,7 +1063,7 @@ end
 
 rule "COVID-19: If CVX 229 or CVX 230 was evaluated as Not Valid due to VACCINE_NOT_ALLOWED_FOR_THIS_DOSE in the Pfizer, Moderna or Mixed Product Series, Ignore the shot when calculating intervals"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	salience 999
 	when
 		There is an administered shot $administeredShot
@@ -1067,12 +1095,12 @@ end
 
 rule "COVID-19: If CVX 212 is administered below the age of 18y-4d in the Janssen Series, override absolute vaccine minimum age check _and_ return supplemental text that the shot does not follow guidelines for minimum age"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "minimumAgeVaccineCheck"
 	salience 5
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850" and the Series with name "COVID19Janssen1DoseSeries"
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the Vaccine Administered is "ICE212"
 			- make note of the date this shot was administered as $administrationDate
 			- make note of the associated series as $associatedTargetSeries
@@ -1087,7 +1115,7 @@ end
 
 rule "COVID-19: For patients >= 18 yrs of age, if shot in the Pfizer, Mixed Product or Moderna series is administered prior to 10/25/2021 and the series is not complete, override series interval logic"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheck"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
@@ -1127,7 +1155,7 @@ end
 
 rule "COVID-19: For patients >= 18y, enforce absolute minimum interval of 24 days *from* any prior Moderna or CVX 213 shots (in any Series) if after 10/25/2021"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1157,7 +1185,7 @@ end
 
 rule "COVID-19: For patients >= 18y, enforce absolute minimum interval of 24 days *to* any Moderna or CVX 213 shots (in any Series) if after 10/25/2021"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1187,7 +1215,7 @@ end
 
 rule "COVID-19: For patients < 18y, always enforce absolute minimum interval of 24 days *from* any prior Moderna or CVX 213 shots (in any Series)"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1216,7 +1244,7 @@ end
 
 rule "COVID-19: For patients < 18y, always enforce absolute minimum interval of 24 days *to* any prior Moderna or CVX 213 shots (in any Series)"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1259,7 +1287,7 @@ end
 
 rule "COVID-19: If a vaccine that is not a Fall 2023-24 vaccine is given on or after 9/12/2023, and the series is not complete, evaluate it as INVALID/VACCINE_NO_LONGER_RECOMMENDED_ON_DATE_SPECIFIED"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "allowableVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -1276,7 +1304,7 @@ end
 
 rule "COVID-19: If a Novavax 211 vaccine is given on or after 10/04/2023, evaluate it as INVALID/VACCINE_NO_LONGER_RECOMMENDED_ON_DATE_SPECIFIED"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "allowableVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -1312,7 +1340,7 @@ end
 
 rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot was administered prior to target dose 1 (prior season) but has never received any (valid) doses, the absolute minimum interval from the prior shot to the current shot is 8w"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	no-loop true
 	when
@@ -1353,7 +1381,7 @@ end
 
 rule "COVID-19(Sep2023 Novavax Series): If the patient has 2 doses of 211 on or after 2023-09-12 but no doses of CVX 313, 8w-4d is the minimum interval"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -1381,7 +1409,7 @@ end
 
 rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot was administered prior to target dose 1 (prior season) and the prior season's series is complete, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	no-loop true
 	when
@@ -1423,7 +1451,7 @@ end
 
 rule "COVID-19(Sep2023 Pfizer Product < 5yrs Series): If 2 valid pfizer shots were administered before, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	salience -2
 	when
@@ -1455,7 +1483,7 @@ end
 
 rule "COVID-19(Sep2023 Pfizer Product < 5yrs Series): If 1 valid pfizer shots was administered before, the absolute minimum interval from the prior shot to the current shot is 17 days"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	salience -3
 	when
@@ -1482,7 +1510,7 @@ end
 
 rule "COVID-19(Sep2023 Moderna Product < 5yrs Series): If 1 moderna valid shot was administered before, the absolute minimum interval from the prior shot to the current shot is 24d"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	salience -4
 	when
@@ -1519,7 +1547,7 @@ end
 
 rule "COVID-19(Sep2023 Moderna/Mixed Product < 5yrs Series): If 2 valid shots were administered before, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	when
 		There is an administered shot $currentShot
@@ -1562,7 +1590,7 @@ end
 
 rule "COVID-19(Sep2023 Mixed Product < 5yrs Series): If 1 valid shot was administered before, the absolute minimum interval from the prior shot to the current shot is 24d"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	salience -5
 	when
@@ -1600,7 +1628,7 @@ end
 
 rule "COVID-19(Sep2023 COVID >= 5yrs Series): If 1 valid shot was administered before, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	salience 983
 	when
@@ -1629,7 +1657,7 @@ end
 
 rule "COVID-19(COVID19Sep2023gte5Series): If a CVX 313 was the only dose on record. Absolute minimum interval to a mRNA CVX (CVX 213, CVX 309, CVX 310, CVX 311, CVX 312) = 8 weeks minus 4 days"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheck"
 	salience 999
 	when
@@ -1666,7 +1694,7 @@ end
 
 rule "COVID-19(COVID19Sep2023gte5Series): If series was completed due to special rule, remove duplicate after 313"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "doseIntervalCheck"
 	salience 998
 	when
@@ -1711,7 +1739,7 @@ end
 
 rule "COVID-19: If CVX 229 or CVX 230 was evaluated as Not Valid and ignored in the Pfizer, Moderna or Mixed Product Series. Make sure to invalidate minimum interval between seasons if latest dose"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience 799
 	when
 	  There is an administered shot $currentShot
@@ -1749,7 +1777,7 @@ end
 
 rule "COVID-19(Sep2023 Novavax Series): If the patient has 2 doses of 211 on or after 2023-09-12 and then one of CVX 313, the series is complete no extra dose"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	no-loop true
 	when
 		There is an administered shot $currentShot
@@ -1809,7 +1837,7 @@ end
 
 rule "COVID-19(Abstract): Previous valid shot before 2023 Fall season Moderna and Pfizer Series < 5 years"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience -1
 	when
 	  There is an administered shot $currentShot
@@ -1836,7 +1864,7 @@ end
 rule "COVID-19(COVID19Sep2023LT5ySeries): Previous valid shot before 2023 Fall season Pfizer Series < 5 years previous 2 valid shots before Fall 2023"
 	extends "COVID-19(Abstract): Previous valid shot before 2023 Fall season Moderna and Pfizer Series < 5 years"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -1
 	when
@@ -1870,7 +1898,7 @@ end
 rule "COVID-19(COVID19Sep2023LT5ySeries): Previous valid shot before 2023 Fall season Pfizer Series < 5 years previous 1 valid shot before Fall 2023"
 	extends "COVID-19(Abstract): Previous valid shot before 2023 Fall season Moderna and Pfizer Series < 5 years"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -2
 	when
@@ -1901,7 +1929,7 @@ end
 
 rule "COVID-19(COVID19Sep2023LT5ySeries): If the patient has 1 dose of updated Sept 2023 Pfizer COVID-19 vaccine intended for patients age >= 5 years (CVX 309 or CVX 310) at age >= 5 years, then the series is complete"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -2
 	when
@@ -1931,7 +1959,7 @@ end
 rule "COVID-19(ModernaSeries): Previous valid shot before 2023 Fall season Moderna Series < 5 years previous 1 valid shots before Fall 2023"
 	extends "COVID-19(Abstract): Previous valid shot before 2023 Fall season Moderna and Pfizer Series < 5 years"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -1
 	when
@@ -1957,7 +1985,7 @@ end
 
 rule "COVID-19(Mixed Product Series): Previous valid 2 shots before 2023 Fall season Mixed product Series < 5 years (Novavax Update 2024)"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -1
 	when
@@ -1992,7 +2020,7 @@ end
 
 rule "COVID-19(Mixed Product Series): Previous valid 2 shots before 2023 Fall season Mixed product Series < 5 years"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -1
 	when
@@ -2027,7 +2055,7 @@ end
 
 rule "COVID-19(Mixed Product Series): Previous valid 1 shot before 2023 Fall season Mixed product Series < 5 years (Novavax Update 2024)"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -2
 	when
@@ -2060,7 +2088,7 @@ end
 
 rule "COVID-19(Mixed Product Series): Previous valid 1 shot before 2023 Fall season Mixed product Series < 5 years"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -2
 	when
@@ -2093,7 +2121,7 @@ end
 
 rule "COVID-19(Mixed Product Series): Only 2 valid doses of CVX 313 is needed for series to be complete"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	when
 	  There is an administered shot $currentShot
@@ -2121,7 +2149,7 @@ end
 
 rule "COVID-19(Mixed Product Series): If the patient has 1 dose of updated Pfizer or Moderna Sept 2023 COVID-19 vaccine intended for patients age >= 5 years (CVX 309, CVX 310, CVX 311, or CVX 312) at age >= 5 years, then the series is complete"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	salience -2
 	when
@@ -2149,7 +2177,7 @@ end
 
 rule "COVID-19(Mixed Product Series): If the patient has >= 1 dose of COVID-19 vaccine at age < 5 years and has 1 dose of updated Novavax Sept 2023 COVID-19 vaccine (CVX 313) at age >= 5 years, then the series is complete"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	activation-group "specialDoseRulesCheck"
 	when
 	  The patient information $oEvaluatedPerson must be known to complete writing this rule
@@ -2180,7 +2208,7 @@ end
 
 rule "COVID-19: If latest 2024 Non Novavax shot was evaluated as ACCEPTED extra dose and did NOT obey 8 week gap, have it as INVALID"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience 500
 	when
 	  There is an administered shot $currentShot
@@ -2221,7 +2249,7 @@ end
 
 rule "COVID-19: If latest 2024 Non Novavax shot was evaluated as ACCEPTED or VALID, previous 2 shots, extra dose and did NOT obey 8 week gap, have it as INVALID"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience 500
 	when
 	  There is an administered shot $currentShot
@@ -2275,7 +2303,7 @@ end
 
 rule "COVID-19: If latest 2024 Non Novavax shot was evaluated as ACCEPTED or VALID, now patient is 5y and did NOT obey 8 week gap, have it as INVALID"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience 500
 	when
 	  The patient information $oEvaluatedPerson must be known to complete writing this rule
@@ -2319,7 +2347,7 @@ end
 
 rule "COVID-19: If latest 2024 Novavax shot was evaluated as ACCEPTED extra dose and did NOT obey 8 week gap, have it as INVALID"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience 500
 	when
 	  There is an administered shot $currentShot
@@ -2360,7 +2388,7 @@ end
 
 rule "COVID-19: If latest 2024 Novavax shot was evaluated as ACCEPTED or VALID, 2 previous valid shots and did NOT obey 8 week gap, have it as INVALID"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
 	salience 500
 	when
 	  There is an administered shot $currentShot
@@ -2413,7 +2441,7 @@ end
 
 rule "COVID-19: If a Novavax 211 vaccine is given between 9/12/2023 and 10/04/2023 and the series is gte 5 years old evaluate it as ACCEPTED/VACCINE_NOT_PART_OF_THIS_SERIES"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	salience -100
 	when
