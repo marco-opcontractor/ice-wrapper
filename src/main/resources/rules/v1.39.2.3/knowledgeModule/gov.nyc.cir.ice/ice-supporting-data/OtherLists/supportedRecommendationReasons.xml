@@ -79,5 +79,17 @@
         <cdsListItemKey>ADMINISTER_2023_24_FORMULATION_COVID19</cdsListItemKey>
         <cdsListItemValue>2023-2024 Formulation of Covid19 vaccine should be administered.</cdsListItemValue>
     </cdsListItem>
+    <cdsListItem>
+      <cdsListItemKey>MENB_HIGH_RISK</cdsListItemKey>
+      <cdsListItemValue>High risk patients should receive the vaccine series starting at age 10+</cdsListItemValue>
+    </cdsListItem>
+    <cdsListItem>
+      <cdsListItemKey>MENB_SHARED_DECISION</cdsListItemKey>
+      <cdsListItemValue>Series recommended to start at age 16+</cdsListItemValue>
+    </cdsListItem>
+  <cdsListItem>
+    <cdsListItemKey>MENB_SHARED_DECISION_NOT_APPLICABLE</cdsListItemKey>
+    <cdsListItemValue>Not Applicable</cdsListItemValue>
+  </cdsListItem>
    <cdsVersion>gov.nyc.cir^ICE^1.0.0</cdsVersion>
 </ns2:cdsListSpecificationFile>
