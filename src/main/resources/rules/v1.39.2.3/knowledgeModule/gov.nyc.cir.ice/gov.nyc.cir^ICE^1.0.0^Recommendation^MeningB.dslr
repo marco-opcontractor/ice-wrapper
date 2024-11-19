@@ -227,7 +227,7 @@ rule "Mening B(Abstract): The series forecasting right now is for high risk"
 			- the Shot belongs to the Series $targetSeries
 			- the Dose Number in the Series is == 1
 			- that has already been Evaluated and whose Shot Validity is VALID
-			- the administration date of the shot is > $dtDateAtAge10y
+			- the administration date of the shot is >= $dtDateAtAge10y
 			- the administration date of the shot is < $dtDateAtAge16y
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate1
 		//Confirm the variable isMenBHighRisk is == true
