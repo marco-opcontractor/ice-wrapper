@@ -174,7 +174,7 @@ rule "Mening B: If the patient < 10yrs and no doses on record, recommendation is
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
-			- the number of doses administered is == 0
+			- the effective dose number in the Series is == 0
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
 		Confirm elapsed time between $birthdate and evalTime < "10y"
@@ -267,7 +267,7 @@ rule "Mening B: If the patient is in shared decision making group, start recomme
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
-			- the number of doses administered is == 0
+			- the effective dose number in the Series is == 0
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
 		Confirm elapsed time between $birthdate and evalTime >= "16y"
@@ -289,7 +289,7 @@ rule "Mening B: If the patient >= 24yrs and no doses on record, recommendation i
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
-			- the number of doses administered is == 0
+			- the effective dose number in the Series is == 0
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
 		Confirm elapsed time between $birthdate and evalTime >= "24y"
