@@ -1,5 +1,7 @@
 package com.connexin.ice.wrapper.service.op
 
+import com.connexin.ice.wrapper.Constants
+import com.connexin.ice.wrapper.model.Interpretation
 import com.connexin.ice.wrapper.model.VaccineReport
 import com.connexin.ice.wrapper.service.AbstractEngine
 import com.connexin.ice.wrapper.service.IEngine
@@ -69,6 +71,9 @@ class OPEngine(private val kieContainer: KieContainer,
             val agendaEventListener = TrackingAgendaEventListener()
             session.addEventListener(agendaEventListener)
         }
+        val isMenBSharedDecision = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_SINGLE) ?: false
+        val isMenBHighRisk = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_HIGH_RISK) ?: false
+
         val cmds = mutableListOf<Command<*>>()
         cmds.add(CommandFactory.newSetGlobal("evalTime",vaccineReport.requestTime.toDate()))
         cmds.add(CommandFactory.newSetGlobal("clientLanguage","en"))
@@ -83,6 +88,8 @@ class OPEngine(private val kieContainer: KieContainer,
         cmds.add(CommandFactory.newSetGlobal("outputRuleName",java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup",java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
+        cmds.add(CommandFactory.newSetGlobal("isMenBSharedDecision", isMenBSharedDecision))
+        cmds.add(CommandFactory.newSetGlobal("isMenBHighRisk", isMenBHighRisk))
 
 
 

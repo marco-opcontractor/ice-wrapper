@@ -131,3 +131,26 @@ rule "Switch from 2-Dose HepA series to 3-Dose HepA series if Dose 2 is given >=
 		Refresh all facts in the Series $targetSeries for Evaluation
 		Log that this Series Rule fired for the Series $targetSeries
 end
+
+
+rule "Evaluate as invalid for Hep A Twinrix administration for patients below 18 years old"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	salience 100
+	when
+		There is an Administered Shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.810"
+			- the vaccine administered a member of ("ICE104")
+			- make note of the date this shot was administered as $dtAdministrationDate
+			- make note of the Associated Series as $associatedTargetSeries
+		The patient information $oEvaluatedPerson must be known to complete writing this rule
+			- make note of the patient's birthdate as $dtBirthDate
+		Confirm elapsed time between $dtBirthDate and $dtAdministrationDate < "18y-4d"
+	then
+	  Set the shot status of $currentShot to Invalid
+	  Refresh all facts in the shot $currentShot
+		Include the reason for shot $currentShot Invalid due to "Below Minimum Age for Vaccine"
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Refresh all facts in the Series $associatedTargetSeries for Evaluation
+		Log that this Series Rule fired for the Series $associatedTargetSeries
+end

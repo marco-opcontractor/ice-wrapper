@@ -37,13 +37,16 @@
     </businessRuleTask>
     <businessRuleTask id="_11" name="Initialize Series and Seasons" g:ruleFlowGroup="InitializeSeriesAndSeasons" >
     </businessRuleTask>
+    <businessRuleTask id="_12" name="Select Best Series Early" g:ruleFlowGroup="EarlySeriesSelection" >
+    </businessRuleTask>
 
     <!-- connections -->
     <sequenceFlow id="_4-_2" sourceRef="_4" targetRef="_2" />
     <sequenceFlow id="_1-_3" sourceRef="_1" targetRef="_3" />
     <sequenceFlow id="_7-_4" sourceRef="_7" targetRef="_4" />
     <sequenceFlow id="_11-_5" sourceRef="_11" targetRef="_5" />
-    <sequenceFlow id="_9-_6" sourceRef="_9" targetRef="_6" />
+    <sequenceFlow id="_9-_12" sourceRef="_9" targetRef="_12" />
+    <sequenceFlow id="_12-_6" sourceRef="_12" targetRef="_6" />
     <sequenceFlow id="_8-_7" sourceRef="_8" targetRef="_7" />
     <sequenceFlow id="_6-_8" sourceRef="_6" targetRef="_8" />
     <sequenceFlow id="_10-_9" sourceRef="_10" targetRef="_9" />
@@ -85,6 +88,9 @@
         <dc:Bounds x="1083" y="130" width="200" height="48" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_11" >
+        <dc:Bounds x="619" y="22" width="202" height="48" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_12" >
         <dc:Bounds x="619" y="22" width="202" height="48" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_4-_2" >
