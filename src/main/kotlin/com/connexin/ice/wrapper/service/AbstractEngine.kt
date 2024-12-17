@@ -40,7 +40,7 @@ abstract class AbstractEngine() {
                 )
             }
         }
-        vaccineReport.indicators.filter { supportedIceWrapperInterpretations.contains(it.interpretation) }.forEach {
+        vaccineReport.indicators.forEach {
             obs.add(
                 VMRObservationResult(
                     it.code, it.system,

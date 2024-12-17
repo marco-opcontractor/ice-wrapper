@@ -71,13 +71,8 @@ class OPEngine(private val kieContainer: KieContainer,
             val agendaEventListener = TrackingAgendaEventListener()
             session.addEventListener(agendaEventListener)
         }
-        val isRsvIndicated = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_RSV_INDICATED) ?: vaccineReport.flags?.get(Constants.FlagConstants.FLAG_SYNAGIS_INDICATED)
         val isMenBSharedDecision = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_SINGLE) ?: false
         val isMenBHighRisk = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_HIGH_RISK) ?: false
-        val mommyVaxGiven = vaccineReport.indicators.any {
-            it.interpretation == Interpretation.PREGNANCY_VACCINATED && it.code == Constants.DiseaseCodes.ICE_RSV_DISEASE_CODE
-                    && it.date.isBefore(vaccineReport.dateOfBirth.minusDays(13))
-        }
 
         val cmds = mutableListOf<Command<*>>()
         cmds.add(CommandFactory.newSetGlobal("evalTime",vaccineReport.requestTime.toDate()))
@@ -93,11 +88,6 @@ class OPEngine(private val kieContainer: KieContainer,
         cmds.add(CommandFactory.newSetGlobal("outputRuleName",java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup",java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
-        cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", org.joda.time.MonthDay(10, 1)))
-        cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", org.joda.time.MonthDay(3, 31)))
-        cmds.add(CommandFactory.newSetGlobal("februaryStartMonthDay", org.joda.time.MonthDay(2, 1)))
-        cmds.add(CommandFactory.newSetGlobal("isRSVHighRisk", isRsvIndicated == true))
-        cmds.add(CommandFactory.newSetGlobal("wasMommyVaxGiven", mommyVaxGiven))
         cmds.add(CommandFactory.newSetGlobal("isMenBSharedDecision", isMenBSharedDecision))
         cmds.add(CommandFactory.newSetGlobal("isMenBHighRisk", isMenBHighRisk))
 
