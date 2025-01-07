@@ -136,5 +136,9 @@
         <cdsListItemKey>VACCINE_NOT_RECOMMENDED_MOTHER_VACCINE_DOCUMENTED</cdsListItemKey>
         <cdsListItemValue>This vaccine is not recommended at this date due to mother vaccine documented</cdsListItemValue>
     </cdsListItem>
+    <cdsListItem>
+        <cdsListItemKey>SECOND_RSV</cdsListItemKey>
+        <cdsListItemValue>RSV-mAb nirsevimab 0.5 mL is never valid for a second season and there is no indication for giving a second dose in the same season.</cdsListItemValue>
+    </cdsListItem>
 	<cdsVersion>org.cdsframework^ICE^1.0.0</cdsVersion>
 </ns2:cdsListSpecificationFile>
