@@ -209,7 +209,7 @@ rule "RSV: Invalidate same season RSV-mAb nirsevimab 0.5 mL vaccine when having 
   			- make note of the associated series as $associatedTargetSeries
   		There is an Administered Shot $previousBeyfortusShot
   			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
-  			- the vaccine administered a member of ("ICE306")
+  			- the vaccine administered a member of ("ICE306", "ICE307", "ICE93")
   			- the shot is not ignored
   			- the administration date of the shot is < $currentShotAdministrationDate
   			- make note of the date this shot was administered as $previousBeyfortusShotDate
