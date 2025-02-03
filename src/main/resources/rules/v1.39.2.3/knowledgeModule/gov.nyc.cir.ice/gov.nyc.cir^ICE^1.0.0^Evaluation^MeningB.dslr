@@ -229,9 +229,10 @@ rule "MeningB: 4C 2-dose Series: Evaluate Invalid third dose for Men B 4C 2-dose
 		  - that has already been evaluated and whose Shot Validity is VALID
 		  - the shot is not ignored
 		  - the administration date of the shot is < "24-Oct-2024"
+		  - make note of the date this shot was administered as $previousShot2Date
 		// Age Validations - ensure patient was 16+ for both doses
     Confirm Elapsed time between $birthdate and $previousShotDate >= "16y"
-    Confirm Elapsed time between $birthdate and $currentShotDate >= "16y"
+    Confirm Elapsed time between $birthdate and $previousShot2Date >= "16y"
 	then
 	  Set the shot status of $currentShot to Invalid
 		Include the reason for shot $currentShot Invalid due to "Third dose is not indicated for completed the MenB 4C 2-dose"
