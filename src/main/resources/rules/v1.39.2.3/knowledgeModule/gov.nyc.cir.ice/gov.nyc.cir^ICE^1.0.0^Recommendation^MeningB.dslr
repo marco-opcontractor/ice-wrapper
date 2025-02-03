@@ -466,13 +466,11 @@ rule "Mening B: When patient got 2 doses in the MenB 4C 2-dose Series of CVX 163
             - the vaccine administered is "ICE163"
             - the administration date of the shot is < "24-Oct-2024"
             - that has already been evaluated and whose shot validity is VALID or ACCEPTED
-            - the administered shot number is == 1
             - make note of the date this shot was administered as $previousShotDate
 
         // Current Shot (Second Dose) Conditions
         There is an Administered Shot $currentShot
             - the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
-            - the dose number in the Series is == 2
             - the administration date of the shot is < "24-Oct-2024"
             - the administration date of the shot is > $previousShotDate
             - make note of the date this shot was administered as $currentShotDate
