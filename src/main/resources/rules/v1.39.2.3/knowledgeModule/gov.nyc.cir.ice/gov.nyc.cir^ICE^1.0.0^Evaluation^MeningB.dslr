@@ -212,7 +212,6 @@ rule "MeningB: 4C 2-dose Series: Evaluate Invalid third dose for Men B 4C 2-dose
 			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
 			- the vaccine administered is "ICE163"
 			- the series that the shot belongs to is complete
-			- the dose number in the Series is == 3
 			- make note of the associated series as $targetSeries
 			- make note of the date this shot was administered as $currentShotDate
 		There is an administered shot $previousShot
@@ -220,7 +219,6 @@ rule "MeningB: 4C 2-dose Series: Evaluate Invalid third dose for Men B 4C 2-dose
 		  - the vaccine administered is "ICE163"
 		  - the administration date of the shot is < $currentShotDate
 		  - that has already been evaluated and whose Shot Validity is VALID
-		  - the administered shot number is == 1
 		  - the shot is not ignored
 		  - the administration date of the shot is < "24-Oct-2024"
 		  - make note of the date this shot was administered as $previousShotDate
@@ -229,7 +227,6 @@ rule "MeningB: 4C 2-dose Series: Evaluate Invalid third dose for Men B 4C 2-dose
 		  - the vaccine administered is "ICE163"
 		  - the administration date of the shot is != $currentShotDate
 		  - that has already been evaluated and whose Shot Validity is VALID
-		  - the administered shot number is == 2
 		  - the shot is not ignored
 		  - the administration date of the shot is < "24-Oct-2024"
 		// Age Validations - ensure patient was 16+ for both doses
