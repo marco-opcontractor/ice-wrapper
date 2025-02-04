@@ -225,7 +225,7 @@ rule "MeningB: 4C 2-dose Series: Evaluate Invalid third dose for Men B 4C 2-dose
 		There is an administered shot $previousShot2
 		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
 		  - the vaccine administered is "ICE163"
-		  - the administration date of the shot is != $currentShotDate
+		  - the administration date of the shot is < $previousShotDate
 		  - that has already been evaluated and whose Shot Validity is VALID
 		  - the shot is not ignored
 		  - the administration date of the shot is < "24-Oct-2024"
