@@ -482,11 +482,11 @@ rule "Mening B: When patient got 2 doses in the MenB 4C 2-dose Series of CVX 163
             - that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
 
         // Age Validations - ensure patient was 16+ for both doses
-        Confirm Elapsed time between $birthdate and $previousShotDate >= "16y"
-        Confirm Elapsed time between $birthdate and $currentShotDate >= "16y"
+        Confirm Elapsed time between $birthdate and $previousShotDate >= "16y-4d"
+        Confirm Elapsed time between $birthdate and $currentShotDate >= "16y-4d"
 
         // Validate minimum interval between doses
-        Confirm Elapsed time between $previousShotDate and $currentShotDate >= "1m"
+        Confirm Elapsed time between $previousShotDate and $currentShotDate >= "1m-4d"
 
     then
         // Actions
