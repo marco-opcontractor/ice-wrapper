@@ -486,7 +486,7 @@ rule "Mening B: When patient got 2 doses in the MenB 4C 2-dose Series of CVX 163
         Confirm Elapsed time between $birthdate and $currentShotDate >= "16y-4d"
 
         // Validate minimum interval between doses
-        // Confirm Elapsed time between $previousShotDate and $currentShotDate >= "1m"
+        Confirm Elapsed time between $previousShotDate and $currentShotDate >= "1m-4d"
 
     then
         // Actions
