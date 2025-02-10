@@ -444,7 +444,7 @@ MenB 4C 2-dose Series specific rules
 *************************************************************************************************************************************************************************************/
 rule "Mening B: When patient got 2 doses in the MenB 4C 2-dose Series of CVX 163 before Oct 24, 2024 end forecasting"
     agenda-group "RecommendationForecast^postCustomRecommendationCheck"
-    salience -50
+    salience -100
     activation-group "specialDoseRulesCheck"
     when
         // Series Conditions
@@ -501,7 +501,7 @@ end
 
 rule "Mening B: When High Risk Patient got 2 doses in the MenB 4C 2-dose Series of CVX 163 before Oct 24, 2024 end forecasting with Suplemental Text"
     agenda-group "RecommendationForecast^postCustomRecommendationCheck"
-    salience -100
+    salience -50
     activation-group "specialDoseRulesCheck"
     when
         // Series Conditions
@@ -552,11 +552,15 @@ rule "Mening B: When High Risk Patient got 2 doses in the MenB 4C 2-dose Series 
         // Actions
         Clear forecasted recommendations from consideration in series $targetSeries
         Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
-        Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+        Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.MENB_SC_HIGH_RISK_BOOSTER_RECOMMENDED"
         Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+
+        // Supplemental Text Recommendation
         Create a recommendation as $rSupplementalText for the Series $targetSeries
         Set the Recommendation Supplemental Text for $rSupplementalText to "Recommended to receive a booster dose."
-        Include the Recommendation $rSupplementalText for Consideration in the final Forecast of the Series $targetSeries
+        Include the Recommendation $rSupplementalText for Consideration in the final Forecast of the Series
+
+        // Finalize
         Mark Forecasting of the Series $targetSeries Complete
         Record that this Series Rule was Processed for the TargetSeries $targetSeries
         Log that this Series Rule fired for the Series $targetSeries
