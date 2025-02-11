@@ -103,6 +103,23 @@ rule "RSV: Recommendation Outside season, Move recommendation date to in-season"
     Log that this Series Rule fired for the Series $evaluatedTargetSeries
 end
 
+rule "RSV: Ideal Date High Recommendation Outside season, Move recommendation date to in-season"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 60
+	when
+		There is a Series $evaluatedTargetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- make note of the overdue date as $outOfSeasonDate
+    // Confirm Elapsed time between $finalRecommendedDate and $finalOverdueDate < "1d"
+    The given date $outOfSeasonDate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+	then
+		Set the final overdue date date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+	  // Set the Final recommendation Overdue Forecast Date on series $evaluatedTargetSeries to rsvSeasonEndMonthDay on the same year
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
 rule "RSV: No longer recommend RSV Immunization starting 20 months old using earliest recommended date"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	when
