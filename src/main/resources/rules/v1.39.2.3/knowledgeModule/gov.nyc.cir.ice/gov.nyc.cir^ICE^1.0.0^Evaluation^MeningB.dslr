@@ -256,6 +256,7 @@ rule "MeningB: 4C 3-dose Series: Evaluate Invalid fourth dose for Men B 4C 3-dos
     			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
     			- the vaccine administered is "ICE163"
     			- the series that the shot belongs to is complete
+          - that has already been evaluated and whose Shot Validity is VALID or ACCEPTED
     			- make note of the associated series as $targetSeries
     			- make note of the date this shot was administered as $currentShotDate
     		There is an administered shot $previousShot
@@ -287,7 +288,7 @@ rule "MeningB: 4C 3-dose Series: Evaluate Invalid fourth dose for Men B 4C 3-dos
         Confirm the variable isMenBHighRisk is == true
     	then
     	  Set the shot status of $currentShot to Invalid
-    		//Include the reason for shot $currentShot Invalid due to "Fourth dose is not indicated for completed the MenB 4C 2-dose"
+    		Include the reason for shot $currentShot Invalid due to "Vaccine not Permitted for this Dose"
     		Refresh all facts in the shot $currentShot
     		Record that this dose rule was Processed for the TargetDose $currentShot
     		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
