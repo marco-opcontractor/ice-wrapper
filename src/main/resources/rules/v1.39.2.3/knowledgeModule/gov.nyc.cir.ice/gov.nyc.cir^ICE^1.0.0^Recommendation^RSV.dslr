@@ -114,10 +114,9 @@ rule "RSV: Ideal Date High Recommendation Outside season, Move recommendation da
     // Confirm Elapsed time between $finalRecommendedDate and $finalOverdueDate < "1d"
     The given date $outOfSeasonDate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
 	then
-		Set the final overdue date date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
-	  // Set the Final recommendation Overdue Forecast Date on series $evaluatedTargetSeries to rsvSeasonEndMonthDay on the same year
-    Record that this Series Rule was Processed for the TargetSeries $targetSeries
-    Log that this Series Rule fired for the Series $targetSeries
+		Set the final overdue forecast date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+    Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
+    Log that this Series Rule fired for the Series $evaluatedTargetSeries
 end
 
 rule "RSV: No longer recommend RSV Immunization starting 20 months old using earliest recommended date"

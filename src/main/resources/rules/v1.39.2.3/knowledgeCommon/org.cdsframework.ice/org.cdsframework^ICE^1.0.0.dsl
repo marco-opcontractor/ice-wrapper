@@ -395,6 +395,7 @@
 [consequence][][Ss]et the final earliest date date for the series {refer_oTargetSeries} to the monthday of {ref_oMonthDay} on the same year={refer_oTargetSeries}.setFinalEarliestDate(new Date({refer_oTargetSeries}.getFinalEarliestDate().getYear(), {ref_oMonthDay}.getMonthOfYear() - 1, {ref_oMonthDay}.getDayOfMonth()));
 [consequence][][Ss]et the final recommended date for the series {refer_oTargetSeries} to the date of {ref_oNewDate}={refer_oTargetSeries}.setFinalRecommendationDate({ref_oNewDate});
 [consequence][][Ss]et the final earliest date date for the series {refer_oTargetSeries} to the date of {ref_oNewDate}={refer_oTargetSeries}.setFinalEarliestDate({ref_oNewDate});
+[consequence][][Ss]et the final [Oo]verdue [Ff]orecast [Dd]ate for the series {refer_oTargetSeries} to the monthday of {ref_oMonthDay} on the same year={refer_oTargetSeries}.setFinalOverdueDate(new Date({refer_oTargetSeries}.getFinalOverdueDate().getYear(), {ref_oMonthDay}.getMonthOfYear() - 1, {ref_oMonthDay}.getDayOfMonth()));
 
 // Consider adding reevaluation of all shots in the series
 /////// [consequence][][Rr]eevaluate all [Ss]hots in the [Ss]eries {refer_oTargetSeries}=
