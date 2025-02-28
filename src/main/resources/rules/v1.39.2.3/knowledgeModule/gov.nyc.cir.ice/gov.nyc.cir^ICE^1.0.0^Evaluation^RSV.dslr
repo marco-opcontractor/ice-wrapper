@@ -54,6 +54,8 @@ global org.joda.time.MonthDay rsvSeasonStartMonthDay
 global org.joda.time.MonthDay rsvSeasonEndMonthDay
 global java.lang.Boolean isRSVHighRisk
 global java.lang.Boolean wasMommyVaxGiven
+global java.util.Date secondRSVSeasonStart
+global java.util.Date secondRSVSeasonEnd
 
 
 rule "RSV: Evaluate the RSV Injection as Outside RSV Season if it does not fall within the Season Start and Stop Dates"
@@ -196,6 +198,35 @@ rule "RSV(Beyfortus): If the vaccine was administered on season and mommy vax wa
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
+rule "RSV(Beyfortus): Invalidate CVX 306 Dose Given in Second RSV Season"
+    agenda-group "HistoryEvaluation^customEvaluationRule"
+    activation-group "validDoseCheck"
+    salience 18
+    when
+      // Patient information
+      The patient information $oEvaluatedPerson must be known to complete writing this rule
+        - make note of the Patient's birthdate as $birthdate
+      // Administered shot that needs to be evaluated
+      There is an Administered Shot $currentShot that needs to be evaluated
+        - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+        - the vaccine administered is "ICE306"
+        - make note of the date this shot was administered as $currentShotDate
+        - make note of the associated series as $associatedTargetSeries
+
+      // Check if the dose was administered in the second RSV season
+      Confirm the date $currentShotDate is on the same date or after secondRSVSeasonStart
+      Confirm the date $currentShotDate is on the same date or before secondRSVSeasonEnd
+
+    then
+      // Include the reason for shot $currentShot being invalid
+   		Include the reason for shot $currentShot Invalid due to "Vaccine Not Allowed Second Season RSV mAB"
+
+      // Record that this dose rule was Processed for the TargetDose $currentShot
+      Record that this dose rule was Processed for the TargetDose $currentShot
+      // Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+      Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
 rule "RSV: Invalidate same season RSV-mAb nirsevimab 0.5 mL vaccine when having a valid RSV-mAb nirsevimab 0.5 mL already"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
   	activation-group "validDoseCheck"
@@ -215,7 +246,7 @@ rule "RSV: Invalidate same season RSV-mAb nirsevimab 0.5 mL vaccine when having 
   			- make note of the date this shot was administered as $previousBeyfortusShotDate
   	then
   		Set the shot status of $currentShot to Invalid
-  		Include the reason for shot $currentShot Invalid due to "Same Season RSV mAB"
+  		Include the reason for shot $currentShot Invalid due to "Vaccine Not Allowed Second Season RSV mAB"
   		Record that this dose rule was Processed for the TargetDose $currentShot
   		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end

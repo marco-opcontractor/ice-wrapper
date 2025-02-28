@@ -62,15 +62,20 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param vaccineReport The vaccine report to be evaluated.
      * @return The evaluation result as a mutable map with string keys and mutable list values.
      */
-    override fun evaluateRaw(vaccineReport: VaccineReport):  MutableMap<String, MutableList<*>> {
-        log.info("Evaluating vaccine report with vaccine count:{} indicator: {} for gender {} and birthdate:{}",
-            vaccineReport.vaccines.size,vaccineReport.indicators.size,vaccineReport.gender,vaccineReport.dateOfBirth)
-        val namedObject = HashMap<String,Any>()
+    override fun evaluateRaw(vaccineReport: VaccineReport): MutableMap<String, MutableList<*>> {
+        log.info(
+            "Evaluating vaccine report with vaccine count:{} indicator: {} for gender {} and birthdate:{}",
+            vaccineReport.vaccines.size, vaccineReport.indicators.size, vaccineReport.gender, vaccineReport.dateOfBirth
+        )
+
+        val namedObject = HashMap<String, Any>()
         val session = kieContainer.newStatelessKieSession()
-        if(enableTracking) {
+
+        if (enableTracking) {
             val agendaEventListener = TrackingAgendaEventListener()
             session.addEventListener(agendaEventListener)
         }
+
         val isRsvIndicated = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_RSV_INDICATED) ?: vaccineReport.flags?.get(Constants.FlagConstants.FLAG_SYNAGIS_INDICATED)
         val isMenBSharedDecision = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_SINGLE) ?: false
         val isMenBHighRisk = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_HIGH_RISK) ?: false
@@ -79,39 +84,70 @@ class OPEngine(private val kieContainer: KieContainer,
                     && it.date.isBefore(vaccineReport.dateOfBirth.minusDays(13))
         }
 
+        // Calculate RSV season dates based on the patient's birthdate
+        val birthdate = vaccineReport.dateOfBirth
+        val rsvSeasonStartMonthDay = org.joda.time.MonthDay(10, 1) // October 1st
+        val rsvSeasonEndMonthDay = org.joda.time.MonthDay(3, 31)   // March 31st
+
+        // Determine if the birthdate is in-season or out-of-season
+        val isInSeasonBirth = birthdate.monthValue in 10..12 || (birthdate.monthValue == 3 && birthdate.dayOfMonth <= 31)
+
+        // Calculate first and second RSV seasons
+//        val firstRSVSeasonStart: LocalDate
+//        val firstRSVSeasonEnd: LocalDate
+        val secondRSVSeasonStart: LocalDate
+        val secondRSVSeasonEnd: LocalDate
+
+        if (isInSeasonBirth) {
+            // In-season birth
+//            firstRSVSeasonStart = LocalDate.of(birthdate.year - 1, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
+//            firstRSVSeasonEnd = LocalDate.of(birthdate.year, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
+            secondRSVSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
+            secondRSVSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
+        } else {
+            // Out-of-season birth
+//            firstRSVSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
+//            firstRSVSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
+            secondRSVSeasonStart = LocalDate.of(birthdate.year + 1, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
+            secondRSVSeasonEnd = LocalDate.of(birthdate.year + 2, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
+        }
+
         val cmds = mutableListOf<Command<*>>()
-        cmds.add(CommandFactory.newSetGlobal("evalTime",vaccineReport.requestTime.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("clientLanguage","en"))
-        cmds.add(CommandFactory.newSetGlobal("clientTimeZoneOffset","+0000"))
+        cmds.add(CommandFactory.newSetGlobal("evalTime", vaccineReport.requestTime.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("clientLanguage", "en"))
+        cmds.add(CommandFactory.newSetGlobal("clientTimeZoneOffset", "+0000"))
         cmds.add(CommandFactory.newSetGlobal("assertions", HashSet<String>()))
-        cmds.add(CommandFactory.newSetGlobal("namedObjects",namedObject))
-        cmds.add(CommandFactory.newSetGlobal("patientAgeTimeOfInterest",null))
-        cmds.add(CommandFactory.newSetGlobal("schedule",schedule))
-        cmds.add(CommandFactory.newSetGlobal("outputEarliestOverdueDates",java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("doseOverrideFeatureEnabled",java.lang.Boolean("false")))
-        cmds.add(CommandFactory.newSetGlobal("outputSupplementalText",java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("outputRuleName",java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup",java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("namedObjects", namedObject))
+        cmds.add(CommandFactory.newSetGlobal("patientAgeTimeOfInterest", null))
+        cmds.add(CommandFactory.newSetGlobal("schedule", schedule))
+        cmds.add(CommandFactory.newSetGlobal("outputEarliestOverdueDates", java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("doseOverrideFeatureEnabled", java.lang.Boolean("false")))
+        cmds.add(CommandFactory.newSetGlobal("outputSupplementalText", java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("outputRuleName", java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup", java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
-        cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", org.joda.time.MonthDay(10, 1)))
-        cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", org.joda.time.MonthDay(3, 31)))
+        cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", rsvSeasonStartMonthDay))
+        cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", rsvSeasonEndMonthDay))
         cmds.add(CommandFactory.newSetGlobal("februaryStartMonthDay", org.joda.time.MonthDay(2, 1)))
         cmds.add(CommandFactory.newSetGlobal("isRSVHighRisk", isRsvIndicated == true))
         cmds.add(CommandFactory.newSetGlobal("wasMommyVaxGiven", mommyVaxGiven))
         cmds.add(CommandFactory.newSetGlobal("isMenBSharedDecision", isMenBSharedDecision))
         cmds.add(CommandFactory.newSetGlobal("isMenBHighRisk", isMenBHighRisk))
 
-
-
+        // Add the calculated dates as globals
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", firstRSVSeasonStart.toDate()))
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", firstRSVSeasonEnd.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonStart", secondRSVSeasonStart.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonEnd", secondRSVSeasonEnd.toDate()))
 
         val vmr = convertToIceModel(vaccineReport)
         val jaxb = unmarshal(vmr)
         val requestDate = vaccineReport.requestTime.toDate() ?: Date()
 
-        //add the facts
-        val facts = buildFactList(vaccineReport,requestDate,jaxb)
-        for(f in facts){
-            if(f.value.isNotEmpty()){
+        // Add the facts
+        val facts = buildFactList(vaccineReport, requestDate, jaxb)
+        for (f in facts) {
+            if (f.value.isNotEmpty()) {
                 cmds.add(
                     CommandFactory.newInsertElements(
                         f.value,
@@ -123,12 +159,11 @@ class OPEngine(private val kieContainer: KieContainer,
         }
 
         cmds.add(CommandFactory.newStartProcess("PrimaryProcess"))
-        val result =  session.execute(CommandFactory.newBatchExecution((cmds)))
-     /*   agendaEventListener.getMatchList().forEach {
-            println(it)
-        }*/
-
-        return convertExecutionResult(result,namedObject.toMap())
+        val result = session.execute(CommandFactory.newBatchExecution((cmds)))
+//        agendaEventListener.getMatchList().forEach {
+//            println(it)
+//        }
+        return convertExecutionResult(result, namedObject.toMap())
     }
 
     /**
