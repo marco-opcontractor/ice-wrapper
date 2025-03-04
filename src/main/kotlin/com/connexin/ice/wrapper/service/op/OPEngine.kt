@@ -42,15 +42,18 @@ import javax.xml.bind.JAXBElement
  * commonKnowledgeDirectory - ~/knowledgeCommon folder
  * commonModuleDirectory - ~/knowledgeModule folder
  */
-class OPEngine(private val kieContainer: KieContainer,
-               private val conceptService: ConceptService,
-               private val enableTracking:Boolean,
-               commonLogicModule:String,
-               commonKnowledgeDirectory:String,
-               commonModuleDirectory:String,
-               knowledgeModules :List<String>) : IEngine, AbstractEngine(){
+class OPEngine(
+    private val kieContainer: KieContainer,
+    private val conceptService: ConceptService,
+    private val enableTracking: Boolean,
+    commonLogicModule: String,
+    commonKnowledgeDirectory: String,
+    commonModuleDirectory: String,
+    knowledgeModules: List<String>
+) : IEngine, AbstractEngine() {
 
-    private val schedule: Schedule = Schedule("requestedKmId",
+    private val schedule: Schedule = Schedule(
+        "requestedKmId",
         commonLogicModule,
         File(commonKnowledgeDirectory),
         knowledgeModules,
@@ -130,7 +133,8 @@ class OPEngine(private val kieContainer: KieContainer,
                         f.key.simpleName,
                         true,
                         null
-                    ))
+                    )
+                )
             }
         }
 
@@ -197,10 +201,10 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param payload The payload containing the CDSInput.
      * @return A map of facts where the key is the class type and the value is a list of instances of that class type.
      */
-    private fun buildFactList(report:VaccineReport, evalTime: Date, payload: JAXBElement<CDSInput>):Map<Class<*>,List<*>>{
+    private fun buildFactList(report: VaccineReport, evalTime: Date, payload: JAXBElement<CDSInput>): Map<Class<*>, List<*>> {
         //Avoid using the MappingUtility where possible, its fine to use it as static, but it has stateful fields which can cause a lot of issues.
 
-        val allFacts = HashMap<Class<*>,List<*>>()
+        val allFacts = HashMap<Class<*>, List<*>>()
         val facts = FactLists()
 
         //Set eval time
@@ -210,7 +214,11 @@ class OPEngine(private val kieContainer: KieContainer,
 
         //Set the CDS input
         val internalCDSInput = org.opencds.vmr.v1_0.internal.CDSInput()
-        CDSInputMapper.pullIn(payload.value as CDSInput, internalCDSInput, null)//it brings in a static class... which has stateful fields, just send null and let it use the static reference
+        CDSInputMapper.pullIn(
+            payload.value as CDSInput,
+            internalCDSInput,
+            null
+        )//it brings in a static class... which has stateful fields, just send null and let it use the static reference
         facts.put(
             org.opencds.vmr.v1_0.internal.CDSInput::class.java,
             internalCDSInput
@@ -239,29 +247,31 @@ class OPEngine(private val kieContainer: KieContainer,
             facts
         )
 
-        facts.put(EvaluatedPerson::class.java,internalPatient)
+        facts.put(EvaluatedPerson::class.java, internalPatient)
 
         val list = getAgeFacts(report.dateOfBirth, report.requestTime.atStartOfDay(), focalPerson.id)
-        for(l in list){
-            facts.put(EvaluatedPersonAgeAtEvalTime::class.java,l)
+        for (l in list) {
+            facts.put(EvaluatedPersonAgeAtEvalTime::class.java, l)
         }
 
 
-        if(inputPatient.clinicalStatements?.observationResults?.observationResult != null) {
-            for (obr in inputPatient.clinicalStatements.observationResults.observationResult){
-                OneObjectMapper.pullInClinicalStatement(obr, ObservationResult(),focalPerson.id,focalPerson.id,facts)
+        if (inputPatient.clinicalStatements?.observationResults?.observationResult != null) {
+            for (obr in inputPatient.clinicalStatements.observationResults.observationResult) {
+                OneObjectMapper.pullInClinicalStatement(obr, ObservationResult(), focalPerson.id, focalPerson.id, facts)
             }
         }
 
-        if(inputPatient.clinicalStatements?.substanceAdministrationEvents?.substanceAdministrationEvent != null) {
-            for (imm in inputPatient.clinicalStatements.substanceAdministrationEvents.substanceAdministrationEvent){
-                OneObjectMapper.pullInClinicalStatement(imm,
-                    SubstanceAdministrationEvent(),focalPerson.id,focalPerson.id,facts)
+        if (inputPatient.clinicalStatements?.substanceAdministrationEvents?.substanceAdministrationEvent != null) {
+            for (imm in inputPatient.clinicalStatements.substanceAdministrationEvents.substanceAdministrationEvent) {
+                OneObjectMapper.pullInClinicalStatement(
+                    imm,
+                    SubstanceAdministrationEvent(), focalPerson.id, focalPerson.id, facts
+                )
             }
         }
 
         val builder = BuildOpenCDSConceptLists()
-        builder.buildConceptLists<VmrOpenCdsConcept>(conceptService,facts,allFacts)
+        builder.buildConceptLists<VmrOpenCdsConcept>(conceptService, facts, allFacts)
 
         facts.put(EvaluatedPerson::class.java, internalPatient)
         facts.populateAllFactLists(allFacts)
@@ -277,30 +287,37 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param personId The ID of the person.
      * @return A list of EvaluatedPersonAgeAtEvalTime objects representing the person's age at the evaluation time.
      */
-    private fun getAgeFacts(birthTime : LocalDate, evalTime: LocalDateTime, personId:String):List<EvaluatedPersonAgeAtEvalTime>{
+    private fun getAgeFacts(birthTime: LocalDate, evalTime: LocalDateTime, personId: String): List<EvaluatedPersonAgeAtEvalTime> {
 
         return listOf(
             buildAgeFact(
-                ChronoUnit.SECONDS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_SECOND,personId),
+                ChronoUnit.SECONDS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_SECOND, personId
+            ),
             buildAgeFact(
-                ChronoUnit.MINUTES.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MINUTE,personId),
+                ChronoUnit.MINUTES.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MINUTE, personId
+            ),
             buildAgeFact(
-                ChronoUnit.HOURS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_HOUR,personId),
+                ChronoUnit.HOURS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_HOUR, personId
+            ),
             buildAgeFact(
-                ChronoUnit.DAYS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_DAY,personId),
+                ChronoUnit.DAYS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_DAY, personId
+            ),
             buildAgeFact(
-                ChronoUnit.WEEKS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_WEEK,personId),
+                ChronoUnit.WEEKS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_WEEK, personId
+            ),
             buildAgeFact(
-                ChronoUnit.MONTHS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MONTH,personId),
+                ChronoUnit.MONTHS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MONTH, personId
+            ),
             buildAgeFact(
-                ChronoUnit.YEARS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_YEAR,personId)
+                ChronoUnit.YEARS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_YEAR, personId
+            )
         )
 
     }
@@ -313,7 +330,7 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param personId The ID of the person.
      * @return An EvaluatedPersonAgeAtEvalTime object representing the person's age at the evaluation time.
      */
-    private fun buildAgeFact(value:Int,ageUnit:String, personId:String): EvaluatedPersonAgeAtEvalTime {
+    private fun buildAgeFact(value: Int, ageUnit: String, personId: String): EvaluatedPersonAgeAtEvalTime {
         val personAgeInUnit = EvaluatedPersonAgeAtEvalTime()
         personAgeInUnit.age = value
         personAgeInUnit.ageUnit = ageUnit
