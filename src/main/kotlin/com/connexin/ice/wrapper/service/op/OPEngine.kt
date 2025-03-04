@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.xml.bind.JAXBElement
@@ -84,33 +85,8 @@ class OPEngine(private val kieContainer: KieContainer,
                     && it.date.isBefore(vaccineReport.dateOfBirth.minusDays(13))
         }
 
-        // Calculate RSV season dates based on the patient's birthdate
-        val birthdate = vaccineReport.dateOfBirth
-        val rsvSeasonStartMonthDay = org.joda.time.MonthDay(10, 1) // October 1st
-        val rsvSeasonEndMonthDay = org.joda.time.MonthDay(3, 31)   // March 31st
-
-        // Determine if the birthdate is in-season or out-of-season
-        val isInSeasonBirth = birthdate.monthValue in 10..12 || (birthdate.monthValue == 3 && birthdate.dayOfMonth <= 31)
-
         // Calculate first and second RSV seasons
-//        val firstRSVSeasonStart: LocalDate
-//        val firstRSVSeasonEnd: LocalDate
-        val secondRSVSeasonStart: LocalDate
-        val secondRSVSeasonEnd: LocalDate
-
-        if (isInSeasonBirth) {
-            // In-season birth
-//            firstRSVSeasonStart = LocalDate.of(birthdate.year - 1, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
-//            firstRSVSeasonEnd = LocalDate.of(birthdate.year, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
-            secondRSVSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
-            secondRSVSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
-        } else {
-            // Out-of-season birth
-//            firstRSVSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
-//            firstRSVSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
-            secondRSVSeasonStart = LocalDate.of(birthdate.year + 1, rsvSeasonStartMonthDay.monthOfYear, rsvSeasonStartMonthDay.dayOfMonth)
-            secondRSVSeasonEnd = LocalDate.of(birthdate.year + 2, rsvSeasonEndMonthDay.monthOfYear, rsvSeasonEndMonthDay.dayOfMonth)
-        }
+        val rsvSeasonDates = calculateRsvSeasonDates(vaccineReport.dateOfBirth)
 
         val cmds = mutableListOf<Command<*>>()
         cmds.add(CommandFactory.newSetGlobal("evalTime", vaccineReport.requestTime.toDate()))
@@ -126,8 +102,8 @@ class OPEngine(private val kieContainer: KieContainer,
         cmds.add(CommandFactory.newSetGlobal("outputRuleName", java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup", java.lang.Boolean("true")))
         cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
-        cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", rsvSeasonStartMonthDay))
-        cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", rsvSeasonEndMonthDay))
+        cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", org.joda.time.MonthDay(10, 1)))
+        cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", org.joda.time.MonthDay(3, 31)))
         cmds.add(CommandFactory.newSetGlobal("februaryStartMonthDay", org.joda.time.MonthDay(2, 1)))
         cmds.add(CommandFactory.newSetGlobal("isRSVHighRisk", isRsvIndicated == true))
         cmds.add(CommandFactory.newSetGlobal("wasMommyVaxGiven", mommyVaxGiven))
@@ -137,8 +113,8 @@ class OPEngine(private val kieContainer: KieContainer,
         // Add the calculated dates as globals
 //        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", firstRSVSeasonStart.toDate()))
 //        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", firstRSVSeasonEnd.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonStart", secondRSVSeasonStart.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonEnd", secondRSVSeasonEnd.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonStart", rsvSeasonDates.secondSeasonStart.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonEnd", rsvSeasonDates.secondSeasonEnd.toDate()))
 
         val vmr = convertToIceModel(vaccineReport)
         val jaxb = unmarshal(vmr)
@@ -364,4 +340,39 @@ class OPEngine(private val kieContainer: KieContainer,
         )
     }
 
+    private data class RsvSeasonDates(
+        val firstSeasonStart: LocalDate,
+        val firstSeasonEnd: LocalDate,
+        val secondSeasonStart: LocalDate,
+        val secondSeasonEnd: LocalDate
+    )
+
+    private fun calculateRsvSeasonDates(birthdate: LocalDate): RsvSeasonDates {
+        // Define constant season boundaries
+        val rsvSeasonStartMonth = Month.OCTOBER
+        val rsvSeasonStartDay = 1
+        val rsvSeasonEndMonth = Month.MARCH
+        val rsvSeasonEndDay = 31
+
+        // Determine if baby was born after RSV season
+        val isBornAfterRSVSeason = birthdate.monthValue >= 4
+
+        return if (isBornAfterRSVSeason) {
+            // Baby born on or after April 1st
+            RsvSeasonDates(
+                firstSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
+                firstSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay),
+                secondSeasonStart = LocalDate.of(birthdate.year + 1, rsvSeasonStartMonth, rsvSeasonStartDay),
+                secondSeasonEnd = LocalDate.of(birthdate.year + 2, rsvSeasonEndMonth, rsvSeasonEndDay)
+            )
+        } else {
+            // Baby born before April 1st (October 1st to March 31st)
+            RsvSeasonDates(
+                firstSeasonStart = LocalDate.of(birthdate.year - 1, rsvSeasonStartMonth, rsvSeasonStartDay),
+                firstSeasonEnd = LocalDate.of(birthdate.year, rsvSeasonEndMonth, rsvSeasonEndDay),
+                secondSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
+                secondSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay)
+            )
+        }
+    }
 }
