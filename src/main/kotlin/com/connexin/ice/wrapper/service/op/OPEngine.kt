@@ -99,11 +99,11 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("namedObjects", namedObject))
         cmds.add(CommandFactory.newSetGlobal("patientAgeTimeOfInterest", null))
         cmds.add(CommandFactory.newSetGlobal("schedule", schedule))
-        cmds.add(CommandFactory.newSetGlobal("outputEarliestOverdueDates", java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("doseOverrideFeatureEnabled", java.lang.Boolean("false")))
-        cmds.add(CommandFactory.newSetGlobal("outputSupplementalText", java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("outputRuleName", java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup", java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("outputEarliestOverdueDates", java.lang.Boolean.valueOf("true")))
+        cmds.add(CommandFactory.newSetGlobal("doseOverrideFeatureEnabled", java.lang.Boolean.valueOf("false")))
+        cmds.add(CommandFactory.newSetGlobal("outputSupplementalText", java.lang.Boolean.valueOf("true")))
+        cmds.add(CommandFactory.newSetGlobal("outputRuleName", java.lang.Boolean.valueOf("true")))
+        cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup", java.lang.Boolean.valueOf("true")))
         cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
         cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", org.joda.time.MonthDay(10, 1)))
         cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", org.joda.time.MonthDay(3, 31)))
@@ -114,8 +114,8 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("isMenBHighRisk", isMenBHighRisk))
 
         // Add the calculated dates as globals
-//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", firstRSVSeasonStart.toDate()))
-//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", firstRSVSeasonEnd.toDate()))
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", rsvSeasonDates.firstSeasonStart.toDate()))
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", rsvSeasonDates.firstSeasonEnd.toDate()))
         cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonStart", rsvSeasonDates.secondSeasonStart.toDate()))
         cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonEnd", rsvSeasonDates.secondSeasonEnd.toDate()))
 
