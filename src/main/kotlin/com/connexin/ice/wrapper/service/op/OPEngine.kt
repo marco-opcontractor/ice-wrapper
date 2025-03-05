@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.xml.bind.JAXBElement
@@ -41,15 +42,18 @@ import javax.xml.bind.JAXBElement
  * commonKnowledgeDirectory - ~/knowledgeCommon folder
  * commonModuleDirectory - ~/knowledgeModule folder
  */
-class OPEngine(private val kieContainer: KieContainer,
-               private val conceptService: ConceptService,
-               private val enableTracking:Boolean,
-               commonLogicModule:String,
-               commonKnowledgeDirectory:String,
-               commonModuleDirectory:String,
-               knowledgeModules :List<String>) : IEngine, AbstractEngine(){
+class OPEngine(
+    private val kieContainer: KieContainer,
+    private val conceptService: ConceptService,
+    private val enableTracking: Boolean,
+    commonLogicModule: String,
+    commonKnowledgeDirectory: String,
+    commonModuleDirectory: String,
+    knowledgeModules: List<String>
+) : IEngine, AbstractEngine() {
 
-    private val schedule: Schedule = Schedule("requestedKmId",
+    private val schedule: Schedule = Schedule(
+        "requestedKmId",
         commonLogicModule,
         File(commonKnowledgeDirectory),
         knowledgeModules,
@@ -62,15 +66,20 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param vaccineReport The vaccine report to be evaluated.
      * @return The evaluation result as a mutable map with string keys and mutable list values.
      */
-    override fun evaluateRaw(vaccineReport: VaccineReport):  MutableMap<String, MutableList<*>> {
-        log.info("Evaluating vaccine report with vaccine count:{} indicator: {} for gender {} and birthdate:{}",
-            vaccineReport.vaccines.size,vaccineReport.indicators.size,vaccineReport.gender,vaccineReport.dateOfBirth)
-        val namedObject = HashMap<String,Any>()
+    override fun evaluateRaw(vaccineReport: VaccineReport): MutableMap<String, MutableList<*>> {
+        log.info(
+            "Evaluating vaccine report with vaccine count:{} indicator: {} for gender {} and birthdate:{}",
+            vaccineReport.vaccines.size, vaccineReport.indicators.size, vaccineReport.gender, vaccineReport.dateOfBirth
+        )
+
+        val namedObject = HashMap<String, Any>()
         val session = kieContainer.newStatelessKieSession()
-        if(enableTracking) {
+
+        if (enableTracking) {
             val agendaEventListener = TrackingAgendaEventListener()
             session.addEventListener(agendaEventListener)
         }
+
         val isRsvIndicated = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_RSV_INDICATED) ?: vaccineReport.flags?.get(Constants.FlagConstants.FLAG_SYNAGIS_INDICATED)
         val isMenBSharedDecision = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_SINGLE) ?: false
         val isMenBHighRisk = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_HIGH_RISK) ?: false
@@ -79,19 +88,22 @@ class OPEngine(private val kieContainer: KieContainer,
                     && it.date.isBefore(vaccineReport.dateOfBirth.minusDays(13))
         }
 
+        // Calculate first and second RSV seasons
+        val rsvSeasonDates = calculateRsvSeasonDates(vaccineReport.dateOfBirth)
+
         val cmds = mutableListOf<Command<*>>()
-        cmds.add(CommandFactory.newSetGlobal("evalTime",vaccineReport.requestTime.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("clientLanguage","en"))
-        cmds.add(CommandFactory.newSetGlobal("clientTimeZoneOffset","+0000"))
+        cmds.add(CommandFactory.newSetGlobal("evalTime", vaccineReport.requestTime.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("clientLanguage", "en"))
+        cmds.add(CommandFactory.newSetGlobal("clientTimeZoneOffset", "+0000"))
         cmds.add(CommandFactory.newSetGlobal("assertions", HashSet<String>()))
-        cmds.add(CommandFactory.newSetGlobal("namedObjects",namedObject))
-        cmds.add(CommandFactory.newSetGlobal("patientAgeTimeOfInterest",null))
-        cmds.add(CommandFactory.newSetGlobal("schedule",schedule))
-        cmds.add(CommandFactory.newSetGlobal("outputEarliestOverdueDates",java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("doseOverrideFeatureEnabled",java.lang.Boolean("false")))
-        cmds.add(CommandFactory.newSetGlobal("outputSupplementalText",java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("outputRuleName",java.lang.Boolean("true")))
-        cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup",java.lang.Boolean("true")))
+        cmds.add(CommandFactory.newSetGlobal("namedObjects", namedObject))
+        cmds.add(CommandFactory.newSetGlobal("patientAgeTimeOfInterest", null))
+        cmds.add(CommandFactory.newSetGlobal("schedule", schedule))
+        cmds.add(CommandFactory.newSetGlobal("outputEarliestOverdueDates", java.lang.Boolean.valueOf("true")))
+        cmds.add(CommandFactory.newSetGlobal("doseOverrideFeatureEnabled", java.lang.Boolean.valueOf("false")))
+        cmds.add(CommandFactory.newSetGlobal("outputSupplementalText", java.lang.Boolean.valueOf("true")))
+        cmds.add(CommandFactory.newSetGlobal("outputRuleName", java.lang.Boolean.valueOf("true")))
+        cmds.add(CommandFactory.newSetGlobal("enableUnsupportedVaccinesGroup", java.lang.Boolean.valueOf("true")))
         cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
         cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", org.joda.time.MonthDay(10, 1)))
         cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", org.joda.time.MonthDay(3, 31)))
@@ -101,34 +113,37 @@ class OPEngine(private val kieContainer: KieContainer,
         cmds.add(CommandFactory.newSetGlobal("isMenBSharedDecision", isMenBSharedDecision))
         cmds.add(CommandFactory.newSetGlobal("isMenBHighRisk", isMenBHighRisk))
 
-
-
+        // Add the calculated dates as globals
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", rsvSeasonDates.firstSeasonStart.toDate()))
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", rsvSeasonDates.firstSeasonEnd.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonStart", rsvSeasonDates.secondSeasonStart.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonEnd", rsvSeasonDates.secondSeasonEnd.toDate()))
 
         val vmr = convertToIceModel(vaccineReport)
         val jaxb = unmarshal(vmr)
         val requestDate = vaccineReport.requestTime.toDate() ?: Date()
 
-        //add the facts
-        val facts = buildFactList(vaccineReport,requestDate,jaxb)
-        for(f in facts){
-            if(f.value.isNotEmpty()){
+        // Add the facts
+        val facts = buildFactList(vaccineReport, requestDate, jaxb)
+        for (f in facts) {
+            if (f.value.isNotEmpty()) {
                 cmds.add(
                     CommandFactory.newInsertElements(
                         f.value,
                         f.key.simpleName,
                         true,
                         null
-                    ))
+                    )
+                )
             }
         }
 
         cmds.add(CommandFactory.newStartProcess("PrimaryProcess"))
-        val result =  session.execute(CommandFactory.newBatchExecution((cmds)))
-     /*   agendaEventListener.getMatchList().forEach {
-            println(it)
-        }*/
-
-        return convertExecutionResult(result,namedObject.toMap())
+        val result = session.execute(CommandFactory.newBatchExecution((cmds)))
+//        agendaEventListener.getMatchList().forEach {
+//            println(it)
+//        }
+        return convertExecutionResult(result, namedObject.toMap())
     }
 
     /**
@@ -186,10 +201,10 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param payload The payload containing the CDSInput.
      * @return A map of facts where the key is the class type and the value is a list of instances of that class type.
      */
-    private fun buildFactList(report:VaccineReport, evalTime: Date, payload: JAXBElement<CDSInput>):Map<Class<*>,List<*>>{
+    private fun buildFactList(report: VaccineReport, evalTime: Date, payload: JAXBElement<CDSInput>): Map<Class<*>, List<*>> {
         //Avoid using the MappingUtility where possible, its fine to use it as static, but it has stateful fields which can cause a lot of issues.
 
-        val allFacts = HashMap<Class<*>,List<*>>()
+        val allFacts = HashMap<Class<*>, List<*>>()
         val facts = FactLists()
 
         //Set eval time
@@ -199,7 +214,11 @@ class OPEngine(private val kieContainer: KieContainer,
 
         //Set the CDS input
         val internalCDSInput = org.opencds.vmr.v1_0.internal.CDSInput()
-        CDSInputMapper.pullIn(payload.value as CDSInput, internalCDSInput, null)//it brings in a static class... which has stateful fields, just send null and let it use the static reference
+        CDSInputMapper.pullIn(
+            payload.value as CDSInput,
+            internalCDSInput,
+            null
+        )//it brings in a static class... which has stateful fields, just send null and let it use the static reference
         facts.put(
             org.opencds.vmr.v1_0.internal.CDSInput::class.java,
             internalCDSInput
@@ -228,29 +247,31 @@ class OPEngine(private val kieContainer: KieContainer,
             facts
         )
 
-        facts.put(EvaluatedPerson::class.java,internalPatient)
+        facts.put(EvaluatedPerson::class.java, internalPatient)
 
         val list = getAgeFacts(report.dateOfBirth, report.requestTime.atStartOfDay(), focalPerson.id)
-        for(l in list){
-            facts.put(EvaluatedPersonAgeAtEvalTime::class.java,l)
+        for (l in list) {
+            facts.put(EvaluatedPersonAgeAtEvalTime::class.java, l)
         }
 
 
-        if(inputPatient.clinicalStatements?.observationResults?.observationResult != null) {
-            for (obr in inputPatient.clinicalStatements.observationResults.observationResult){
-                OneObjectMapper.pullInClinicalStatement(obr, ObservationResult(),focalPerson.id,focalPerson.id,facts)
+        if (inputPatient.clinicalStatements?.observationResults?.observationResult != null) {
+            for (obr in inputPatient.clinicalStatements.observationResults.observationResult) {
+                OneObjectMapper.pullInClinicalStatement(obr, ObservationResult(), focalPerson.id, focalPerson.id, facts)
             }
         }
 
-        if(inputPatient.clinicalStatements?.substanceAdministrationEvents?.substanceAdministrationEvent != null) {
-            for (imm in inputPatient.clinicalStatements.substanceAdministrationEvents.substanceAdministrationEvent){
-                OneObjectMapper.pullInClinicalStatement(imm,
-                    SubstanceAdministrationEvent(),focalPerson.id,focalPerson.id,facts)
+        if (inputPatient.clinicalStatements?.substanceAdministrationEvents?.substanceAdministrationEvent != null) {
+            for (imm in inputPatient.clinicalStatements.substanceAdministrationEvents.substanceAdministrationEvent) {
+                OneObjectMapper.pullInClinicalStatement(
+                    imm,
+                    SubstanceAdministrationEvent(), focalPerson.id, focalPerson.id, facts
+                )
             }
         }
 
         val builder = BuildOpenCDSConceptLists()
-        builder.buildConceptLists<VmrOpenCdsConcept>(conceptService,facts,allFacts)
+        builder.buildConceptLists<VmrOpenCdsConcept>(conceptService, facts, allFacts)
 
         facts.put(EvaluatedPerson::class.java, internalPatient)
         facts.populateAllFactLists(allFacts)
@@ -266,30 +287,37 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param personId The ID of the person.
      * @return A list of EvaluatedPersonAgeAtEvalTime objects representing the person's age at the evaluation time.
      */
-    private fun getAgeFacts(birthTime : LocalDate, evalTime: LocalDateTime, personId:String):List<EvaluatedPersonAgeAtEvalTime>{
+    private fun getAgeFacts(birthTime: LocalDate, evalTime: LocalDateTime, personId: String): List<EvaluatedPersonAgeAtEvalTime> {
 
         return listOf(
             buildAgeFact(
-                ChronoUnit.SECONDS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_SECOND,personId),
+                ChronoUnit.SECONDS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_SECOND, personId
+            ),
             buildAgeFact(
-                ChronoUnit.MINUTES.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MINUTE,personId),
+                ChronoUnit.MINUTES.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MINUTE, personId
+            ),
             buildAgeFact(
-                ChronoUnit.HOURS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_HOUR,personId),
+                ChronoUnit.HOURS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_HOUR, personId
+            ),
             buildAgeFact(
-                ChronoUnit.DAYS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_DAY,personId),
+                ChronoUnit.DAYS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_DAY, personId
+            ),
             buildAgeFact(
-                ChronoUnit.WEEKS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_WEEK,personId),
+                ChronoUnit.WEEKS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_WEEK, personId
+            ),
             buildAgeFact(
-                ChronoUnit.MONTHS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MONTH,personId),
+                ChronoUnit.MONTHS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_MONTH, personId
+            ),
             buildAgeFact(
-                ChronoUnit.YEARS.between(evalTime,birthTime.atStartOfDay()).toInt(),
-                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_YEAR,personId)
+                ChronoUnit.YEARS.between(evalTime, birthTime.atStartOfDay()).toInt(),
+                EvaluatedPersonAgeAtEvalTime.AGE_UNIT_YEAR, personId
+            )
         )
 
     }
@@ -302,7 +330,7 @@ class OPEngine(private val kieContainer: KieContainer,
      * @param personId The ID of the person.
      * @return An EvaluatedPersonAgeAtEvalTime object representing the person's age at the evaluation time.
      */
-    private fun buildAgeFact(value:Int,ageUnit:String, personId:String): EvaluatedPersonAgeAtEvalTime {
+    private fun buildAgeFact(value: Int, ageUnit: String, personId: String): EvaluatedPersonAgeAtEvalTime {
         val personAgeInUnit = EvaluatedPersonAgeAtEvalTime()
         personAgeInUnit.age = value
         personAgeInUnit.ageUnit = ageUnit
@@ -329,4 +357,39 @@ class OPEngine(private val kieContainer: KieContainer,
         )
     }
 
+    private data class RsvSeasonDates(
+        val firstSeasonStart: LocalDate,
+        val firstSeasonEnd: LocalDate,
+        val secondSeasonStart: LocalDate,
+        val secondSeasonEnd: LocalDate
+    )
+
+    private fun calculateRsvSeasonDates(birthdate: LocalDate): RsvSeasonDates {
+        // Define constant season boundaries
+        val rsvSeasonStartMonth = Month.OCTOBER
+        val rsvSeasonStartDay = 1
+        val rsvSeasonEndMonth = Month.MARCH
+        val rsvSeasonEndDay = 31
+
+        // Determine if baby was born after RSV season
+        val isBornAfterRSVSeason = birthdate.monthValue >= 4
+
+        return if (isBornAfterRSVSeason) {
+            // Baby born on or after April 1st
+            RsvSeasonDates(
+                firstSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
+                firstSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay),
+                secondSeasonStart = LocalDate.of(birthdate.year + 1, rsvSeasonStartMonth, rsvSeasonStartDay),
+                secondSeasonEnd = LocalDate.of(birthdate.year + 2, rsvSeasonEndMonth, rsvSeasonEndDay)
+            )
+        } else {
+            // Baby born before April 1st (October 1st to March 31st)
+            RsvSeasonDates(
+                firstSeasonStart = LocalDate.of(birthdate.year - 1, rsvSeasonStartMonth, rsvSeasonStartDay),
+                firstSeasonEnd = LocalDate.of(birthdate.year, rsvSeasonEndMonth, rsvSeasonEndDay),
+                secondSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
+                secondSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay)
+            )
+        }
+    }
 }
