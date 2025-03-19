@@ -87,6 +87,10 @@ class OPEngine(
             it.interpretation == Interpretation.PREGNANCY_VACCINATED && it.code == Constants.DiseaseCodes.ICE_RSV_DISEASE_CODE
                     && it.date.isBefore(vaccineReport.dateOfBirth.minusDays(13))
         }
+        val isMenBTrumemba2Series = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_TRUMEMBA_2DOSE) ?: false
+        val isMenBTrumemba3Series = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_TRUMEMBA_3DOSE) ?: false
+        val isMenBTrumembaSeriesChanged = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_TRUMEMBA_SERIES_CHANGED) ?: false
+
 
         // Calculate first and second RSV seasons
         val rsvSeasonDates = calculateRsvSeasonDates(vaccineReport.dateOfBirth)
@@ -112,6 +116,9 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("wasMommyVaxGiven", mommyVaxGiven))
         cmds.add(CommandFactory.newSetGlobal("isMenBSharedDecision", isMenBSharedDecision))
         cmds.add(CommandFactory.newSetGlobal("isMenBHighRisk", isMenBHighRisk))
+        cmds.add(CommandFactory.newSetGlobal("isMenBTrumemba2Series", isMenBTrumemba2Series))
+        cmds.add(CommandFactory.newSetGlobal("isMenBTrumemba3Series", isMenBTrumemba3Series))
+        cmds.add(CommandFactory.newSetGlobal("isMenBTrumembaSeriesChanged", isMenBTrumembaSeriesChanged))
 
         // Add the calculated dates as globals
 //        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", rsvSeasonDates.firstSeasonStart.toDate()))

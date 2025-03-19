@@ -48,6 +48,9 @@ expander ../../knowledgeCommon/org.cdsframework.ice/org.cdsframework^ICE^1.0.0.d
 
 global java.util.Date evalTime
 global java.lang.Boolean isMenBHighRisk
+global java.lang.Boolean isMenBTrumemba2Series
+global java.lang.Boolean isMenBTrumemba3Series
+global java.lang.Boolean isMenBTrumembaSeriesChanged
 
 
 // CVX 164 (Meningococcal B, NOS) is not listed in the table above because it does not count toward the completion of the Meningococcal B series. CVX 164 is categorized in the "Other Vaccine Group". 
@@ -113,6 +116,41 @@ rule "Mening B / FBhp 2-dose series: Do not invoke default Absolute Minimum Age 
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
 end
 
+rule "MeningB: FHbp 2-dose series: Invalid Second dose when elapsed time between 1st dose and 2nd dose is less than 6mo - 4d"
+    dialect "mvel"
+  	agenda-group "HistoryEvaluation^postEvaluationCheck"
+  	activation-group "allowableVaccineCheck"
+  	no-loop true
+  	salience 980
+  	when
+      // Patient Information
+      The Patient information $patientInfo must be known to complete writing this rule
+        - make note of the Patient's birthdate as $birthdate
+  		There is an administered shot $currentShot
+  		  - the shot belongs to the Series with name a member of ("MenBFHbp3DoseSeries")
+  			- the vaccine administered is "ICE162"
+  			// - the series that the shot belongs to is complete
+  			- make note of the associated series as $targetSeries
+  			- make note of the date this shot was administered as $currentShotDate
+  		There is an administered shot $previousShot
+  		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+  		  - the vaccine administered is "ICE162"
+  		  - the administration date of the shot is < $currentShotDate
+  		  - that has already been evaluated and whose Shot Validity is VALID
+  		  - the shot is not ignored
+  		  - make note of the date this shot was administered as $previousShotDate
+  		// Interval Validations - ensure 1st dose and current dose is less than 6mo - 4d
+      Confirm Elapsed time between $previousShotDate and $currentShotDate < "6m-4d"
+      Confirm the variable isMenBTrumemba2Series is == true
+  	then
+  	  Set the shot status of $currentShot to Invalid
+  		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
+  		Refresh all facts in the shot $currentShot
+  		Record that this dose rule was Processed for the TargetDose $currentShot
+  		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+
+end
+
 
 /*************************************************************************************************************************************************************************************
 MenB FHbp 2-dose Series specific rules END
@@ -157,6 +195,47 @@ rule "Mening B / FHbp 3-dose series: Skip interval check on ACCEPTED/VACCINE_NOT
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+rule "MeningB: FHbp 3-dose series: Invalid Third dose when elapsed time between 1st dose and 3rd dose is less than 6mo"
+    dialect "mvel"
+  	agenda-group "HistoryEvaluation^postEvaluationCheck"
+  	activation-group "allowableVaccineCheck"
+  	salience 989
+  	when
+      // Patient Information
+      The Patient information $patientInfo must be known to complete writing this rule
+        - make note of the Patient's birthdate as $birthdate
+  		There is an administered shot $currentShot
+  			- the shot belongs to the Series with name a member of ("MenBFHbp3DoseSeries")
+  			- the vaccine administered is "ICE162"
+  			- the series that the shot belongs to is complete
+  			- make note of the associated series as $targetSeries
+  			- make note of the date this shot was administered as $currentShotDate
+  		There is an administered shot $previousShot
+  		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+  		  - the vaccine administered is "ICE162"
+  		  - the administration date of the shot is < $currentShotDate
+  		  - that has already been evaluated and whose Shot Validity is VALID
+  		  - the shot is not ignored
+  		  - make note of the date this shot was administered as $previousShotDate
+  		There is an administered shot $previousShot2
+  		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+  		  - the vaccine administered is "ICE162"
+  		  - the administration date of the shot is < $previousShotDate
+  		  - that has already been evaluated and whose Shot Validity is VALID
+  		  - the shot is not ignored
+  		  - make note of the date this shot was administered as $previousShot2Date
+  		// Interval Validations - ensure 1st dose and current dose is less than 6mo
+      Confirm Elapsed time between $previousShot2Date and $currentShotDate < "6m"
+      Confirm the variable isMenBHighRisk is == true
+  	then
+  	  Set the shot status of $currentShot to Invalid
+  		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
+  		Refresh all facts in the shot $currentShot
+  		Record that this dose rule was Processed for the TargetDose $currentShot
+  		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+
 end
 
 /*************************************************************************************************************************************************************************************
@@ -294,44 +373,36 @@ rule "MeningB: 4C 3-dose Series: Evaluate Invalid fourth dose for Men B 4C 3-dos
     		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
     end
 
+    rule "MeningB: 4C 3-dose Series: Evaluate Third Dose interval for Men B  4C 3-dose Series (1st dose + 6m)"
+    	dialect "mvel"
+    	agenda-group "HistoryEvaluation^customEvaluationRule"
+    	activation-group "allowableVaccineCheck"
+    	salience 989
+    	when
+    		There is an administered shot $currentShot
+    			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
+    			- the dose number in the Series is == 3
+    			- make note of the date this shot was administered as $currentShotDate
+    			- make note of the associated series as $associatedTargetSeries
+    		There does not exist an IceFact
+    			- that has associated administered shot $currentShot
+    			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
+    		There is an administered shot $previousShot
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the administration date of the shot is < $currentShotDate
+          - that has already been evaluated
+          - the administered shot number is == 1
+          - the shot is not ignored
+          - make note of the date this shot was administered as $previousShotDate
+        Confirm Elapsed time between $previousShotDate and $currentShotDate < "6m"
+    	then
+    	  Set the shot status of $currentShot to Invalid
+    		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
+    		Refresh all facts in the shot $currentShot
+    		Record that this dose rule was Processed for the TargetDose $currentShot
+    		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+    end
+
 /*************************************************************************************************************************************************************************************
 MenB 4C 2-dose Series specific rules
-*************************************************************************************************************************************************************************************/
-
-/*************************************************************************************************************************************************************************************
-MenB FHbp 3-dose Series specific rules
-*************************************************************************************************************************************************************************************/
-
-rule "MeningB: FHbp 3-dose series : Evaluate Third Dose interval for Men B FHbp 3-dose series (1st dose + 6m)"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule"
-	activation-group "allowableVaccineCheck"
-	salience 989
-	when
-		There is an administered shot $currentShot
-			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
-			- the dose number in the Series is == 3
-			- make note of the date this shot was administered as $currentShotDate
-			- make note of the associated series as $associatedTargetSeries
-		There does not exist an IceFact
-			- that has associated administered shot $currentShot
-			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
-		There is an administered shot $previousShot
-      - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
-      - the administration date of the shot is < $currentShotDate
-      - that has already been evaluated
-      - the administered shot number is == 1
-      - the shot is not ignored
-      - make note of the date this shot was administered as $previousShotDate
-    Confirm Elapsed time between $previousShotDate and $currentShotDate < "6m"
-	then
-	  Set the shot status of $currentShot to Invalid
-		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
-		Refresh all facts in the shot $currentShot
-		Record that this dose rule was Processed for the TargetDose $currentShot
-		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
-end
-
-/*************************************************************************************************************************************************************************************
-MenB FHbp 3-dose Series specific rules END
 *************************************************************************************************************************************************************************************/
