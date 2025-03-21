@@ -91,5 +91,9 @@
     <cdsListItemKey>MENB_SHARED_DECISION_NOT_APPLICABLE</cdsListItemKey>
     <cdsListItemValue>Not Applicable</cdsListItemValue>
   </cdsListItem>
+  <cdsListItem>
+    <cdsListItemKey>MENB_SC_HIGH_RISK_BOOSTER_RECOMMENDED</cdsListItemKey>
+    <cdsListItemValue>Recommended to receive a booster dose.</cdsListItemValue>
+  </cdsListItem>
    <cdsVersion>gov.nyc.cir^ICE^1.0.0</cdsVersion>
 </ns2:cdsListSpecificationFile>
