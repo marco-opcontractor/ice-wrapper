@@ -47,6 +47,7 @@ import org.cdsframework.ice.service.Vaccine
 expander ../../knowledgeCommon/org.cdsframework.ice/org.cdsframework^ICE^1.0.0.dsl
 
 global java.util.Date evalTime
+global java.lang.Boolean isMenBHighRisk
 
 
 // CVX 164 (Meningococcal B, NOS) is not listed in the table above because it does not count toward the completion of the Meningococcal B series. CVX 164 is categorized in the "Other Vaccine Group". 
@@ -198,6 +199,100 @@ rule "Mening B / MenB 4C 2-dose Series: Skip interval check on ACCEPTED/VACCINE_
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
 end
+
+rule "MeningB: 4C 2-dose Series: Evaluate Invalid third dose for Men B 4C 2-dose Series when two previous shots before Oct 24, 2024"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	activation-group "allowableVaccineCheck"
+	salience 989
+	when
+    // Patient Information
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the Patient's birthdate as $birthdate
+		There is an administered shot $currentShot
+			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
+			- the vaccine administered is "ICE163"
+			- the series that the shot belongs to is complete
+			- make note of the associated series as $targetSeries
+			- make note of the date this shot was administered as $currentShotDate
+		There is an administered shot $previousShot
+		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+		  - the vaccine administered is "ICE163"
+		  - the administration date of the shot is < $currentShotDate
+		  - that has already been evaluated and whose Shot Validity is VALID
+		  - the shot is not ignored
+		  - the administration date of the shot is < "24-Oct-2024"
+		  - make note of the date this shot was administered as $previousShotDate
+		There is an administered shot $previousShot2
+		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+		  - the vaccine administered is "ICE163"
+		  - the administration date of the shot is < $previousShotDate
+		  - that has already been evaluated and whose Shot Validity is VALID
+		  - the shot is not ignored
+		  - the administration date of the shot is < "24-Oct-2024"
+		  - make note of the date this shot was administered as $previousShot2Date
+		// Age Validations - ensure patient was 16+ for both doses
+    Confirm Elapsed time between $birthdate and $previousShotDate >= "16y-4d"
+    Confirm Elapsed time between $birthdate and $previousShot2Date >= "16y-4d"
+    Confirm the variable isMenBHighRisk is == false
+	then
+	  Set the shot status of $currentShot to Invalid
+		Include the reason for shot $currentShot Invalid due to "Third dose is not indicated for completed the MenB 4C 2-dose"
+		Refresh all facts in the shot $currentShot
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+rule "MeningB: 4C 3-dose Series: Evaluate Invalid fourth dose for Men B 4C 3-dose Series for High Risk Patients when three previous shots before Oct 24, 2024"
+    dialect "mvel"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    activation-group "allowableVaccineCheck"
+    salience 990
+    when
+        // Patient Information
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+    		There is an administered shot $currentShot
+    			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
+    			- the vaccine administered is "ICE163"
+    			- the series that the shot belongs to is complete
+          - that has already been evaluated and whose Shot Validity is VALID or ACCEPTED
+    			- make note of the associated series as $targetSeries
+    			- make note of the date this shot was administered as $currentShotDate
+    		There is an administered shot $previousShot
+    		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+    		  - the vaccine administered is "ICE163"
+    		  - the administration date of the shot is < $currentShotDate
+    		  - that has already been evaluated and whose Shot Validity is VALID
+    		  - the shot is not ignored
+    		  - make note of the date this shot was administered as $previousShotDate
+    		There is an administered shot $previousShot2
+    		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+    		  - the vaccine administered is "ICE163"
+    		  - the administration date of the shot is < $previousShotDate
+    		  - that has already been evaluated and whose Shot Validity is VALID
+    		  - the shot is not ignored
+    		  - the administration date of the shot is < "24-Oct-2024"
+    		  - make note of the date this shot was administered as $previousShot2Date
+    		There is an administered shot $previousShot3
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the vaccine administered is "ICE163"
+          - the administration date of the shot is < $previousShot2Date
+          - that has already been evaluated and whose Shot Validity is VALID
+          - the shot is not ignored
+          - the administration date of the shot is < "24-Oct-2024"
+          - make note of the date this shot was administered as $previousShot3Date
+    		// Age Validations - ensure patient was 16+ for both doses
+        Confirm Elapsed time between $birthdate and $previousShotDate >= "16y-4d"
+        Confirm Elapsed time between $birthdate and $previousShot2Date >= "16y-4d"
+        Confirm the variable isMenBHighRisk is == true
+    	then
+    	  Set the shot status of $currentShot to Invalid
+    		Include the reason for shot $currentShot Invalid due to "Vaccine not Permitted for this Dose"
+    		Refresh all facts in the shot $currentShot
+    		Record that this dose rule was Processed for the TargetDose $currentShot
+    		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+    end
 
 /*************************************************************************************************************************************************************************************
 MenB 4C 2-dose Series specific rules
