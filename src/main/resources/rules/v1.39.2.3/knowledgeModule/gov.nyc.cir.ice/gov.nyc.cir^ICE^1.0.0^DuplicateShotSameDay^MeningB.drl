@@ -83,14 +83,14 @@ rule "Duplicate Shots/Same Day MeningB Rule: If CVX 162/CVX 163 reported on same
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, $tdother + " in TargetSeries " + $td.associatedTargetSeries);
 end
 
-rule "Duplicate Shots/Same Day MeningB Rule: If CVX 162/CVX 163 reported on same day in FBhp 2-dose or FBhp 3-dose Series, evaluate CVX 162 as Invalid with reason DUPLICATE_SAME_DAY"
+rule "Duplicate Shots/Same Day MeningB Rule: If CVX 162/CVX 163 reported on same day in FBhp Series, evaluate CVX 162 as Invalid with reason DUPLICATE_SAME_DAY"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^duplicateShotSameDay"
 	auto-focus true
 	no-loop true
 	when
 		$td: TargetDose(hasBeenEvaluated == true, associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", vaccineComponent.cdsConceptName == "ICE162", isDoseStatusOverridden() == false, 
-			associatedTargetSeries.seriesName == "MenBFHbp2DoseSeries" || associatedTargetSeries.seriesName == "MenBFHbp3DoseSeries")
+			associatedTargetSeries.seriesName == "MenBFHbpSeries")
 		$tdother : TargetDose(this != $td, associatedTargetSeries == $td.associatedTargetSeries, administrationDate == $td.administrationDate, hasBeenEvaluated == true, isDoseStatusOverridden() == false,
 			doseNumberInSeries == $td.doseNumberInSeries, vaccineComponent.cdsConceptName == "ICE163", isDuplicateShotSameDayCheckCompleted() == false || $td.isDuplicateShotSameDayCheckCompleted() == false)
 	then
