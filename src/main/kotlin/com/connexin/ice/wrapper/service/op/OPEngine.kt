@@ -120,6 +120,10 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", rsvSeasonDates.firstSeasonEnd.toDate()))
         cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonStart", rsvSeasonDates.secondSeasonStart.toDate()))
         cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonEnd", rsvSeasonDates.secondSeasonEnd.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("extendedFirstRSVSeasonStart", rsvSeasonDates.extendedFirstSeasonStart.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("extendedFirstRSVSeasonEnd", rsvSeasonDates.extendedFirstSeasonEnd.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("extendedSecondRSVSeasonStart", rsvSeasonDates.extendedSecondSeasonStart.toDate()))
+        cmds.add(CommandFactory.newSetGlobal("extendedSecondRSVSeasonEnd", rsvSeasonDates.extendedSecondSeasonEnd.toDate()))
 
         val vmr = convertToIceModel(vaccineReport)
         val jaxb = unmarshal(vmr)
@@ -363,14 +367,20 @@ class OPEngine(
         val firstSeasonStart: LocalDate,
         val firstSeasonEnd: LocalDate,
         val secondSeasonStart: LocalDate,
-        val secondSeasonEnd: LocalDate
+        val secondSeasonEnd: LocalDate,
+        val extendedFirstSeasonStart: LocalDate,
+        val extendedFirstSeasonEnd: LocalDate,
+        val extendedSecondSeasonStart: LocalDate,
+        val extendedSecondSeasonEnd: LocalDate,
     )
 
     private fun calculateRsvSeasonDates(birthdate: LocalDate): RsvSeasonDates {
         // Define constant season boundaries
         val rsvSeasonStartMonth = Month.OCTOBER
+        val extendedRsvSeasonStartMonth = Month.SEPTEMBER
         val rsvSeasonStartDay = 1
         val rsvSeasonEndMonth = Month.MARCH
+        val extendedRsvSeasonEndMonth = Month.APRIL
         val rsvSeasonEndDay = 31
 
         // Determine if baby was born after RSV season
@@ -382,7 +392,11 @@ class OPEngine(
                 firstSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
                 firstSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay),
                 secondSeasonStart = LocalDate.of(birthdate.year + 1, rsvSeasonStartMonth, rsvSeasonStartDay),
-                secondSeasonEnd = LocalDate.of(birthdate.year + 2, rsvSeasonEndMonth, rsvSeasonEndDay)
+                secondSeasonEnd = LocalDate.of(birthdate.year + 2, rsvSeasonEndMonth, rsvSeasonEndDay),
+                extendedFirstSeasonStart = LocalDate.of(birthdate.year, extendedRsvSeasonStartMonth, rsvSeasonStartDay),
+                extendedFirstSeasonEnd = LocalDate.of(birthdate.year + 1, extendedRsvSeasonEndMonth, rsvSeasonEndDay - 1),
+                extendedSecondSeasonStart = LocalDate.of(birthdate.year + 1, extendedRsvSeasonStartMonth, rsvSeasonStartDay),
+                extendedSecondSeasonEnd = LocalDate.of(birthdate.year + 2, extendedRsvSeasonEndMonth, rsvSeasonEndDay - 1)
             )
         } else {
             // Baby born before April 1st (October 1st to March 31st)
@@ -390,7 +404,11 @@ class OPEngine(
                 firstSeasonStart = LocalDate.of(birthdate.year - 1, rsvSeasonStartMonth, rsvSeasonStartDay),
                 firstSeasonEnd = LocalDate.of(birthdate.year, rsvSeasonEndMonth, rsvSeasonEndDay),
                 secondSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
-                secondSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay)
+                secondSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay),
+                extendedFirstSeasonStart = LocalDate.of(birthdate.year - 1, extendedRsvSeasonStartMonth, rsvSeasonStartDay),
+                extendedFirstSeasonEnd = LocalDate.of(birthdate.year, extendedRsvSeasonEndMonth, rsvSeasonEndDay - 1),
+                extendedSecondSeasonStart = LocalDate.of(birthdate.year, extendedRsvSeasonStartMonth, rsvSeasonStartDay),
+                extendedSecondSeasonEnd = LocalDate.of(birthdate.year + 1, extendedRsvSeasonEndMonth, rsvSeasonEndDay - 1)
             )
         }
     }
