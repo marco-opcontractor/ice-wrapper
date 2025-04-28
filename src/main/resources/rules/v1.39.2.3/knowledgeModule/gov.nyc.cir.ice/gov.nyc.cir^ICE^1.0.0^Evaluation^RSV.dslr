@@ -52,6 +52,8 @@ expander ../../knowledgeCommon/org.cdsframework.ice/org.cdsframework^ICE^1.0.0.d
 global java.util.Date evalTime
 global org.joda.time.MonthDay rsvSeasonStartMonthDay
 global org.joda.time.MonthDay rsvSeasonEndMonthDay
+global org.joda.time.MonthDay extendedRsvSeasonStartMonthDay
+global org.joda.time.MonthDay extendedRsvSeasonEndMonthDay
 global java.lang.Boolean isRSVHighRisk
 global java.lang.Boolean wasMommyVaxGiven
 global java.util.Date secondRSVSeasonStart
@@ -61,19 +63,38 @@ global java.util.Date secondRSVSeasonEnd
 rule "RSV: Evaluate the RSV Injection as Outside RSV Season if it does not fall within the Season Start and Stop Dates"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseInSeasonCheck"
-	salience 50
+	salience 60
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+			- the vaccine administered a member of ("ICE306", "ICE307")
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the Associated Series as $associatedTargetSeries
-    The Given date $currentShotDate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    The Given date $currentShotDate does not fall within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
 	then
 		Include the reason for shot $currentShot Invalid due to "Outside RSV Season"
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
+rule "RSV: Validate non-Beyfortus RSV vaccines during regular season"
+  agenda-group "HistoryEvaluation^customEvaluationRule"
+  activation-group "doseInSeasonCheck"
+  salience 50
+  when
+    There is an Administered Shot $currentShot that needs to be evaluated
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered not a member of ("ICE306", "ICE307")
+      - make note of the date this shot was administered as $currentShotDate
+      - make note of the Associated Series as $associatedTargetSeries
+
+      // Regular season check (Oct 1 - Mar 31)
+      The Given date $currentShotDate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+  then
+    Include the reason for shot $currentShot Invalid due to "Outside RSV Season"
+    Record that this dose rule was Processed for the TargetDose $currentShot
+    Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
 
 rule "RSV(Synagis): If Given Synagis and patient is NOT on RSV High risk, evaluate it as INVALID dose"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
@@ -190,7 +211,7 @@ rule "RSV(Beyfortus): If the vaccine was administered on season and mommy vax wa
 			- the administration date of the shot is < $dateAt8mOld
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
-    The Given date $currentShotDate falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+    The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
     Confirm the variable wasMommyVaxGiven is == true
 	then
 		Include the reason for shot $currentShot Invalid due to "Not Recommended due to Mother Vaccine Documented"
