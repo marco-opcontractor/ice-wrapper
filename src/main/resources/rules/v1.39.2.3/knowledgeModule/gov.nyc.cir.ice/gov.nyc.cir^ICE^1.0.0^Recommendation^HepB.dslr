@@ -152,8 +152,8 @@ rule "HepB: Ensure last dose of a 3-series schedule considers grace period"
       - that has already been evaluated and whose shot validity is VALID
       - Make note of the date this shot was administered as $dtAdministrationDate
   then
-    Add "6m-4d" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedLow
-    Add "19m-1d" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedHigh
+    Add "6m" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedLow
+    Add "19m" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedHigh
     Set the Final recommendation earliest forecast date on series $targetSeries to $dtCalculatedLow
     Set the Final recommendation Overdue Forecast Date on series $targetSeries to $dtCalculatedHigh
     Record that this Series Rule was Processed for the TargetSeries $targetSeries
@@ -182,8 +182,8 @@ rule "HepB: Ensure 3-series schedule is applied after valid 2nd dose and invalid
       - that has already been evaluated and whose shot validity is INVALID
       - Make note of the date this shot was administered as $dtAdministrationDate
   then
-    Add "6m-4d" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedLow
-    Add "19m-1d" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedHigh
+    Add "6m" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedLow
+    Add "19m" to $dtBirthDate and make note of the newly calculated date as $dtCalculatedHigh
     Set the Final recommendation recommended forecast date on series $targetSeries to $dtCalculatedLow
     Set the Final recommendation earliest forecast date on series $targetSeries to $dtCalculatedLow
     Set the Final recommendation Overdue Forecast Date on series $targetSeries to $dtCalculatedHigh
