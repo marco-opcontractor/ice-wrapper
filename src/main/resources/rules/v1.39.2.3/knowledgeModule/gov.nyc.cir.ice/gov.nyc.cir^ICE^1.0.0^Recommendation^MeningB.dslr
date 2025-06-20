@@ -302,14 +302,14 @@ rule "Mening B: If the patient >= 24yrs and no doses on record, recommendation i
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "Mening B: Ensure that third dose is at least 6 months apart from first dose"
+rule "Mening B: Ensure that third dose is at least 6 months apart from first dose for both Trumemba and Bexsero"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	salience -5
 	no-loop true
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
-			- the name of the series is "MenB4C2DoseSeries"
+			- the name of the Series a member of ("MenB4C2DoseSeries", "MenBFHbpSeries")
 			- a forecast for the Series has been made and a shot is Recommended
       - Make note of the earliest date as $earliestDate
 			- the Series is not Complete
