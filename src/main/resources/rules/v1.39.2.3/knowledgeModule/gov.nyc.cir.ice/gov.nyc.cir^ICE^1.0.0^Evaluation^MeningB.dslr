@@ -63,13 +63,13 @@ MenB FHbp 2-dose Series specific rules
 
 // If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp 2-dose series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
 // Ignore the reported CVX 163 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
-rule "Mening B / FHbp series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+rule "Mening B / FHbp 2-dose series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "allowableVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbp2DoseSeries"
 			- the vaccine administered is "ICE163"
 			- the series that the shot belongs to is not complete
 			- make note of the associated series as $targetSeries
@@ -81,8 +81,8 @@ rule "Mening B / FHbp series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_B
 end
 
 
-rule "Mening B / FHbp series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN" extends
-		"Mening B / FHbp series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+rule "Mening B / FHbp 2-dose series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN" extends 
+		"Mening B / FHbp 2-dose series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseIntervalCheck"
@@ -94,13 +94,13 @@ rule "Mening B / FHbp series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTE
 end
 
 
-rule "Mening B / FBhp series: Do not invoke default Absolute Minimum Age check for CVX 163 administered >= 10yrs-4days of age"
+rule "Mening B / FBhp 2-dose series: Do not invoke default Absolute Minimum Age check for CVX 163 administered >= 10yrs-4days of age"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseAgeCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbp2DoseSeries"
 			- the vaccine administered is "ICE163"
 			- make note of the date this shot was administered as $shotDate
 			- make note of the associated series as $targetSeries
@@ -129,13 +129,13 @@ MenB FHbp 3-dose Series specific rules
 
 // If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp 3-dose series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
 // Ignore the reported CVX 163 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
-rule "MeningB: FHbp series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+rule "MeningB: FHbp 3-dose series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "allowableVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbp3DoseSeries"
 			- the vaccine administered is "ICE163"
 			- the series that the shot belongs to is not complete
 			- make note of the associated series as $targetSeries
@@ -148,7 +148,7 @@ end
 
 
 rule "Mening B / FHbp 3-dose series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN" extends 
-		"MeningB: FHbp series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+		"MeningB: FHbp 3-dose series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseIntervalCheck"
