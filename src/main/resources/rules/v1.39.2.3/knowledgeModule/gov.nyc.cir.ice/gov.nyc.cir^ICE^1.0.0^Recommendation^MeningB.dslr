@@ -771,6 +771,24 @@ rule "Mening B: Trumemba, ensure after invalid third dose the next suggested is 
         Record that this Series Rule was Processed for the TargetSeries $targetSeries
         Log that this Series Rule fired for the Series $targetSeries
 end
+
+rule "Mening B: When the patient >= 26yrs, recommendation is NOT_RECOMMENDED/TOO_OLD"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		Confirm elapsed time between $birthdate and evalTime >= "26y"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.TOO_OLD"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
 /*************************************************************************************************************************************************************************************
 END Trumemba Recommendation MenBFHbpSeries Series specific rules
 *************************************************************************************************************************************************************************************/
