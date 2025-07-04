@@ -9,8 +9,8 @@
   <ns2:doseInterval>
     <ns2:fromDoseNumber>1</ns2:fromDoseNumber>
     <ns2:toDoseNumber>2</ns2:toDoseNumber>
-    <ns2:absoluteMinimumInterval>1m-4d</ns2:absoluteMinimumInterval>
-    <ns2:minimumInterval>1m</ns2:minimumInterval>
+    <ns2:absoluteMinimumInterval>4w-4d</ns2:absoluteMinimumInterval>
+    <ns2:minimumInterval>4w</ns2:minimumInterval>
     <ns2:earliestRecommendedInterval>1m</ns2:earliestRecommendedInterval>
     <ns2:latestRecommendedInterval>2m</ns2:latestRecommendedInterval>
   </ns2:doseInterval>
@@ -43,7 +43,7 @@
   <ns2:iceSeriesDose>
     <ns2:doseNumber>2</ns2:doseNumber>
     <ns2:earliestRecommendedAge>10y1m-4d</ns2:earliestRecommendedAge>
-    <ns2:latestRecommendedAge>10y6m-5d</ns2:latestRecommendedAge>
+    <ns2:latestRecommendedAge>10y2m</ns2:latestRecommendedAge>
     <ns2:doseVaccine>
       <ns2:preferred>true</ns2:preferred>
       <ns2:vaccine code="162" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Meningococcal B FHbp, recombinant"/>
@@ -53,8 +53,8 @@
   <!-- Dose 3 -->
   <ns2:iceSeriesDose>
     <ns2:doseNumber>3</ns2:doseNumber>
-    <ns2:earliestRecommendedAge>10y5m-4d</ns2:earliestRecommendedAge>
-    <ns2:latestRecommendedAge>26y-1d</ns2:latestRecommendedAge>
+    <!-- This represents base minimum interval [0, 1, 5] months including the grace period -->
+    <ns2:earliestRecommendedAge>10y6m</ns2:earliestRecommendedAge>
     <ns2:doseVaccine>
       <ns2:preferred>true</ns2:preferred>
       <ns2:vaccine code="162" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Meningococcal B FHbp, recombinant"/>
