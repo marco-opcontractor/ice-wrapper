@@ -464,6 +464,8 @@
 [consequence][][Ll]og that this [Ss]eries [Rr]ule fired for the [Ss]eries {refer_oTargetSeries}=ICELogicHelper.logDRLDebugMessage(drools.getRule().getName(), "in TargetSeries " + {refer_oTargetSeries}.getSeriesName());
 [consequence][][Ll]og that this [Rr]ule fired=ICELogicHelper.logDRLDebugMessage(drools.getRule().getName(), "fired");
 [consequence][][Ll]og [Dd]ebugging [Ii]nformation about [Oo]bject [Nn]amed {strObjectName} and [Vv]alue {oDebugObject}=ICELogicHelper.logDRLDebugMessage("DEBUG INFORMATION for " + drools.getRule().getName(), {strObjectName} + ": " + {oDebugObject});
+[consequence][][Pp]rint [Dd]ebug [Mm]essage about [Oo]bject [Nn]amed {strObjectName} and [Vv]alue {oDebugObject}=System.out.println("[DEBUG RULE: " + drools.getRule().getName() + "] " + {strObjectName} + " = " + {oDebugObject});
+[consequence][][Pp]rint [Dd]ebug [Mm]essage {strMessage}=System.out.println("[DEBUG RULE: " + drools.getRule().getName() + "] " + {strMessage});
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
