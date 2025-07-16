@@ -551,6 +551,7 @@ rule "Mening B: Bexsero, ensure third dose is at least 4 months apart from secon
             - the name of the series is "MenB4C2DoseSeries"
             - a forecast for the Series has been made and a shot is Recommended
             - the Series is not Complete
+             - the Effective Number of Doses Administered in the Series is == 2
         The Patient information $patientInfo must be known to complete writing this rule
             - make note of the Patient's birthdate as $birthdate
             - make note of the date as $dtDateAtAge10y when the patient is "10y" of age
@@ -638,6 +639,7 @@ rule "Mening B: Bexsero, ensure after invalid second dose the next suggested is 
         // Additional conditions for dose 2
         There is a Series $associatedTargetSeries identified by $targetSeries
             - Make note of the earliest date as $earliestDate
+            - the Effective Number of Doses Administered in the Series is == 1
 
         // Get the second invalid dose
         There is an Administered Shot $dose2
@@ -649,10 +651,10 @@ rule "Mening B: Bexsero, ensure after invalid second dose the next suggested is 
     then
         // Calculate 4 weeks after invalid dose
         Add "4w" to $dtAdministrationDate2 and make note of the newly calculated date as $dtWeeksFromDose2
-        // Calculate 1 monts after invalid dose
+        // Calculate 1 months after invalid dose
         Add "1m" to $dtAdministrationDate2 and make note of the newly calculated date as $dtMonthsFromDose2
         // Calculate 2 months after invalid dose
-        Add "2m" to $dtAdministrationDate2 and make note of the newly calculated date as $dt2MonthsFromDose2
+        Add "2m-1d" to $dtAdministrationDate2 and make note of the newly calculated date as $dt2MonthsFromDose2
 
         // Create and apply recommendation
         Create a Recommendation as $recommendation with Status RecommendationStatus.RECOMMENDED for the Series $targetSeries
@@ -676,6 +678,7 @@ rule "Mening B: Bexsero, ensure second dose forecast ideal date high is 2 months
             - the name of the series is "MenB4C2DoseSeries"
             - a forecast for the Series has been made and a shot is Recommended
             - the Series is not Complete
+            - the Effective Number of Doses Administered in the Series is == 1
         The Patient information $patientInfo must be known to complete writing this rule
             - make note of the Patient's birthdate as $birthdate
             - make note of the date as $dtDateAtAge10y when the patient is "10y" of age
@@ -855,6 +858,7 @@ rule "Mening B: Trumemba, ensure second dose forecast ideal date high is 2 month
     when
         There is a Series $associatedTargetSeries identified by $targetSeries
             - Make note of the recommendation date as $recommendedDate
+            - the Effective Number of Doses Administered in the Series is == 1
 
     then
         // Calculate 2 months after first dose
@@ -896,12 +900,13 @@ end
 rule "Mening B: Trumemba, ensure third dose is at least 4 months apart from second dose"
     extends "Mening B(Abstract): For Trumemba series forecasting which is High Risk HR"
     agenda-group "RecommendationForecast^postCustomRecommendationCheck"
-    salience -5
+    salience -2
     no-loop true
     when
         // Additional conditions for dose 3
         There is a Series $associatedTargetSeries identified by $targetSeries
             - the effective dose number in the Series is == 3
+            - the Effective Number of Doses Administered in the Series is == 2
             - Make note of the earliest date as $earliestDate
 
         // Get the second valid dose
@@ -993,6 +998,7 @@ rule "Mening B: Trumemba, ensure after invalid second dose the next suggested is
         // Additional conditions for dose 2
         There is a Series $associatedTargetSeries identified by $targetSeries
             - Make note of the earliest date as $earliestDate
+            - the Effective Number of Doses Administered in the Series is == 1
 
         // Get the second invalid dose
         There is an Administered Shot $dose2
@@ -1007,7 +1013,7 @@ rule "Mening B: Trumemba, ensure after invalid second dose the next suggested is
         // Calculate 1 monts after second dose
         Add "1m" to $dtAdministrationDate2 and make note of the newly calculated date as $dtMonthsFromDose2
         // Calculate 6 months after first dose
-        Add "2m" to $dtAdministrationDate2 and make note of the newly calculated date as $dt2MonthsFromDose2
+        Add "2m-1d" to $dtAdministrationDate2 and make note of the newly calculated date as $dt2MonthsFromDose2
 
         // Create and apply recommendation
         Create a Recommendation as $recommendation with Status RecommendationStatus.RECOMMENDED for the Series $targetSeries
