@@ -315,7 +315,7 @@ rule "Mening B(Abstract): The series forecasting right now is for shared decisio
 			- the effective dose number in the Series is > 1
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
-			- make note of the date as $dtDateAtAge16y when the patient is "16y" of age
+			- make note of the date as $dtDateAtAge16y when the patient is "16y-4d" of age
 			- make note of the date as $dtDateAtAge23y when the patient is "23y" of age
 		There is an Administered Shot $dose1
 			- the Shot belongs to the Series $targetSeries
@@ -325,6 +325,7 @@ rule "Mening B(Abstract): The series forecasting right now is for shared decisio
 			- the administration date of the shot is < $dtDateAtAge23y
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate1
 		Confirm the variable isMenBHighRisk is == false
+    Confirm the variable isMenBSharedDecision is == true
 	then
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
@@ -343,7 +344,7 @@ rule "Mening B: When at shared decision making, end forecasting upon second vali
 			- the Dose Number in the Series is == 2
 			- that has already been Evaluated and whose Shot Validity is VALID
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate2
-		Confirm elapsed time between $dtAdministrationDate1 and $dtAdministrationDate2 >= "6m"
+		Confirm elapsed time between $dtAdministrationDate1 and $dtAdministrationDate2 >= "6m-4d"
 	then
 	  Clear forecasted recommendations from consideration in series $targetSeries
 		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
@@ -369,6 +370,7 @@ rule "Mening B: When at shared decision making, second dose recommendation is 6 
 		Add "6m" to $dtAdministrationDate1 and make note of the newly calculated date as $dtCalculated
 		Set the Recommendation Recommended Forecast Date for $recommendation to $dtCalculated
 		Set the Recommendation Earliest  Forecast Date for $recommendation to $dtCalculated
+    Set the Recommendation Overdue Forecast Date for $recommendation to null
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
@@ -551,7 +553,7 @@ rule "Mening B: Bexsero, ensure third dose is at least 4 months apart from secon
             - the name of the series is "MenB4C2DoseSeries"
             - a forecast for the Series has been made and a shot is Recommended
             - the Series is not Complete
-             - the Effective Number of Doses Administered in the Series is == 2
+            - the Effective Number of Doses Administered in the Series is == 2
         The Patient information $patientInfo must be known to complete writing this rule
             - make note of the Patient's birthdate as $birthdate
             - make note of the date as $dtDateAtAge10y when the patient is "10y" of age
@@ -574,6 +576,8 @@ rule "Mening B: Bexsero, ensure third dose is at least 4 months apart from secon
             - the Dose Number in the Series is == 2
             - that has already been Evaluated and whose Shot Validity is VALID
             - Make note of the Date this Shot was Administered as $dtAdministrationDate2
+        Confirm the variable isMenBSharedDecision is == false
+        Confirm the variable isMenBHighRisk is == true
     then
         // Calculate 4 months after second dose
         Add "4m" to $dtAdministrationDate2 and make note of the newly calculated date as $dtFromDose2
@@ -675,7 +679,8 @@ rule "Mening B: Bexsero, ensure second dose forecast ideal date high is 2 months
         // Copy all abstract rule conditions directly (instead of extending)
         There is a Series $targetSeries
             - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
-            - the name of the series is "MenB4C2DoseSeries"
+            //- the name of the series is "MenB4C2DoseSeries"
+            - the name of the Series a member of ("MenBFHbpSeries", "MenB4C2DoseSeries")
             - a forecast for the Series has been made and a shot is Recommended
             - the Series is not Complete
             - the Effective Number of Doses Administered in the Series is == 1
@@ -684,7 +689,7 @@ rule "Mening B: Bexsero, ensure second dose forecast ideal date high is 2 months
             - make note of the date as $dtDateAtAge10y when the patient is "10y" of age
         There is an Administered Shot $dose1
             - the Shot belongs to the Series $targetSeries
-            - the vaccine administered is "ICE163"
+            //- the vaccine administered is "ICE163"
             - the Dose Number in the Series is == 1
             - that has already been Evaluated and whose Shot Validity is VALID
             - Make note of the Date this Shot was Administered as $dtAdministrationDate1
@@ -694,7 +699,7 @@ rule "Mening B: Bexsero, ensure second dose forecast ideal date high is 2 months
         // Only fire if there's no invalid second dose (to avoid conflict with the invalid dose rule)
         There does not exist an Administered Shot
             - the Shot belongs to the Series $targetSeries
-            - the vaccine administered is "ICE163"
+            //- the vaccine administered is "ICE163"
             - the Dose Number in the Series is == 2
             - that has already been Evaluated and whose Shot Validity is INVALID
 
@@ -730,7 +735,7 @@ rule "Mening B(Abstract): For Trumemba series forecasting which is Shared Decisi
 			- the effective dose number in the Series is > 1
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
-			- make note of the date as $dtDateAtAge16y when the patient is "16y" of age
+			- make note of the date as $dtDateAtAge16y when the patient is "16y-4d" of age
 			- make note of the date as $dtDateAtAge23y when the patient is "23y" of age
 		There is an Administered Shot $dose1
 			- the Shot belongs to the Series $targetSeries
@@ -741,6 +746,7 @@ rule "Mening B(Abstract): For Trumemba series forecasting which is Shared Decisi
 			- the administration date of the shot is < $dtDateAtAge23y
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate1
 		Confirm the variable isMenBHighRisk is == false
+		Confirm the variable isMenBSharedDecision is == true
 	then
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
 		Log that this Series Rule fired for the Series $targetSeries
@@ -760,7 +766,7 @@ rule "Mening B: Trumemba, when at SDM, end forecasting upon second valid vaccine
 			- the Dose Number in the Series is == 2
 			- that has already been Evaluated and whose Shot Validity is VALID
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate2
-		Confirm elapsed time between $dtAdministrationDate1 and $dtAdministrationDate2 >= "6m"
+		Confirm elapsed time between $dtAdministrationDate1 and $dtAdministrationDate2 >= "6m-4d"
 	then
 		Clear forecasted recommendations from consideration in series $targetSeries
 		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
@@ -779,9 +785,10 @@ rule "Mening B: Trumemba, when at SDM ensure that third dose is at least 6 month
 	when
 		There is a Series $targetSeries
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
-			- the name of the series is "MenBFHbpSeries"
+			- the name of the Series a member of ("MenBFHbpSeries", "MenB4C2DoseSeries")
 			- a forecast for the Series has been made and a shot is Recommended
       - Make note of the earliest date as $earliestDate
+      - make note of the Effective Dose Number in the Series as $effectiveDoseNumber
 			- the Series is not Complete
 			- the effective dose number in the Series is == 3
 		There is an Administered Shot $dose1
@@ -790,6 +797,16 @@ rule "Mening B: Trumemba, when at SDM ensure that third dose is at least 6 month
 			- the Dose Number in the Series is == 1
 			- that has already been Evaluated and whose Shot Validity is VALID
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate
+    // Ensure there's NO valid second dose (either no dose or invalid dose)
+    There does not exist an Administered Shot
+      - the Shot belongs to the Series $targetSeries
+      - the Dose Number in the Series is == 2
+      - that has already been Evaluated and whose Shot Validity is VALID
+    // Also ensure no valid 3rd dose exists
+    There does not exist an Administered Shot
+      - the Shot belongs to the Series $targetSeries
+      - the Dose Number in the Series is == 3
+      - that has already been Evaluated and whose Shot Validity is INVALID
 		Confirm the variable isMenBSharedDecision is == true
     Confirm the variable isMenBHighRisk is == false
 	then
@@ -798,6 +815,7 @@ rule "Mening B: Trumemba, when at SDM ensure that third dose is at least 6 month
 		Calculate the latter of $dtCalculated and $earliestDate and save calculated date as $earliestMenBDate
 		Set the Final recommendation earliest forecast date on series $targetSeries to $earliestMenBDate
 		Set the Final recommendation recommended forecast date on series $targetSeries to $earliestMenBDate
+    Set the Final Recommendation Overdue Forecast Date on series $targetSeries to null
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
@@ -817,6 +835,7 @@ rule "Mening B: Trumemba, when at SDM, second dose recommendation is 6 months ap
 		Add "6m" to $dtAdministrationDate1 and make note of the newly calculated date as $dtCalculated
 		Set the Recommendation Recommended Forecast Date for $recommendation to $dtCalculated
 		Set the Recommendation Earliest  Forecast Date for $recommendation to $dtCalculated
+    Set the Final Recommendation Overdue Forecast Date on series $targetSeries to null
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
@@ -981,6 +1000,7 @@ rule "Mening B: When the patient >= 26yrs, recommendation is NOT_RECOMMENDED/TOO
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
 		Confirm elapsed time between $birthdate and evalTime >= "26y"
+    Confirm the variable isMenBHighRisk is == true
 	then
 		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
 		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.TOO_OLD"
@@ -1024,6 +1044,126 @@ rule "Mening B: Trumemba, ensure after invalid second dose the next suggested is
 
         Record that this Series Rule was Processed for the TargetSeries $targetSeries
         Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "Mening B: For SDM patients when the patient is >= 24yrs, recommendation is NOT_RECOMMENDED/TOO_OLD"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		Confirm elapsed time between $birthdate and evalTime >= "24y"
+    Confirm the variable isMenBSharedDecision is == true
+    Confirm the variable isMenBHighRisk is == false
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.TOO_OLD"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "Mening B: When the patient >= 26yrs, recommendation is NOT_RECOMMENDED/TOO_OLD when NOT_FORECAST"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		Confirm elapsed time between $birthdate and evalTime >= "26y"
+    Confirm the variable isMenBHighRisk is == false
+    Confirm the variable isMenBSharedDecision is == false
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.TOO_OLD"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "Mening B, when patient betweeen (16 - 23) and NOT_FORECAST indicator ensure second dose is at least 6 months apart from first dose"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience -5
+	no-loop true
+	when
+	  The Patient information $patientInfo must be known to complete writing this rule
+  		- make note of the Patient's birthdate as $birthdate
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+			- the name of the Series a member of ("MenBFHbpSeries", "MenB4C2DoseSeries")
+			- a forecast for the Series has been made and a shot is Recommended
+      - Make note of the earliest date as $earliestDate
+      - make note of the Effective Dose Number in the Series as $effectiveDoseNumber
+			- the Series is not Complete
+		There is an Administered Shot $dose1
+			- the Shot belongs to the Series $targetSeries
+			- the Dose Number in the Series is == 1
+			- that has already been Evaluated and whose Shot Validity is VALID
+			- Make note of the Date this Shot was Administered as $dtAdministrationDate
+    // Ensure there's NO valid second dose (either no dose or invalid dose)
+    There does not exist an Administered Shot
+      - the Shot belongs to the Series $targetSeries
+      - the Dose Number in the Series is == 2
+      - that has already been Evaluated and whose Shot Validity is VALID
+    // Also ensure no valid 3rd dose exists
+    There does not exist an Administered Shot
+      - the Shot belongs to the Series $targetSeries
+      - the Dose Number in the Series is == 3
+      - that has already been Evaluated and whose Shot Validity is INVALID
+		Confirm the variable isMenBSharedDecision is == false
+    Confirm the variable isMenBHighRisk is == false
+    Confirm elapsed time between $birthdate and evalTime >= "16y"
+    Confirm elapsed time between $birthdate and evalTime < "23y"
+	then
+		Add "6m" to $dtAdministrationDate and make note of the newly calculated date as $dtCalculated
+		Create a Recommendation as $recommendation with Status RecommendationStatus.RECOMMENDED for the Series $targetSeries
+		Calculate the latter of $dtCalculated and $earliestDate and save calculated date as $earliestMenBDate
+		Set the Final recommendation earliest forecast date on series $targetSeries to $earliestMenBDate
+		Set the Final recommendation recommended forecast date on series $targetSeries to $earliestMenBDate
+    Set the Final Recommendation Overdue Forecast Date on series $targetSeries to null
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "Mening B: When at Not Forecast indicator and age between (16 - 23), end forecasting upon second valid vaccine 6 months apart"
+    agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+    salience -10
+    no-loop true
+    when
+      The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the Patient's birthdate as $birthdate
+        There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+      - the name of the Series a member of ("MenBFHbpSeries", "MenB4C2DoseSeries")
+      - a forecast for the Series has been made and a shot is Recommended
+      - the Series is not Complete
+    There is an Administered Shot $dose1
+      - the Shot belongs to the Series $targetSeries
+      - the Dose Number in the Series is == 1
+      - that has already been Evaluated and whose Shot Validity is VALID
+      - Make note of the Date this Shot was Administered as $dtAdministrationDate1
+    There is an Administered Shot $dose2
+      - the Shot belongs to the Series $targetSeries
+      - the Dose Number in the Series is == 2
+      - that has already been Evaluated and whose Shot Validity is VALID
+      - Make note of the Date this Shot was Administered as $dtAdministrationDate2
+    Confirm elapsed time between $dtAdministrationDate1 and $dtAdministrationDate2 >= "6m-4d"
+    Confirm the variable isMenBSharedDecision is == false
+    Confirm the variable isMenBHighRisk is == false
+    Confirm elapsed time between $birthdate and evalTime >= "16y"
+    Confirm elapsed time between $birthdate and evalTime < "23y"
+    then
+      Clear forecasted recommendations from consideration in series $targetSeries
+        Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark Forecasting of the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
 end
 
 /*************************************************************************************************************************************************************************************
