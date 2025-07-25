@@ -1162,7 +1162,7 @@ rule "Mening B: When at Not Forecast indicator and age between (16 - 23), end fo
     Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
     Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
     Mark Forecasting of the Series $targetSeries Complete
-        Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
 end
 

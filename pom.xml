@@ -108,7 +108,7 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
             <!-- For debugging comment below line -->
-<!--            <scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
 
         <dependency>
