@@ -316,13 +316,13 @@ rule "Mening B(Abstract): The series forecasting right now is for shared decisio
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
 			- make note of the date as $dtDateAtAge16y when the patient is "16y-4d" of age
-			- make note of the date as $dtDateAtAge23y when the patient is "23y" of age
+			- make note of the date as $dtDateAtAge24y when the patient is "24y" of age
 		There is an Administered Shot $dose1
 			- the Shot belongs to the Series $targetSeries
 			- the Dose Number in the Series is == 1
 			- that has already been Evaluated and whose Shot Validity is VALID
 			- the administration date of the shot is >= $dtDateAtAge16y
-			- the administration date of the shot is < $dtDateAtAge23y
+			- the administration date of the shot is < $dtDateAtAge24y
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate1
 		Confirm the variable isMenBHighRisk is == false
     Confirm the variable isMenBSharedDecision is == true
@@ -702,6 +702,8 @@ rule "Mening B: Bexsero, ensure second dose forecast ideal date high is 2 months
             //- the vaccine administered is "ICE163"
             - the Dose Number in the Series is == 2
             - that has already been Evaluated and whose Shot Validity is INVALID
+        Confirm the variable isMenBHighRisk is == true
+        Confirm the variable isMenBSharedDecision is == false
 
     then
         // Calculate 2 months after first dose
@@ -736,14 +738,14 @@ rule "Mening B(Abstract): For Trumemba series forecasting which is Shared Decisi
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
 			- make note of the date as $dtDateAtAge16y when the patient is "16y-4d" of age
-			- make note of the date as $dtDateAtAge23y when the patient is "23y" of age
+			- make note of the date as $dtDateAtAge24y when the patient is "24y" of age
 		There is an Administered Shot $dose1
 			- the Shot belongs to the Series $targetSeries
       - the vaccine administered is "ICE162"
 			- the Dose Number in the Series is == 1
 			- that has already been Evaluated and whose Shot Validity is VALID
 			- the administration date of the shot is >= $dtDateAtAge16y
-			- the administration date of the shot is < $dtDateAtAge23y
+			- the administration date of the shot is < $dtDateAtAge24y
 			- Make note of the Date this Shot was Administered as $dtAdministrationDate1
 		Confirm the variable isMenBHighRisk is == false
 		Confirm the variable isMenBSharedDecision is == true
@@ -1162,6 +1164,39 @@ rule "Mening B: When at Not Forecast indicator and age between (16 - 23), end fo
     Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
     Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
     Mark Forecasting of the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "Mening B: When at Not Forecast indicator and age 23+ years, follow HR indicator logic after 1st dose"
+    agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+    salience -10
+    no-loop true
+    when
+      The Patient information $patientInfo must be known to complete writing this rule
+        - make note of the Patient's birthdate as $birthdate
+
+      There is a Series $targetSeries
+        - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+        - the name of the Series a member of ("MenBFHbpSeries", "MenB4C2DoseSeries")
+        - a forecast for the Series has been made and a shot is Recommended
+        - the Series is not Complete
+
+      There is an Administered Shot $dose1
+        - the Shot belongs to the Series $targetSeries
+        - the Dose Number in the Series is == 1
+        - that has already been Evaluated and whose Shot Validity is VALID
+        - Make note of the Date this Shot was Administered as $dtAdministrationDate1
+
+      Confirm elapsed time between $birthdate and evalTime > "23y"
+      Confirm elapsed time between $birthdate and $dtAdministrationDate1 > "23y"
+      Confirm the variable isMenBSharedDecision is == false
+      Confirm the variable isMenBHighRisk is == false
+
+  then
+    // Calculate 6 months after first dose
+    Add "2m-1d" to $dtAdministrationDate1 and make note of the newly calculated date as $dtIdealHighFromDose1
+    Set the Final recommendation Overdue forecast date on series $targetSeries to $dtIdealHighFromDose1
     Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
 end
