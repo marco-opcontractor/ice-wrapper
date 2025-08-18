@@ -1086,6 +1086,7 @@ rule "Mening B: When the patient >= 26yrs, recommendation is NOT_RECOMMENDED/TOO
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
+/*
 rule "Mening B, when patient betweeen (16 - 23) and NOT_FORECAST indicator ensure second dose is at least 6 months apart from first dose"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	salience -5
@@ -1425,6 +1426,7 @@ rule "Mening B: When at Not Forecast indicator and age between (10 - 16), end fo
     Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
   end
+  */
 
 /*************************************************************************************************************************************************************************************
 END Trumemba Recommendation MenBFHbpSeries Series specific rules
