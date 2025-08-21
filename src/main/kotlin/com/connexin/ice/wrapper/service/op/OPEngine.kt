@@ -83,6 +83,10 @@ class OPEngine(
         val isRsvIndicated = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_RSV_INDICATED) ?: vaccineReport.flags?.get(Constants.FlagConstants.FLAG_SYNAGIS_INDICATED)
         val isMenBSharedDecision = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_SINGLE) ?: false
         val isMenBHighRisk = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_HIGH_RISK) ?: false
+        val emptyMenBIndicators = vaccineReport.flags?.let { flagsMap ->
+            flagsMap.keys.none { it == Constants.FlagConstants.FLAG_MENB_SINGLE ||
+                    it == Constants.FlagConstants.FLAG_MENB_HIGH_RISK }
+        } ?: true
         val mommyVaxGiven = vaccineReport.indicators.any {
             it.interpretation == Interpretation.PREGNANCY_VACCINATED && it.code == Constants.DiseaseCodes.ICE_RSV_DISEASE_CODE
                     && it.date.isBefore(vaccineReport.dateOfBirth.minusDays(13))
@@ -114,6 +118,7 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("wasMommyVaxGiven", mommyVaxGiven))
         cmds.add(CommandFactory.newSetGlobal("isMenBSharedDecision", isMenBSharedDecision))
         cmds.add(CommandFactory.newSetGlobal("isMenBHighRisk", isMenBHighRisk))
+        cmds.add(CommandFactory.newSetGlobal("isEmptyMenBIndicators", emptyMenBIndicators))
 
         // Add the calculated dates as globals
         cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", rsvSeasonDates.firstSeasonStart.toDate()))
