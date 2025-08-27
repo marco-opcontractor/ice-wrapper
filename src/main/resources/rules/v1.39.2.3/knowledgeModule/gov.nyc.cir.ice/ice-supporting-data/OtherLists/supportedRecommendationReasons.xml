@@ -99,5 +99,9 @@
     <cdsListItemKey>MENB_NOT_FORECAST_INDICATOR</cdsListItemKey>
     <cdsListItemValue>Vaccine not indicated because of Not Forecast Indicator.</cdsListItemValue>
   </cdsListItem>
+  <cdsListItem>
+    <cdsListItemKey>MENB_SDM_OUTSIDE_OF_RANGE</cdsListItemKey>
+    <cdsListItemValue>Series is Recommended to start at age 16+ and go up through 23 years.</cdsListItemValue>
+  </cdsListItem>
    <cdsVersion>gov.nyc.cir^ICE^1.0.0</cdsVersion>
 </ns2:cdsListSpecificationFile>
