@@ -1049,7 +1049,7 @@ rule "Mening B: Trumemba, ensure after invalid second dose the next suggested is
         Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "Mening B: For SDM patients when the patient is >= 24yrs, recommendation is NOT_RECOMMENDED/TOO_OLD"
+rule "Mening B: For SDM patients when the patient is >= 24yrs, recommendation is MENB_SDM_OUTSIDE_OF_RANGE"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
@@ -1061,11 +1061,13 @@ rule "Mening B: For SDM patients when the patient is >= 24yrs, recommendation is
     Confirm the variable isMenBSharedDecision is == true
     Confirm the variable isMenBHighRisk is == false
 	then
-		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
-		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.TOO_OLD"
-		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
+
+		Clear forecasted recommendations from consideration in series $targetSeries
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.MENB_SDM_OUTSIDE_OF_RANGE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
 end
 
 rule "Mening B: When the patient >= 26yrs, recommendation is NOT_RECOMMENDED/TOO_OLD when NOT_FORECAST"
@@ -1115,6 +1117,38 @@ end
   		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
   		Record that this Series Rule was Processed for the TargetSeries $targetSeries
   		Log that this Series Rule fired for the Series $targetSeries
+  end
+
+  // Rule for patients too young (<16y-4d)
+  rule "Mening B: SDM indicator - Too young (under 16y-4d)"
+    dialect "mvel"
+    agenda-group "RecommendationForecast^customRecommendationRule"
+    when
+      There is a Series $targetSeries that needs forecasting
+        - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+
+      The Patient information $patientInfo must be known to complete writing this rule
+        - make note of the Patient's birthdate as $birthdate
+
+      There is an administered shot $lastShotAdministered
+        - the shot belongs to the series $targetSeries
+        - that has already been evaluated and whose shot validity is INVALID
+        - make note of all evaluation reasons for this shot as $collectionOfStrReasons
+        - the collection $collectionOfStrReasons contains "EVALUATION_REASON_CONCEPT.OUTSIDE_MENB_SDM_RANGE"
+
+      // Check if patient is at SDM indicator
+  		Confirm the variable isMenBSharedDecision is == true
+      Confirm the variable isMenBHighRisk is == false
+
+      Confirm elapsed time between $birthdate and evalTime < "16y-4d"
+
+      then
+        Clear forecasted recommendations from consideration in series $targetSeries
+        Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+        Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.MENB_SDM_OUTSIDE_OF_RANGE"
+        Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+        Record that this Series Rule was Processed for the TargetSeries $targetSeries
+        Log that this Series Rule fired for the Series $targetSeries
   end
 
 /*************************************************************************************************************************************************************************************
