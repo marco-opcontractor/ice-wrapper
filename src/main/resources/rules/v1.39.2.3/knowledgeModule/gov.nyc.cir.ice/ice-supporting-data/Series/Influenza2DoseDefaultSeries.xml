@@ -126,6 +126,10 @@
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="320" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, MDCK, trivalent, preservative"/>
         </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="333" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, live, trivalent, intranasal, self/caregiver admin"/>
+        </ns2:doseVaccine>
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>2</ns2:doseNumber>
@@ -236,6 +240,10 @@
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="320" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, MDCK, trivalent, preservative"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="333" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, live, trivalent, intranasal, self/caregiver admin"/>
         </ns2:doseVaccine>
 	</ns2:iceSeriesDose>
     <ns2:seasonCode>DefaultInfluenzaSeason</ns2:seasonCode>
