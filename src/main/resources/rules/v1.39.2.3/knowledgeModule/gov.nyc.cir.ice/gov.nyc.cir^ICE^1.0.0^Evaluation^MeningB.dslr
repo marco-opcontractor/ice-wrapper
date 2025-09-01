@@ -63,8 +63,9 @@ global java.lang.Boolean isEmptyMenBIndicators
 MenB FHbp 2-dose Series specific rules
 *************************************************************************************************************************************************************************************/
 
-// If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp 2-dose series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
+// If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
 // Ignore the reported CVX 163 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
+// This rule applies regardless of series completion status to ensure proper cross-vaccine invalidation
 rule "Mening B / FHbp series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
@@ -73,7 +74,6 @@ rule "Mening B / FHbp series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_B
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
 			- the vaccine administered is "ICE163"
-			- the series that the shot belongs to is not complete
 			- make note of the associated series as $targetSeries
 	then
 		Include the reason for shot $currentShot Accepted due to "Vaccine Not Counted Based on Most Recent Vaccine Given"
@@ -129,8 +129,9 @@ MenB FHbp 3-dose Series specific rules
 // Nothing to do
 
 
-// If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp 3-dose series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
+// If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
 // Ignore the reported CVX 163 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
+// This rule applies regardless of series completion status to ensure proper cross-vaccine invalidation
 rule "MeningB: FHbp series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
@@ -139,7 +140,6 @@ rule "MeningB: FHbp series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BA
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
 			- the vaccine administered is "ICE163"
-			- the series that the shot belongs to is not complete
 			- make note of the associated series as $targetSeries
 	then
 		Include the reason for shot $currentShot Accepted due to "Vaccine Not Counted Based on Most Recent Vaccine Given"
@@ -172,6 +172,7 @@ MenB 4C 2-dose Series specific rules
 
 // If CVX 162 (Meningococcal B FHbp, recombinant (Trumenba)) is reported, then evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN
 // Ignore the reported CVX 162 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
+// This rule applies regardless of series completion status to ensure proper cross-vaccine invalidation
 rule "MeningB: MenB 4C 2-dose Series: Evaluate CVX 162 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
@@ -180,7 +181,6 @@ rule "MeningB: MenB 4C 2-dose Series: Evaluate CVX 162 as ACCEPTED/VACCINE_NOT_C
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenB4C2DoseSeries"
 			- the vaccine administered is "ICE162"
-			- the series that the shot belongs to is not complete
 			- make note of the associated series as $targetSeries
 	then
 		Include the reason for shot $currentShot Accepted due to "Vaccine Not Counted Based on Most Recent Vaccine Given"

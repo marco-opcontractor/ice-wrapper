@@ -1227,6 +1227,7 @@ end
 ///////////////////////////////////////////////////////////// Meningococcal B Specific Series Selection Rules Start Here /////////////////////////////////////////////////////////////
 
 // Default Mening B series if no shots administered - select MenB 4C 2-Dose Series if no shots administered (and by default)
+// But only if no CVX 162 (Trumenba) doses exist that should trigger MenBFHbpSeries selection
 rule "SeriesSelection(MenB): Select MenB 4C 2-Dose Series by default"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
@@ -1234,6 +1235,8 @@ rule "SeriesSelection(MenB): Select MenB 4C 2-Dose Series by default"
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", selectedSeries == true)
 		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesRules.seriesName == "MenB4C2DoseSeries", isSeriesComplete() == false)
+		// Only select MenB4C2DoseSeries by default if no CVX 162 (Trumenba) doses exist
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", vaccineComponent.cdsConceptName == "ICE162", isValid == true)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
@@ -1245,14 +1248,18 @@ rule "SeriesSelection(MenB): Select MenB 4C 2-Dose Series by default"
 end
 
 
-// If one or more of the series is complete, pick it; leave it to default series selection rules to determine which series was complete first
+// If one or more of the series is complete, pick it; but only if no vaccine-specific rules should apply
+// This rule has lower salience to ensure vaccine-specific rules take precedence
 rule "SeriesSelection(MenB): Select Complete Series"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	salience -5
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", selectedSeries == true)
 		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", isSeriesComplete() == true)
+		// Only select complete series if no CVX 162 (Trumenba) doses exist that should trigger MenBFHbpSeries selection
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", vaccineComponent.cdsConceptName == "ICE162", isValid == true)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
@@ -1301,14 +1308,15 @@ rule "SerieSelection(MenB): Select MenB 4C 2-dose series if target dose 1 (CVX 1
 		update($ts);
 end
 
-rule "SerieSelection(MenB): Select MenB 4C 2-dose series if target dose 1 (CVX 163) is Valid; series is _not_ complete" 
+rule "SerieSelection(MenB): Select MenB 4C 2-dose series if target dose 1 (CVX 163) is Valid; series is _not_ complete"
 		extends "ABSTRACT SeriesSelection(MenB): Select MenB 4C 2-Dose Series if valid dose 1"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
 	salience 5
 	when
 		TargetSeries(this == $ts, isSeriesComplete() == false)
-		not TargetSeries(this != $ts, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", isSeriesComplete() == true)
+		// Only check for complete series that are vaccine-compatible (i.e., other MenB4C2DoseSeries, not MenBFHbpSeries with wrong vaccines)
+		not TargetSeries(this != $ts, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesRules.seriesName == "MenB4C2DoseSeries", isSeriesComplete() == true)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
@@ -1333,7 +1341,7 @@ end
 rule "ABSTRACT SeriesSelection(MenB): Select MenB FHbp series if target dose 1 (CVX 162) is valid for this series"
   dialect "mvel"
   agenda-group "SeriesSelection^customSeriesSelectionRules"
-  salience 5
+  salience 15
   when
     $tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
     not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", selectedSeries == true)
@@ -1367,10 +1375,11 @@ rule "SerieSelection(MenB): Select MenB FHbp series with CVX 162 as first dose; 
     extends "ABSTRACT SeriesSelection(MenB): Select MenB FHbp series if target dose 1 (CVX 162) is valid for this series"
   dialect "mvel"
   agenda-group "SeriesSelection^customSeriesSelectionRules"
-  salience 5
+  salience 15
   when
     TargetSeries(this == $tsMenBFHbpSeries, isSeriesComplete() == false)
-    not TargetSeries(this != $tsMenBFHbpSeries, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", isSeriesComplete() == true)
+    // Only check for complete series that are vaccine-compatible (i.e., other MenBFHbpSeries, not MenB4C2DoseSeries with wrong vaccines)
+    not TargetSeries(this != $tsMenBFHbpSeries, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesRules.seriesName == "MenBFHbpSeries", isSeriesComplete() == true)
   then
     String _RULENAME = kcontext.rule.name;
     ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $tsMenBFHbpSeries);
@@ -1384,7 +1393,7 @@ end
 rule "ABSTRACT SeriesSelection(MenB): Select MenB FHbp series if at least 2 doses of CVX 162 are valid"
   dialect "mvel"
   agenda-group "SeriesSelection^customSeriesSelectionRules"
-  salience 10
+  salience 20
   when
     $tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
     not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", selectedSeries == true)
@@ -1415,10 +1424,11 @@ rule "SerieSelection(MenB): Select MenB FHbp series if at least 2 doses of CVX 1
     extends "ABSTRACT SeriesSelection(MenB): Select MenB FHbp series if at least 2 doses of CVX 162 are valid"
   dialect "mvel"
   agenda-group "SeriesSelection^customSeriesSelectionRules"
-  salience 10
+  salience 20
   when
     TargetSeries(this == $tsMenBFHbpSeries, isSeriesComplete() == false)
-    not TargetSeries(this != $tsMenBFHbpSeries, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", isSeriesComplete() == true)
+    // Only check for complete series that are vaccine-compatible (i.e., other MenBFHbpSeries, not MenB4C2DoseSeries with wrong vaccines)
+    not TargetSeries(this != $tsMenBFHbpSeries, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesRules.seriesName == "MenBFHbpSeries", isSeriesComplete() == true)
   then
     String _RULENAME = kcontext.rule.name;
     ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $tsMenBFHbpSeries);
@@ -1432,7 +1442,7 @@ end
 rule "ABSTRACT SeriesSelection(MenB): Select MenB FHbp series if only one valid CVX 162 dose has been administered"
   dialect "mvel"
   agenda-group "SeriesSelection^customSeriesSelectionRules"
-  salience 10
+  salience 15
   when
     $tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
     not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", selectedSeries == true)
@@ -1446,10 +1456,11 @@ rule "SeriesSelection(MenB): Select MenB FHbp series if only one valid CVX 162 d
     extends "ABSTRACT SeriesSelection(MenB): Select MenB FHbp series if only one valid CVX 162 dose has been administered"
   dialect "mvel"
   agenda-group "SeriesSelection^customSeriesSelectionRules"
-  salience 10
+  salience 15
   when
     TargetSeries(this == $tsMenBFHbpSeries, isSeriesComplete() == false)
-    not TargetSeries(this != $tsMenBFHbpSeries, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", isSeriesComplete() == true)
+    // Only check for complete series that are vaccine-compatible (i.e., other MenBFHbpSeries, not MenB4C2DoseSeries with wrong vaccines)
+    not TargetSeries(this != $tsMenBFHbpSeries, seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.835", seriesRules.seriesName == "MenBFHbpSeries", isSeriesComplete() == true)
   then
     String _RULENAME = kcontext.rule.name;
     ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $tsMenBFHbpSeries);
