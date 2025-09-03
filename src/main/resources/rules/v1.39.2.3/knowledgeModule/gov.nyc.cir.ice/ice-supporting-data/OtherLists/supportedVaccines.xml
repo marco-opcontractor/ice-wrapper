@@ -231,6 +231,14 @@
     		<displayName>Influenza, live, intranasal</displayName>
     	</cdsListItemConceptMapping>
     </cdsListItem>
+	<cdsListItem>
+    	<cdsListItemKey>333</cdsListItemKey>
+    	<cdsListItemValue>Influenza, live, trivalent, intranasal, self/caregiver admin</cdsListItemValue>
+    	<cdsListItemConceptMapping>
+    		<code>ICE333</code>
+    		<displayName>Influenza, live, trivalent, intranasal, self/caregiver admin</displayName>
+    	</cdsListItemConceptMapping>
+    </cdsListItem>
     <cdsListItem>
     	<cdsListItemKey>135</cdsListItemKey>
     	<cdsListItemValue>Influenza, high dose, seasonal</cdsListItemValue>
