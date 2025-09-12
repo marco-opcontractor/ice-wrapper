@@ -1214,11 +1214,20 @@ rule "Mening B: For SDM patients when the patient is >= 24yrs, recommendation is
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+			- the series is not complete
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
 		Confirm elapsed time between $birthdate and evalTime >= "24y"
     Confirm the variable isMenBSharedDecision is == true
     Confirm the variable isMenBHighRisk is == false
+
+    // Ensure patient doesn't already have a completed 2-dose CVX 163 series before Oct 24, 2024
+    // This prevents the rule from firing when series should be considered complete
+    There does not exist a Series
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+      - the name of the series is "MenB4C2DoseSeries"
+      - the effective dose number in the Series is >= 2
+
 	then
 
 		Clear forecasted recommendations from consideration in series $targetSeries
