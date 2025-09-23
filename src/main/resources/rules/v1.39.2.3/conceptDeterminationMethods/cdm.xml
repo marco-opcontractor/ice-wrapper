@@ -1574,6 +1574,14 @@
         <concept code="313" displayName="Novavax COVID-19 Vaccine, Adjuvanted"/>
       </fromConcepts>
     </conceptMapping>
+    <conceptMapping>
+      <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+        codeSystemName="OpenCDS concepts" code="ICE334" displayName="COVID-19, mRNA, LNP-S, PF, 50 mcg/0.5 mL dose, Moderna"/>
+      <fromConcepts codeSystem="2.16.840.1.113883.12.292"
+        codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+        <concept code="334" displayName="COVID-19, mRNA, LNP-S, PF, 50 mcg/0.5 mL dose, Moderna"/>
+      </fromConcepts>
+    </conceptMapping>
 		<conceptMapping>
 			<toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
 				codeSystemName="OpenCDS concepts" code="ICE93" displayName="Synagis(R)" />

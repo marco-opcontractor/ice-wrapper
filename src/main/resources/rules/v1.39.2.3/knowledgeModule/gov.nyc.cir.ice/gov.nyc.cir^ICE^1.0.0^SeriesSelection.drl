@@ -955,6 +955,26 @@ end
 
 
 
+rule "EarlySeriesSelection(COVID-19): In Sep2023 season, if CVX 334 (Moderna Annual) is administered, select COVID19ModernaAnnualSeries"
+	dialect "mvel"
+	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
+	salience 35
+	when
+		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS, seriesSelectionSeason!.seasonName == "COVID19Sep2023Season")
+		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
+		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19ModernaAnnualSeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
+		exists TargetDose(associatedVaccineGroup == "VACCINE_GROUP_CONCEPT.850", vaccineComponent.cdsConceptName == "ICE334")
+	then
+		String _RULENAME = kcontext.rule.name;
+		$ts.setSelectedSeries(true);
+		$tss.setSelectedSeriesName($ts.seriesName);
+		$tss.setSeriesSelectionStatus(SeriesSelectionStatus.SERIES_SELECTION_COMPLETE);
+		update($tss);
+		update($ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection Complete: TargetSeries " + $ts);
+end
+
+
 rule "EarlySeriesSelection(COVID-19): In Sep2023 season, if patient is >= 5 years of age, select GTE 5 years by default if no other series was selected before"
 	dialect "mvel"
 	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
