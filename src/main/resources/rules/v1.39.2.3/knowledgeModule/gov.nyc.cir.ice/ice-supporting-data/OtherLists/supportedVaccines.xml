@@ -1360,6 +1360,14 @@
 		</cdsListItemConceptMapping>
 	</cdsListItem>
 	<cdsListItem>
+		<cdsListItemKey>334</cdsListItemKey>
+		<cdsListItemValue>COVID-19, mRNA, LNP-S, PF, 50 mcg/0.5 mL dose, Moderna</cdsListItemValue>
+		<cdsListItemConceptMapping>
+			<code>ICE334</code>
+			<displayName>COVID-19, mRNA, LNP-S, PF, 50 mcg/0.5 mL dose, Moderna</displayName>
+		</cdsListItemConceptMapping>
+	</cdsListItem>
+	<cdsListItem>
 		<cdsListItemKey>306</cdsListItemKey>
 		<cdsListItemValue>RSV, mAb, nirsevimab-alip, 0.5 mL, Beyfortus</cdsListItemValue>
 		<cdsListItemConceptMapping>
