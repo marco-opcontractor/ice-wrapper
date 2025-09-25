@@ -207,6 +207,29 @@ rule "COVID-19: If a CVX 313 vaccine was administered prior to 10/04/2023, evalu
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
+rule "COVID-19: If a CVX 334 vaccine was administered prior to 08/27/2025, evaluate the shot as Invalid / VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
+	no-loop true
+	when
+		There is an administered shot $currentShot
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- that has already been evaluated
+			- the administration date of the shot is < "27-Aug-2025"
+			- the vaccine administered a member of ("ICE334")
+			- make note of all evaluation reasons for this shot as $oEvaluationReasons
+			- the collection $oEvaluationReasons does not contain "EVALUATION_REASON_CONCEPT.EXTRA_DOSE"
+      - the collection $oEvaluationReasons does not contain "EVALUATION_REASON_CONCEPT.VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
+			- make note of the associated series as $associatedTargetSeries
+	then
+		Set the shot status of $currentShot to Invalid
+		Remove all evaluation reasons from shot $currentShot
+		Include the reason for shot $currentShot Invalid due to "Vaccine Not Yet Available for Use on Specified Administration Date"
+		Refresh all facts in the shot $currentShot
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // END INVALID vaccines specified prior to availability datein a wrong FDA-approved series
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2539,7 +2562,40 @@ rule "COVID-19: CVX 334 - Invalid if given too soon after last COVID vaccine (le
 			- the administration date of the shot is < $shotDate
 			- that has already been evaluated and whose shot validity is VALID or ACCEPTED
 		// Check minimum interval (3 months - 4 days) - only applies if prior vaccine exists
-		Confirm elapsed time between $priorShotDate and $shotDate < "3m-4d"
+		Confirm elapsed time between $priorShotDate and $shotDate < "12w-4d"
+	then
+		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+
+rule "COVID-19: CVX 334 - Invalid if given too soon after most recent invalid CVX 334 shot (less than 3 months - 4 days)"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
+	activation-group "allowableVaccineCheck"
+	when
+		There is an administered shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the vaccine administered is "ICE334"
+      - make note of the associated series as $targetSeries
+      - make note of the date this shot was administered as $shotDate
+	// Find the most recent prior invalid CVX 334 shot (if any exists)
+		There is an administered shot $priorInvalidShot
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the vaccine administered is "ICE334"
+			- the administration date of the shot is < $shotDate
+			- that has already been evaluated and whose shot validity is INVALID
+			- make note of the date this shot was administered as $priorInvalidShotDate
+		// Ensure this is the most recent prior invalid CVX 334 shot
+		There does not exist an Administered Shot
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the vaccine administered is "ICE334"
+			- the administration date of the shot is > $priorInvalidShotDate
+			- the administration date of the shot is < $shotDate
+			- that has already been evaluated and whose shot validity is INVALID
+		// Check minimum interval (3 months - 4 days) from most recent invalid CVX 334
+		Confirm elapsed time between $priorInvalidShotDate and $shotDate < "12w-4d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
 		Record that this dose rule was Processed for the TargetDose $currentShot
