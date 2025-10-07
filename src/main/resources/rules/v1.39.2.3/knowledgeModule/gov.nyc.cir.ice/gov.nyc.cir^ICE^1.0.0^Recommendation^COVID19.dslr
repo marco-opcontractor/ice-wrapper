@@ -1500,6 +1500,67 @@ rule "COVID-19(Sep2023 Novavax Series): If the patient has 2 doses of 211 on or 
     Log that this Series Rule fired for the Series $targetSeries
 end
 
+rule "COVID-19: CVX 334 - If the latest covid shot is 334, mark the series manually incomplete"
+  dialect "mvel"
+  agenda-group "RecommendationForecast^customCovidRecommendationRule"
+  when
+    There is a Series $targetSeries that needs forecasting
+      - the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+      - the name of the Series a member of ("COVID19Sep2023gte5Series", "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries", "COVID19Sep2023NovavaxSeries")
+      - the number of administered shots is > 1
+      - the series is complete
+      - Make note of the last shot administered in the Series as $lastShotAdministered
+    // Find the most recent prior COVID vaccine (if any exists)
+    There is an administered shot $priorShot
+      - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+      - the vaccine administered is "ICE334"
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - make note of the date this shot was administered as $priorShotDate
+    // Ensure this is the most recent prior shot
+    There does not exist an Administered Shot
+      - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+      - the administration date of the shot is > $priorShotDate
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+  then
+    Manually Mark the Series $targetSeries Not Complete
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.DUE_IN_FUTURE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark Forecasting of the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "COVID-19: CVX 334 - If the latest covid shot is 334 and INVALID, mark the series manually incomplete"
+  dialect "mvel"
+  agenda-group "RecommendationForecast^customCovidRecommendationRule"
+  when
+    There is a Series $targetSeries that needs forecasting
+      - the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+      - the name of the Series a member of ("COVID19Sep2023gte5Series", "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries", "COVID19Sep2023NovavaxSeries")
+      - the number of administered shots is > 1
+      - the series is complete
+      - Make note of the last shot administered in the Series as $lastShotAdministered
+    // Find the most recent prior COVID vaccine (if any exists)
+    There is an administered shot $priorShot
+      - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+      - the vaccine administered is "ICE334"
+      - that has already been evaluated and whose shot validity is INVALID
+      - make note of the date this shot was administered as $priorShotDate
+    // Ensure this is the most recent prior shot
+    There does not exist an Administered Shot
+      - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+      - the administration date of the shot is > $priorShotDate
+      - that has already been evaluated and whose shot validity is INVALID
+  then
+    Manually Mark the Series $targetSeries Not Complete
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.DUE_IN_FUTURE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark Forecasting of the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
 
 /*************************************************************************************************************************************************************************************
  END Series Special Rules for Sep2023 Novavax Series

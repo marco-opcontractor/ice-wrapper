@@ -28,6 +28,10 @@
         	<ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="312" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, 12+ yrs, Moderna"/>
         </ns2:doseVaccine>
+        <ns2:doseVaccine>
+          <ns2:preferred>true</ns2:preferred>
+          <ns2:vaccine code="334" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, LNP-S, PF, 50 mcg/0.5 mL dose, Moderna"/>
+        </ns2:doseVaccine>
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>2</ns2:doseNumber>
@@ -41,6 +45,10 @@
         <ns2:doseVaccine>
         	<ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="312" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, 12+ yrs, Moderna"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+          <ns2:preferred>true</ns2:preferred>
+          <ns2:vaccine code="334" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, mRNA, LNP-S, PF, 50 mcg/0.5 mL dose, Moderna"/>
         </ns2:doseVaccine>
     </ns2:iceSeriesDose>
 	<ns2:seasonCode>COVID19Sep2023Season</ns2:seasonCode>
