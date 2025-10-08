@@ -2522,7 +2522,7 @@ end
 rule "COVID-19: CVX 334 - Invalid if patient under 12 years old"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
-	activation-group "allowableVaccineCheck"
+	activation-group "cvx334IntervalCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -2542,7 +2542,7 @@ end
 rule "COVID-19: CVX 334 - Invalid if given too soon after last COVID vaccine (less than 3 months - 4 days)"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
-	activation-group "allowableVaccineCheck"
+	activation-group "cvx334IntervalCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -2569,11 +2569,10 @@ rule "COVID-19: CVX 334 - Invalid if given too soon after last COVID vaccine (le
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
 end
 
-
 rule "COVID-19: CVX 334 - Invalid if given too soon after most recent invalid CVX 334 shot (less than 3 months - 4 days)"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customCovidEvaluationRule"
-	activation-group "allowableVaccineCheck"
+	activation-group "cvx334IntervalCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
