@@ -105,6 +105,10 @@
             <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="307" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV, mAb, nirsevimab-alip, 1 mL, Beyfortus"/>
         </ns2:doseVaccine>
+        <ns2:doseVaccine>
+          <ns2:preferred>true</ns2:preferred>
+          <ns2:vaccine code="332" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="RSV, mAb, 0.7 mL, age 0 - &lt; 8 mos. (clesrovimab)"/>
+        </ns2:doseVaccine>
     </ns2:iceSeriesDose>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>2</ns2:doseNumber>

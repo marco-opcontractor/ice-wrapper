@@ -1614,6 +1614,14 @@
 				<concept code="307" displayName="RSV, mAb, nirsevimab-alip, 1 mL, Beyfortus" />
 			</fromConcepts>
 		</conceptMapping>
+    <conceptMapping>
+      <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+        codeSystemName="OpenCDS concepts" code="ICE332" displayName="RSV, mAb, 0.7 mL, age 0 - &lt; 8 mos. (clesrovimab)" />
+      <fromConcepts codeSystem="2.16.840.1.113883.12.292"
+        codeSystemName="Vaccines administered (CVX)" displayName="CVX">
+        <concept code="332" displayName="RSV, mAb, 0.7 mL, age 0 - &lt; 8 mos. (clesrovimab)" />
+      </fromConcepts>
+    </conceptMapping>
     <timestamp>2022-08-15T00:00:00.606-05:00</timestamp>
     <userId>daryl</userId>
   </conceptDeterminationMethod>
