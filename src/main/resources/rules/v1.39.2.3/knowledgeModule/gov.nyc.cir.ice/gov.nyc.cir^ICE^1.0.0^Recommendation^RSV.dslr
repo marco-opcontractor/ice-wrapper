@@ -336,3 +336,36 @@ rule "RSV(Edge case): If patient was born between February and March, stop recom
 	  Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
 end
+
+//
+rule "RSV: Complete series after 1 Enflonsia valid dose (or valid dose in the first season) with no mommyvax"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 100 // Higher priority
+  when
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - the series is not complete
+    There is an Administered Shot $currentShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $currentShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    The given date $currentShotAdministrationDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+
+    // Check if the dose was administered in the second RSV season
+    Confirm the variable wasMommyVaxGiven is == false
+    Confirm the variable isRSVHighRisk is == false
+    Confirm the date $currentShotAdministrationDate is on the same date or after extendedSecondRSVSeasonStart
+    Confirm the date $currentShotAdministrationDate is on the same date or before extendedSecondRSVSeasonEnd
+
+  then
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+end
