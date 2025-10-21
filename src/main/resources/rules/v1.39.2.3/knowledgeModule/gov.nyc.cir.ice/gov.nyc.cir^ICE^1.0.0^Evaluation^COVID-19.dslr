@@ -209,17 +209,14 @@ end
 
 rule "COVID-19: If a CVX 334 vaccine was administered prior to 08/27/2025, evaluate the shot as Invalid / VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postCovidEvaluationCheck"
+  agenda-group "HistoryEvaluation^customCovidEvaluationRule"
+	activation-group "allowableVaccineCheck"
 	no-loop true
 	when
-		There is an administered shot $currentShot
+		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- that has already been evaluated
 			- the administration date of the shot is < "27-Aug-2025"
 			- the vaccine administered a member of ("ICE334")
-			- make note of all evaluation reasons for this shot as $oEvaluationReasons
-			- the collection $oEvaluationReasons does not contain "EVALUATION_REASON_CONCEPT.EXTRA_DOSE"
-      - the collection $oEvaluationReasons does not contain "EVALUATION_REASON_CONCEPT.VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED"
 			- make note of the associated series as $associatedTargetSeries
 	then
 		Set the shot status of $currentShot to Invalid
