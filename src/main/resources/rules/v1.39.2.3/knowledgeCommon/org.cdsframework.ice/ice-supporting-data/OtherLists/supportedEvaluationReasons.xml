@@ -141,6 +141,10 @@
         <cdsListItemValue>RSV-mAb nirsevimab 0.5 mL is never valid for a second season and there is no indication for giving a second dose in the same season.</cdsListItemValue>
     </cdsListItem>
     <cdsListItem>
+        <cdsListItemKey>INVALID_RSV_MAB_SEQUENCE_FIRST_RSV_SEASON</cdsListItemKey>
+        <cdsListItemValue>Nirsevimab 1 mL contraindicated for first RSV season due to previous valid Enflonsia dose in prior first season.</cdsListItemValue>
+    </cdsListItem>
+    <cdsListItem>
         <cdsListItemKey>SERIES_ALREADY_COMPLETE_MENB4C2DOSE</cdsListItemKey>
         <cdsListItemValue>Children 16 years or older who completed the MenB 4C 2-dose series before October 24, 2024, do not need a third dose.</cdsListItemValue>
     </cdsListItem>
