@@ -281,11 +281,13 @@ rule "RSV(Beyfortus): If patient latest vaccine was Beyfortus at least 6 months 
 	  There is an Administered Shot $latestShot
       - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
   		- the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
       - the administration date of the shot falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
       - make note of the date this shot was administered as $latestShotAdministrationDate
       - make note of the associated series as $associatedTargetSeries
     There does not exist an Administered Shot
       - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
       - the administration date of the shot is > $latestShotAdministrationDate
       - the administration date of the shot falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
       - the shot is not ignored
@@ -346,10 +348,54 @@ rule "RSV(Beyfortus): If patient has received a previous valid dose of Beyfortus
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
+rule "RSV(Beyfortus): April-born patient with April dose - maintain 8-month forecast until 8 months old"
+  dialect "mvel"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  activation-group "AprilBornBeyfortusForecasting"
+  salience 1000  // Extremely high to override ALL other rules
+  no-loop true
+  when
+    There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - Make note of the earliest date as $earliestRecommendedDate
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+      - make note of the Patient's birthdate as $birthDate
+    // Check if birthdate is in April (April 1 - April 30)
+    The given date $birthDate falls within the ranges of aprilStartMonthDay and aprilEndMonthDay
+    // Check if patient is not yet 8 months old
+    Confirm the date $dateAt8MonthsAge is after evalTime
+    // Find the FIRST VALID Beyfortus shot (regardless of any INVALID doses)
+    There is an Administered Shot $firstValidShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $firstValidShotDate
+    // Ensure this is the FIRST VALID shot (no earlier VALID shot exists)
+    There does not exist an Administered Shot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the administration date of the shot is < $firstValidShotDate
+      - the shot is not ignored
+    // Check if the FIRST VALID shot was in April (same month as birth)
+    The given date $firstValidShotDate falls within the ranges of aprilStartMonthDay and aprilEndMonthDay
+  then
+    // Set forecast to 8 months (DOB + 8m) - this will override any other forecast
+    Set the final recommended date for the series $targetSeries to the date of $dateAt8MonthsAge
+    Set the final earliest date date for the series $targetSeries to the date of $dateAt8MonthsAge
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
 rule "RSV(Beyfortus): If April-born patient received Beyfortus in 1st season, recommend 2nd dose in 2nd season"
   dialect "mvel"
   agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  activation-group "AprilBornBeyfortusForecasting"
   salience 151  // Higher than the 8-month Beyfortus rule (150)
+  no-loop true
   when
     There is a Series $targetSeries
       - a forecast for the Series has been made and a recommendation date has been determined
@@ -361,11 +407,20 @@ rule "RSV(Beyfortus): If April-born patient received Beyfortus in 1st season, re
       - that has already been evaluated and whose shot validity is VALID or ACCEPTED
       - the shot is not ignored
       - make note of the date this shot was administered as $latestShotAdministrationDate
+    // Ensure this is the LATEST VALID shot (no other VALID shot after this one)
+    There does not exist an Administered Shot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the administration date of the shot is > $latestShotAdministrationDate
+      - the shot is not ignored
     The Patient information $patientInfo must be known to complete writing this rule
       - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
       - make note of the Patient's birthdate as $birthDate
     // Check if birthdate is in April (April 1 - April 30)
     The given date $birthDate falls within the ranges of aprilStartMonthDay and aprilEndMonthDay
+    // Check if shot was NOT in April (exclude April shots - those are handled by the April-specific rule)
+    The given date $latestShotAdministrationDate does not fall within the ranges of aprilStartMonthDay and aprilEndMonthDay
     // Check if shot was in 1st EXTENDED season (Sept-Apr)
     The given date $latestShotAdministrationDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
     Confirm the date $latestShotAdministrationDate is on the same date or after extendedFirstRSVSeasonStart
