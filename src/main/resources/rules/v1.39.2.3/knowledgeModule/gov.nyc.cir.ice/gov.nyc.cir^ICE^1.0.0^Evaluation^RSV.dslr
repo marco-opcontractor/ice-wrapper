@@ -300,7 +300,7 @@ rule "RSV(Enflonsia): If no mommyVax and ICE332 given in second season, Invalida
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
     The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
-    Confirm the variable wasMommyVaxGiven is == false
+    //Confirm the variable wasMommyVaxGiven is == false
     //Confirm the variable isRSVHighRisk is == false
     Confirm the date $currentShotDate is on the same date or after extendedSecondRSVSeasonStart
     Confirm the date $currentShotDate is on the same date or before extendedSecondRSVSeasonEnd
