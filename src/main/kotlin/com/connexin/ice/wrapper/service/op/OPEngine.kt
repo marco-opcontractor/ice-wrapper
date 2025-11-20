@@ -84,10 +84,8 @@ class OPEngine(
         val isMenBSharedDecision = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_SINGLE) ?: false
         val isMenBHighRisk = vaccineReport.flags?.get(Constants.FlagConstants.FLAG_MENB_HIGH_RISK) ?: false
         val emptyMenBIndicators = vaccineReport.flags?.let { flagsMap ->
-            flagsMap.keys.none {
-                it == Constants.FlagConstants.FLAG_MENB_SINGLE ||
-                        it == Constants.FlagConstants.FLAG_MENB_HIGH_RISK
-            }
+            flagsMap.keys.none { it == Constants.FlagConstants.FLAG_MENB_SINGLE ||
+                    it == Constants.FlagConstants.FLAG_MENB_HIGH_RISK }
         } ?: true
         val mommyVaxGiven = vaccineReport.indicators.any {
             it.interpretation == Interpretation.PREGNANCY_VACCINATED && it.code == Constants.DiseaseCodes.ICE_RSV_DISEASE_CODE
@@ -113,11 +111,7 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("vaccineGroupExclusions", listOf<Any>()))
         cmds.add(CommandFactory.newSetGlobal("rsvSeasonStartMonthDay", org.joda.time.MonthDay(10, 1)))
         cmds.add(CommandFactory.newSetGlobal("rsvSeasonEndMonthDay", org.joda.time.MonthDay(3, 31)))
-        cmds.add(CommandFactory.newSetGlobal("extendedRsvSeasonStartMonthDay", org.joda.time.MonthDay(9, 1)))
-        cmds.add(CommandFactory.newSetGlobal("extendedRsvSeasonEndMonthDay", org.joda.time.MonthDay(4, 30)))
         cmds.add(CommandFactory.newSetGlobal("februaryStartMonthDay", org.joda.time.MonthDay(2, 1)))
-        cmds.add(CommandFactory.newSetGlobal("aprilStartMonthDay", org.joda.time.MonthDay(4, 1)))
-        cmds.add(CommandFactory.newSetGlobal("aprilEndMonthDay", org.joda.time.MonthDay(4, 30)))
         cmds.add(CommandFactory.newSetGlobal("isRSVHighRisk", isRsvIndicated == true))
         cmds.add(CommandFactory.newSetGlobal("wasMommyVaxGiven", mommyVaxGiven))
         cmds.add(CommandFactory.newSetGlobal("isMenBSharedDecision", isMenBSharedDecision))
@@ -125,14 +119,10 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("isEmptyMenBIndicators", emptyMenBIndicators))
 
         // Add the calculated dates as globals
-        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", rsvSeasonDates.firstSeasonStart.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", rsvSeasonDates.firstSeasonEnd.toDate()))
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonStart", rsvSeasonDates.firstSeasonStart.toDate()))
+//        cmds.add(CommandFactory.newSetGlobal("firstRSVSeasonEnd", rsvSeasonDates.firstSeasonEnd.toDate()))
         cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonStart", rsvSeasonDates.secondSeasonStart.toDate()))
         cmds.add(CommandFactory.newSetGlobal("secondRSVSeasonEnd", rsvSeasonDates.secondSeasonEnd.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("extendedFirstRSVSeasonStart", rsvSeasonDates.extendedFirstSeasonStart.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("extendedFirstRSVSeasonEnd", rsvSeasonDates.extendedFirstSeasonEnd.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("extendedSecondRSVSeasonStart", rsvSeasonDates.extendedSecondSeasonStart.toDate()))
-        cmds.add(CommandFactory.newSetGlobal("extendedSecondRSVSeasonEnd", rsvSeasonDates.extendedSecondSeasonEnd.toDate()))
 
         val vmr = convertToIceModel(vaccineReport)
         val jaxb = unmarshal(vmr)
@@ -376,75 +366,35 @@ class OPEngine(
         val firstSeasonStart: LocalDate,
         val firstSeasonEnd: LocalDate,
         val secondSeasonStart: LocalDate,
-        val secondSeasonEnd: LocalDate,
-        val extendedFirstSeasonStart: LocalDate,
-        val extendedFirstSeasonEnd: LocalDate,
-        val extendedSecondSeasonStart: LocalDate,
-        val extendedSecondSeasonEnd: LocalDate,
+        val secondSeasonEnd: LocalDate
     )
 
     private fun calculateRsvSeasonDates(birthdate: LocalDate): RsvSeasonDates {
         // Define constant season boundaries
-        val standardSeason = SeasonBoundary(
-            startMonth = Month.OCTOBER,
-            startDay = 1,
-            endMonth = Month.MARCH,
-            endDay = 31
-        )
+        val rsvSeasonStartMonth = Month.OCTOBER
+        val rsvSeasonStartDay = 1
+        val rsvSeasonEndMonth = Month.MARCH
+        val rsvSeasonEndDay = 31
 
-        val extendedSeason = SeasonBoundary(
-            startMonth = Month.SEPTEMBER,
-            startDay = 1,
-            endMonth = Month.APRIL,
-            endDay = 30
-        )
-
-        // Determine if baby was born after RSV season (April 1st or later)
+        // Determine if baby was born after RSV season
         val isBornAfterRSVSeason = birthdate.monthValue >= 4
 
         return if (isBornAfterRSVSeason) {
-            // Baby born April-December: gets upcoming seasons
-            buildSeasonDates(
-                birthYear = birthdate.year,
-                standardSeason = standardSeason,
-                extendedSeason = extendedSeason
+            // Baby born on or after April 1st
+            RsvSeasonDates(
+                firstSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
+                firstSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay),
+                secondSeasonStart = LocalDate.of(birthdate.year + 1, rsvSeasonStartMonth, rsvSeasonStartDay),
+                secondSeasonEnd = LocalDate.of(birthdate.year + 2, rsvSeasonEndMonth, rsvSeasonEndDay)
             )
         } else {
-            // Baby born January-March: gets previous seasons
-            buildSeasonDates(
-                birthYear = birthdate.year - 1,
-                standardSeason = standardSeason,
-                extendedSeason = extendedSeason
+            // Baby born before April 1st (October 1st to March 31st)
+            RsvSeasonDates(
+                firstSeasonStart = LocalDate.of(birthdate.year - 1, rsvSeasonStartMonth, rsvSeasonStartDay),
+                firstSeasonEnd = LocalDate.of(birthdate.year, rsvSeasonEndMonth, rsvSeasonEndDay),
+                secondSeasonStart = LocalDate.of(birthdate.year, rsvSeasonStartMonth, rsvSeasonStartDay),
+                secondSeasonEnd = LocalDate.of(birthdate.year + 1, rsvSeasonEndMonth, rsvSeasonEndDay)
             )
         }
     }
-
-    // Function to build season dates for a given base year
-    private fun buildSeasonDates(
-        birthYear: Int,
-        standardSeason: SeasonBoundary,
-        extendedSeason: SeasonBoundary
-    ): RsvSeasonDates {
-        return RsvSeasonDates(
-            // Standard seasons
-            firstSeasonStart = LocalDate.of(birthYear, standardSeason.startMonth, standardSeason.startDay),
-            firstSeasonEnd = LocalDate.of(birthYear + 1, standardSeason.endMonth, standardSeason.endDay),
-            secondSeasonStart = LocalDate.of(birthYear + 1, standardSeason.startMonth, standardSeason.startDay),
-            secondSeasonEnd = LocalDate.of(birthYear + 2, standardSeason.endMonth, standardSeason.endDay),
-
-            // Extended seasons
-            extendedFirstSeasonStart = LocalDate.of(birthYear, extendedSeason.startMonth, extendedSeason.startDay),
-            extendedFirstSeasonEnd = LocalDate.of(birthYear + 1, extendedSeason.endMonth, extendedSeason.endDay),
-            extendedSecondSeasonStart = LocalDate.of(birthYear + 1, extendedSeason.startMonth, extendedSeason.startDay),
-            extendedSecondSeasonEnd = LocalDate.of(birthYear + 2, extendedSeason.endMonth, extendedSeason.endDay)
-        )
-    }
-
-    // Data class for season boundaries
-    private data class SeasonBoundary(
-        val startMonth: Month,
-        val startDay: Int,
-        val endMonth: Month,
-        val endDay: Int
-    )
 }
