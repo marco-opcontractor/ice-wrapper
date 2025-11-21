@@ -550,7 +550,7 @@ rule "RSV(High Risk): Complete series after Enflonsia ACCEPTED (1st season) + Be
     There is an Administered Shot $enflonsiaShot
       - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
       - the vaccine administered a member of ("ICE332")
-      - that has already been evaluated and whose shot validity is ACCEPTED
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
       - the shot is not ignored
       - make note of the date this shot was administered as $enflosniaShotDate
       - make note of the associated series as $associatedTargetSeries
