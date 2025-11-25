@@ -473,7 +473,7 @@ rule "RSV(Beyfortus): Invalidate CVX306 or CVX332 Dose Given in Second RSV Seaso
       Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
-rule "RSV(High Risk): Invalidate CVX307 (Beyfortus) Given in First RSV Season After Valid CVX332 (Enflonsia)"
+rule "RSV: Invalidate Beyfortus (CVX306, ICE307) given in First RSV Season After Valid Enflonsia (CVX332)"
     agenda-group "HistoryEvaluation^postEvaluationCheck"
     activation-group "validDoseCheck"
     salience 28
@@ -482,10 +482,10 @@ rule "RSV(High Risk): Invalidate CVX307 (Beyfortus) Given in First RSV Season Af
       The patient information $oEvaluatedPerson must be known to complete writing this rule
         - make note of the Patient's birthdate as $birthdate
 
-      // Current shot: CVX 307 (Beyfortus) that has been evaluated
+      // Current shot: CVX306 or CVX307 (Beyfortus) that has been evaluated
       There is an Administered Shot $currentShot
         - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
-        - the vaccine administered a member of ("ICE307")
+        - the vaccine administered a member of ("ICE306", "ICE307")
         - that has already been evaluated and whose shot validity is VALID or ACCEPTED
         - make note of the date this shot was administered as $currentShotDate
         - make note of the associated series as $associatedTargetSeries
@@ -507,18 +507,57 @@ rule "RSV(High Risk): Invalidate CVX307 (Beyfortus) Given in First RSV Season Af
       Confirm the date $currentShotDate is on the same date or after extendedFirstRSVSeasonStart
       Confirm the date $currentShotDate is on the same date or before extendedFirstRSVSeasonEnd
 
-      // High risk patient
-      Confirm the variable isRSVHighRisk is == true
-
     then
       // Set the shot status to Invalid
       Set the shot status of $currentShot to Invalid
       // Include the reason for shot $currentShot being invalid
-      Include the reason for shot $currentShot Invalid due to "Vaccine Not Allowed First Season After Enflonsia"
+      Include the reason for shot $currentShot Invalid due to "Second Dose Not Allowed in First Season"
       // Record that this dose rule was Processed for the TargetDose $currentShot
       Record that this dose rule was Processed for the TargetDose $currentShot
       // Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
       Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+rule "RSV: Invalidate CVX332 (Enflonsia) Given in First RSV Season After Valid Beyfortus"
+  agenda-group "HistoryEvaluation^customEvaluationRule"
+  activation-group "allowableVaccineCheck"
+  salience 29
+  when
+    // Patient information
+    The patient information $oEvaluatedPerson must be known to complete writing this rule
+      - make note of the Patient's birthdate as $birthdate
+
+    // Current shot: CVX 332 (Enflonsia) that needs to be evaluated
+    There is an Administered Shot $currentShot that needs to be evaluated
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - make note of the date this shot was administered as $currentShotDate
+      - make note of the associated series as $associatedTargetSeries
+
+    // Previous shot: CVX 306/307 (Beyfortus) that was VALID
+    There is an Administered Shot $previousBeyfortusShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID
+      - the shot is not ignored
+      - the administration date of the shot is < $currentShotDate
+      - make note of the date this shot was administered as $previousBeyfortusShotDate
+
+    // Confirm previous Beyfortus was in first extended season
+    Confirm the date $previousBeyfortusShotDate is on the same date or after extendedFirstRSVSeasonStart
+    Confirm the date $previousBeyfortusShotDate is on the same date or before extendedFirstRSVSeasonEnd
+
+    // Confirm current Enflonsia is also in first extended season (not second)
+    Confirm the date $currentShotDate is on the same date or after extendedFirstRSVSeasonStart
+    Confirm the date $currentShotDate is on the same date or before extendedFirstRSVSeasonEnd
+
+  then
+    // Include the reason for shot $currentShot being invalid
+    Include the reason for shot $currentShot Invalid due to "Second Dose Not Allowed in First Season"
+    // Record that this dose rule was Processed for the TargetDose $currentShot
+    Record that this dose rule was Processed for the TargetDose $currentShot
+    // Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+    Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
 rule "RSV: Invalidate same season RSV-mAb nirsevimab 0.5 mL vaccine when having a valid RSV-mAb nirsevimab 0.5 mL already"
