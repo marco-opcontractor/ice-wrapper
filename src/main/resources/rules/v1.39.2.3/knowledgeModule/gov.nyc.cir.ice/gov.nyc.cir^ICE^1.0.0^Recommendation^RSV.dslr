@@ -585,3 +585,34 @@ rule "RSV(High Risk): Complete series after Enflonsia ACCEPTED (1st season) + Be
     Record that this Series Rule was Processed for the TargetSeries $targetSeries
     Log that this Series Rule fired for the Series $targetSeries
 end
+
+rule "RSV(High Risk): Complete series after last valid Beyfortus (CVX307) in 2nd season with mommyVax"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 110 // Higher priority
+  when
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - the series is not complete
+    There is an Administered Shot $currentShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $currentShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    // Confirm Beyfortus was in second extended season
+    The given date $currentShotAdministrationDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+
+    // Check if the dose was administered in the second RSV season
+    Confirm the variable wasMommyVaxGiven is == true
+    Confirm the variable isRSVHighRisk is == true
+
+  then
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+end
