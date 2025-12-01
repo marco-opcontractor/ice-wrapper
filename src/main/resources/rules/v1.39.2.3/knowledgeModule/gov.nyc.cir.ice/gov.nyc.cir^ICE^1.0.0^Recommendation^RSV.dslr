@@ -282,12 +282,15 @@ rule "RSV(Beyfortus): If patient latest vaccine was Beyfortus at least 6 months 
       - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
   		- the vaccine administered a member of ("ICE306", "ICE307")
       - the administration date of the shot falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
       - make note of the date this shot was administered as $latestShotAdministrationDate
       - make note of the associated series as $associatedTargetSeries
     There does not exist an Administered Shot
       - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
       - the administration date of the shot is > $latestShotAdministrationDate
       - the administration date of the shot falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
       - the shot is not ignored
 		Confirm elapsed time between $latestShotAdministrationDate and evalTime < "6m"
 	then
@@ -325,7 +328,7 @@ end
 rule "RSV(Beyfortus): If patient has received a previous valid dose of Beyfortus and recommended date is before 8 months, move to at least 8 months"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
-	salience 150
+	salience 55
 	when
 		There is a Series $targetSeries
       - a forecast for the Series has been made and a recommendation date has been determined
