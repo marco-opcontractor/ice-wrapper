@@ -95,6 +95,7 @@ rule "RSV: Recommendation previous than eval time, Move recommendation date to n
 	then
 	  //Set the final recommended date for the series $evaluatedTargetSeries to the date of evalTime
 	  Set the final earliest date date for the series $evaluatedTargetSeries to the date of evalTime
+	  Set the final recommended date for the series $evaluatedTargetSeries to the date of evalTime
 		Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
     Log that this Series Rule fired for the Series $evaluatedTargetSeries
 end
