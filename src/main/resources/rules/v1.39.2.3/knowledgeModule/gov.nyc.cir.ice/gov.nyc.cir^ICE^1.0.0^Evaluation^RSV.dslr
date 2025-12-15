@@ -219,6 +219,8 @@ rule "RSV(Beyfortus): If the vaccine was administered on season and mommy vax wa
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
     The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+    // MommyVax only protects during 1st season, so ensure shot is within 1st season (before 1st season end)
+    Confirm the date $currentShotDate is on the same date or before extendedFirstRSVSeasonEnd
     Confirm the variable wasMommyVaxGiven is == true
 	then
 		Include the reason for shot $currentShot Invalid due to "Not Recommended due to Mother Vaccine Documented"
