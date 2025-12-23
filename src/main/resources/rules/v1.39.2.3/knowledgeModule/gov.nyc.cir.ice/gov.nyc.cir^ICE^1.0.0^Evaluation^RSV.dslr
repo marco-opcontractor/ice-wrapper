@@ -177,7 +177,11 @@ rule "RSV: Invalidate same season vaccine if the Beyfortus vaccine was administe
 			- the shot is not ignored
 			- the administration date of the shot is < $currentShotAdministrationDate
 			- make note of the date this shot was administered as $previousBeyfortusShotDate
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
 		Confirm Elapsed time between $previousBeyfortusShotDate and $currentShotAdministrationDate < "6m"
+		// Only invalidate if current shot is < 8 months old (i.e., still in 1st season)
+		Confirm the date $currentShotAdministrationDate is before $dateAt8MonthsAge
 	then
 		Set the shot status of $currentShot to Invalid
 		Include the reason for shot $currentShot Invalid due to "Second Dose Not Allowed in First Season"
