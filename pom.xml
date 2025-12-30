@@ -157,10 +157,11 @@
             <version>3.25.5</version>
         </dependency>
 
+        <!-- Netty CVE fix - UPDATE THIS -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
-            <version>4.1.119.Final</version> <!-- or latest -->
+            <version>4.1.125.Final</version>
         </dependency>
 
     </dependencies>
