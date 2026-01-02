@@ -12,6 +12,11 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <kotlin.version>1.8.21</kotlin.version>
+
+        <!-- Spring Boot Security -->
+        <spring-security.version>6.4.4</spring-security.version> <!-- or latest -->
+        <tomcat.version>10.1.34</tomcat.version> <!-- or latest 10.1.x -->
+
     </properties>
 
     <distributionManagement>
@@ -128,6 +133,35 @@
             <artifactId>assertj-core</artifactId>
             <version>3.22.0</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- CVE fixes -->
+        <!-- ZIP / archive DoS from commons-compress 1.19.0 to 1.26.0 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.26.0</version>
+        </dependency>
+
+        <!-- XML parsing DoS from XStream 1.4.20 to 1.4.21 -->
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.21</version>
+        </dependency>
+
+        <!-- Protobuf DoS from protobuf-java 3.19.6 to 3.25.5 -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.25.5</version>
+        </dependency>
+
+        <!-- Netty CVE fix - UPDATE THIS -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>4.1.125.Final</version>
         </dependency>
 
     </dependencies>
