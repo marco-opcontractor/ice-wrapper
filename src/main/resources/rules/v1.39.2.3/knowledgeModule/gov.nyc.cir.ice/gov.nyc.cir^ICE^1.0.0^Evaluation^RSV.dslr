@@ -177,7 +177,11 @@ rule "RSV: Invalidate same season vaccine if the Beyfortus vaccine was administe
 			- the shot is not ignored
 			- the administration date of the shot is < $currentShotAdministrationDate
 			- make note of the date this shot was administered as $previousBeyfortusShotDate
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
 		Confirm Elapsed time between $previousBeyfortusShotDate and $currentShotAdministrationDate < "6m"
+		// Only invalidate if current shot is < 8 months old (i.e., still in 1st season)
+		Confirm the date $currentShotAdministrationDate is before $dateAt8MonthsAge
 	then
 		Set the shot status of $currentShot to Invalid
 		Include the reason for shot $currentShot Invalid due to "Second Dose Not Allowed in First Season"
@@ -240,11 +244,13 @@ rule "RSV(Enflonsia): If mommyVax given and ICE332 administered in first season,
 	when
 	  The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
+      - make note of the date as $dateAt8mOld when the patient is "8m" of age
 		There is an Administered Shot $currentShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
 			- the vaccine administered a member of ("ICE332")
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
+      - the administration date of the shot is < $dateAt8mOld
 		Confirm the variable wasMommyVaxGiven is == true
 		Confirm the variable isRSVHighRisk is == false
 		The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
@@ -295,7 +301,7 @@ rule "RSV(Enflonsia): If mommyVax given and ICE332 administered in first season,
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
-rule "RSV(Enflonsia): If ICE332 given in second season at least 8 months old and second extended season, Invalidate and recommend next season"
+rule "RSV(Enflonsia): Invalidate ICE332 given in calendar-based second season"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "allowableVaccineCheck"
   salience 110
@@ -308,9 +314,8 @@ rule "RSV(Enflonsia): If ICE332 given in second season at least 8 months old and
 			- the vaccine administered a member of ("ICE332")
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
-			- the administration date of the shot is >= $dateAt8mOfAge
     The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
-    // Ensure shot is actually in 2nd season, not just >= 8 months old in 1st season
+    // Ensure shot is in calendar-based 2nd season (regardless of patient age)
     Confirm the date $currentShotDate is on the same date or after extendedSecondRSVSeasonStart
     Confirm the date $currentShotDate is on the same date or before extendedSecondRSVSeasonEnd
 	then
@@ -319,10 +324,10 @@ rule "RSV(Enflonsia): If ICE332 given in second season at least 8 months old and
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
-rule "RSV(Enflonsia): Invalidate ICE332 Dose Given in Second RSV Season when patient < 8 months old"
+rule "RSV(Enflonsia): Invalidate ICE332 given when patient >= 8 months old"
     agenda-group "HistoryEvaluation^customEvaluationRule"
-    activation-group "validDoseCheck"
-    salience 19
+    activation-group "allowableVaccineCheck"
+    salience 109
     when
       // Patient information
       The patient information $oEvaluatedPerson must be known to complete writing this rule
@@ -333,13 +338,10 @@ rule "RSV(Enflonsia): Invalidate ICE332 Dose Given in Second RSV Season when pat
         - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
         - the vaccine administered a member of ("ICE332")
         - make note of the date this shot was administered as $currentShotDate
-        - the administration date of the shot is < $dateAt8mOfAge
+        - the administration date of the shot is >= $dateAt8mOfAge
         - make note of the associated series as $associatedTargetSeries
-
-      // Check if the dose was administered in the second RSV season
-      Confirm the date $currentShotDate is on the same date or after extendedSecondRSVSeasonStart
-      Confirm the date $currentShotDate is on the same date or before extendedSecondRSVSeasonEnd
-
+      // Ensure shot is within extended season (but could be 1st or 2nd calendar season)
+      The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
     then
       // Set the shot status to Invalid
       Set the shot status of $currentShot to Invalid
@@ -359,6 +361,7 @@ rule "RSV(Enflonsia): If no mommyVax and 2nd ICE332 dose given in first season, 
 	when
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
+			- make note of the date as $dateAt8mOld when the patient is "8m" of age
 		There is an Administered Shot $currentShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
 			- the vaccine administered a member of ("ICE332")
@@ -367,6 +370,7 @@ rule "RSV(Enflonsia): If no mommyVax and 2nd ICE332 dose given in first season, 
 			- the Rule "RSV(Enflonsia): If no mommyVax and 2nd ICE332 dose given in first season, mark 2nd dose as ACCEPTED and Series Complete (Non-High Risk)" has not been executed before for this Dose
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
+			- the administration date of the shot is < $dateAt8mOld
     There is a Series $targetSeries identified by $associatedTargetSeries
       - the effective number of doses administered in the Series is == 1
     The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
@@ -413,6 +417,7 @@ rule "RSV(Enflonsia): If no mommyVax and 2nd ICE332 dose given in first season, 
 	when
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthdate
+			- make note of the date as $dateAt8mOld when the patient is "8m" of age
 		There is an Administered Shot $currentShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
 			- the vaccine administered a member of ("ICE332")
@@ -421,6 +426,7 @@ rule "RSV(Enflonsia): If no mommyVax and 2nd ICE332 dose given in first season, 
 			- the Rule "RSV(Enflonsia): If no mommyVax and 2nd ICE332 dose given in first season, mark 2nd dose as ACCEPTED (High Risk)" has not been executed before for this Dose
 			- make note of the associated series as $associatedTargetSeries
 			- make note of the date this shot was administered as $currentShotDate
+			- the administration date of the shot is < $dateAt8mOld
 		There is a Series $targetSeries identified by $associatedTargetSeries
 			- the effective number of doses administered in the Series is == 1
     The Given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
