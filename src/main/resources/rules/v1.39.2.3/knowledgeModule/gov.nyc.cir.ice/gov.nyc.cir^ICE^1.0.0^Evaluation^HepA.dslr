@@ -97,7 +97,7 @@ rule "Switch from 2-Dose HepA series to 3-Dose HepA series if CVX 83 (Hep A, ped
 end
 
 
-rule "Switch from 2-Dose HepA series to 3-Dose HepA series if Dose 2 is given >= 24d and < 6m-4d from dose 1 and dose 2 is given to a patient >= 18yrs old"
+rule "Switch from 2-Dose HepA series to 3-Dose HepA series if Dose 2 is given >= 24d and < 6m-4d from dose 1 and dose 2 is given to a patient >= 19y-4d old"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "SwitchFromHepA2DoseTo3Dose"
@@ -123,7 +123,7 @@ rule "Switch from 2-Dose HepA series to 3-Dose HepA series if Dose 2 is given >=
 			- the name of the Series is "HepAAdult3DoseSeries"
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
-		Confirm elapsed time between $dtBirthDate and $dtAdministrationDateTwo >= "18y"
+		Confirm elapsed time between $dtBirthDate and $dtAdministrationDateTwo >= "19y-4d"
 		Confirm elapsed time between $dtAdministrationDateOne and $dtAdministrationDateTwo < "6m-4d"
 		Confirm elapsed time between $dtAdministrationDateOne and $dtAdministrationDateTwo >= "24d"
 	then
