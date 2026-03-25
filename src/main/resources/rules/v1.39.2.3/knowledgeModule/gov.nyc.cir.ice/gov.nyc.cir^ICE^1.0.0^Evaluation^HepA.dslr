@@ -67,7 +67,7 @@ rule "HepA: Shot 2 Valid if administered >= 6 months from Dose 1, even if there 
 		Log that this dose rule fired for the dose $currentDose in the Series $associatedTargetSeries 
 end 
 
-
+/*
 rule "Switch from 2-Dose HepA series to 3-Dose HepA series if CVX 83 (Hep A, ped/adol, 2 dose) or CVX 84 (Hep A, ped/adol, 3 dose) or CVX 31 (Hep A, pediatric, unspecified formulation) is given to a patient >= 19 years old as dose 1 or dose 2 "
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
@@ -131,7 +131,7 @@ rule "Switch from 2-Dose HepA series to 3-Dose HepA series if Dose 2 is given >=
 		Refresh all facts in the Series $targetSeries for Evaluation
 		Log that this Series Rule fired for the Series $targetSeries
 end
-
+*/
 
 rule "Evaluate as invalid for Hep A Twinrix administration for patients below 18 years old"
 	dialect "mvel"

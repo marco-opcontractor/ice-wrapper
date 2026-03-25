@@ -1588,9 +1588,8 @@ rule "SeriesSelection.HepADoNOTSelectAlreadyCompleteSeriesWithFewestDosesIfExist
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
 end
 
-
-// Select 2-dos series by default. Note that additional series selection rules for Hep A are not required since the rules "switch" from 2-dose to 3-dose during evaluation 
-// in all circumstances when needed.
+// Select 2-dos series by default. Note that additional series selection rules for Hep A are not required since the rules "switch"
+// from 2-dose to 3-dose during evaluation in all circumstances when needed.
 rule "SeriesSelection.SelectByDefaultHepA2DoseSeries"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
@@ -1610,6 +1609,7 @@ end
 
 // Select 3-dos series if 2 dose series is not eligible anymore due to patient being an adult
 // in all circumstances when needed.
+/*
 rule "SeriesSelection.SelectHepAAdult3DoseSeries when 2 dose series is not sufficient"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
@@ -1628,7 +1628,30 @@ rule "SeriesSelection.SelectHepAAdult3DoseSeries when 2 dose series is not suffi
 		$tss.setSelectedSeriesName($ts.seriesName);
 		update($ts);
 end
+*/
 
+// Select 3-dose series when a patient >= 19y-4d has an adult HepA vaccine (CVX52 or CVX104/Twinrix).
+// This intentionally excludes CVX83, CVX84, CVX31 (pediatric formulations).
+rule "SeriesSelection.SelectHepAAdult3DoseSeries when adult HepA vaccine (CVX52 or CVX104) given at >= 19y"
+    dialect "mvel"
+    agenda-group "SeriesSelection^customSeriesSelectionRules"
+    salience 80
+    activation-group "HepASeriesSelectionCheck"
+    when
+        EvaluatedPerson($dateAt19yrs : TimePeriod.addTimePeriod(demographics.birthTime, "19y-4d"))
+        $tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
+        not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", selectedSeries == true)
+        exists TargetDose(associatedTargetSeries.seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810",
+            administrationDate >= $dateAt19yrs,
+            vaccineComponent.cdsConceptName in ("ICE52", "ICE104") || administeredVaccine.cdsConceptName in ("ICE52", "ICE104"))
+        $ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.810", seriesRules.seriesName == "HepAAdult3DoseSeries", selectedSeries == false)
+    then
+        String _RULENAME = kcontext.rule.name;
+        ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesSelection: TargetSeries " + $ts);
+        $ts.setSelectedSeries(true);
+        $tss.setSelectedSeriesName($ts.seriesName);
+        update($ts);
+end
 
 // Select twinrix series when no completed HepA series and latest valid vaccine 18+ is Twinrix.
 // in all circumstances when needed.
