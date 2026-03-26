@@ -154,3 +154,43 @@ rule "Evaluate as invalid for Hep A Twinrix administration for patients below 18
 		Refresh all facts in the Series $associatedTargetSeries for Evaluation
 		Log that this Series Rule fired for the Series $associatedTargetSeries
 end
+
+// CVX83 (Hep A, ped/adol) is only valid up to age 18 inclusive (< 19y).
+// This rule explicitly invalidates standalone CVX83 given to patients >= 19.
+//
+// Twinrix (CVX104) exclusion strategy:
+//   "The vaccine administered a member of ICE83" matches BOTH standalone CVX83 AND Twinrix,
+//   because Twinrix has vaccineComponent=ICE83 (its HepA component is CVX83).
+//   The Drools DSL expands this condition as:
+//     vaccineComponent.cdsConceptName in ("ICE83") || administeredVaccine.cdsConceptName in ("ICE83")
+//   For Twinrix: "ICE83" in ("ICE83") = TRUE => first condition already passes.
+//
+//   The "There does not exist an Administered Shot - that is the same shot - a member of ICE104"
+//   pattern resolves the conflict. For Twinrix, administeredVaccine.cdsConceptName = "ICE104",
+//   so the negated pattern FINDS the shot (ICE104 membership is TRUE) and the NOT returns FALSE,
+//   preventing the rule from firing. For standalone CVX83, no ICE104 membership exists,
+//   the NOT returns TRUE, and the rule fires correctly.
+rule "Evaluate as invalid for HepA CVX83 (pediatric) if administered to patients >= 19 years old"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	salience 100
+	when
+		There is an Administered Shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.810"
+			- the vaccine administered a member of ("ICE83")
+			- make note of the date this shot was administered as $dtAdministrationDate
+			- make note of the Associated Series as $associatedTargetSeries
+		The patient information $oEvaluatedPerson must be known to complete writing this rule
+			- make note of the patient's birthdate as $dtBirthDate
+		Confirm elapsed time between $dtBirthDate and $dtAdministrationDate >= "19y"
+		There does not exist an Administered Shot
+			- that is the same shot as $currentShot
+			- the vaccine administered a member of ("ICE104")
+	then
+		Set the shot status of $currentShot to Invalid
+		Refresh all facts in the shot $currentShot
+		Include the reason for shot $currentShot Invalid due to "Above maximum age for the vaccine"
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Refresh all facts in the Series $associatedTargetSeries for Evaluation
+		Log that this Series Rule fired for the Series $associatedTargetSeries
+end
