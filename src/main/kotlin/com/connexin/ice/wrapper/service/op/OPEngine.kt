@@ -116,6 +116,7 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("extendedRsvSeasonStartMonthDay", org.joda.time.MonthDay(9, 1)))
         cmds.add(CommandFactory.newSetGlobal("extendedRsvSeasonEndMonthDay", org.joda.time.MonthDay(4, 30)))
         cmds.add(CommandFactory.newSetGlobal("februaryStartMonthDay", org.joda.time.MonthDay(2, 1)))
+        cmds.add(CommandFactory.newSetGlobal("marchStartMonthDay", org.joda.time.MonthDay(3, 1)))
         cmds.add(CommandFactory.newSetGlobal("aprilStartMonthDay", org.joda.time.MonthDay(4, 1)))
         cmds.add(CommandFactory.newSetGlobal("aprilEndMonthDay", org.joda.time.MonthDay(4, 30)))
         cmds.add(CommandFactory.newSetGlobal("isRSVHighRisk", isRsvIndicated == true))

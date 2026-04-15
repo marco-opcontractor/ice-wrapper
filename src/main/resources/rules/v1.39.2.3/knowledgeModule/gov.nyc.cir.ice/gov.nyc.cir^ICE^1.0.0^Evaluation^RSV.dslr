@@ -64,6 +64,7 @@ global java.util.Date extendedFirstRSVSeasonStart
 global java.util.Date extendedFirstRSVSeasonEnd
 global java.util.Date extendedSecondRSVSeasonStart
 global java.util.Date extendedSecondRSVSeasonEnd
+global org.joda.time.MonthDay marchStartMonthDay
 
 
 rule "RSV: Evaluate the RSV Injection as Outside RSV Season (Invalid) if it does not fall within the Season Start and Stop Dates"
@@ -768,6 +769,9 @@ rule "RSV: Validate non-high risk second season dose under 8 months with no prio
     The patient information $oEvaluatedPerson must be known to complete writing this rule
       - make note of the Patient's birthdate as $birthdate
       - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+
+    // Patient's birthday must be in March (March 1 - March 31)
+    The given date $birthdate falls within the ranges of marchStartMonthDay and rsvSeasonEndMonthDay
 
     // Current shot (Beyfortus ICE306/307 or Enflonsia ICE332)
     There is an Administered Shot $currentShot
