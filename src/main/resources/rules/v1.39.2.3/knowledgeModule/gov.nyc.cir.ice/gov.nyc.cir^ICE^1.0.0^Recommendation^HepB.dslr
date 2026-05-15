@@ -128,6 +128,77 @@ rule "Hep B: Recommend CVX 189 (Hep B adjuvanted) for the Hep B 2-dose Adult Ser
 		Set the Recommendation Vaccine for $oRecommendation to "ICE189"
 		Include the Recommendation $oRecommendation for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
 end
 
+// ─────────────────────────────────────────────────────────────────────────────
+// RULE 1 of 2 — HepB Standard Twinrix: Override routine D3 interval forecast
+//               and anchor both earliest and recommended dates to D1
+// ─────────────────────────────────────────────────────────────────────────────
+rule "HepB: Twinrix Standard - Forecast Dose 3 at 6 months from Dose 1"
+    dialect "mvel"
+    agenda-group "RecommendationForecast^customRecommendationRule"
+    activation-group "recommendationIntervalCheck"
+    salience 200
+when
+    There is a Series $targetSeries that needs forecasting
+    - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.100"
+    - the name of the Series is "HepBTwinrixSeries"
+    - the Series is not Complete
+    - the effective dose number in the Series is == 3
+
+    There is an Administered Shot $dose1
+    - the Shot belongs to the Series $targetSeries
+    - the Dose Number in the Series is == 1
+    - that has already been Evaluated and whose Shot Validity is VALID
+    - Make note of the Date this Shot was Administered as $dtDoseOne
+
+    There is an Administered Shot $dose2
+    - the Shot belongs to the Series $targetSeries
+    - the Dose Number in the Series is == 2
+    - that has already been Evaluated and whose Shot Validity is VALID
+then
+    Create a Recommendation as $r for the Series $targetSeries
+    Add "6m" to $dtDoseOne and make note of the newly calculated date as $dtCalculated
+    Set the recommendation Earliest Forecast Date for $r to $dtCalculated
+    Set the recommendation Recommended Forecast Date for $r to $dtCalculated
+    Include the Recommendation $r for Consideration in the final forecast of the Series
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RULE 2 of 2 — HepA Accelerated Twinrix: Override routine D4 interval forecast
+//               and anchor both earliest and recommended dates to D1
+// ─────────────────────────────────────────────────────────────────────────────
+rule "HepB: Twinrix Accelerated - Forecast Dose 4 at 12 months from Dose 1"
+    dialect "mvel"
+    agenda-group "RecommendationForecast^customRecommendationRule"
+    activation-group "routineRecommendationInterval"
+    salience 1000
+when
+    There is a Series $targetSeries that needs forecasting
+    - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.100"
+    - the name of the Series is "HepBTwinrixAcceleratedSeries"
+    - the Series is not Complete
+    - the effective dose number in the Series is == 4
+
+    There is an Administered Shot $dose1
+    - the Shot belongs to the Series $targetSeries
+    - the Dose Number in the Series is == 1
+    - that has already been Evaluated and whose Shot Validity is VALID
+    - Make note of the Date this Shot was Administered as $dtDoseOne
+
+    There is an Administered Shot $dose3
+    - the Shot belongs to the Series $targetSeries
+    - the Dose Number in the Series is == 3
+    - that has already been Evaluated and whose Shot Validity is VALID
+then
+    Create a Recommendation as $r for the Series $targetSeries
+    Add "12m" to $dtDoseOne and make note of the newly calculated date as $dtCalculated
+    Set the recommendation Earliest Forecast Date for $r to $dtCalculated
+    Set the recommendation Recommended Forecast Date for $r to $dtCalculated
+    Include the Recommendation $r for Consideration in the final forecast of the Series
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
