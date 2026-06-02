@@ -2,6 +2,7 @@ package com.connexin.ice.wrapper.service.op
 
 import com.connexin.ice.wrapper.Constants
 import com.connexin.ice.wrapper.model.Interpretation
+import com.connexin.ice.wrapper.model.Vaccine
 import com.connexin.ice.wrapper.model.VaccineReport
 import com.connexin.ice.wrapper.service.AbstractEngine
 import com.connexin.ice.wrapper.service.IEngine
@@ -95,7 +96,7 @@ class OPEngine(
         }
 
         // Calculate first and second RSV seasons
-        val rsvSeasonDates = calculateRsvSeasonDates(vaccineReport.dateOfBirth)
+        val rsvSeasonDates = calculateRsvSeasonDates(vaccineReport.dateOfBirth, vaccineReport.vaccines, mommyVaxGiven)
 
         val cmds = mutableListOf<Command<*>>()
         cmds.add(CommandFactory.newSetGlobal("evalTime", vaccineReport.requestTime.toDate()))
@@ -116,6 +117,7 @@ class OPEngine(
         cmds.add(CommandFactory.newSetGlobal("extendedRsvSeasonStartMonthDay", org.joda.time.MonthDay(9, 1)))
         cmds.add(CommandFactory.newSetGlobal("extendedRsvSeasonEndMonthDay", org.joda.time.MonthDay(4, 30)))
         cmds.add(CommandFactory.newSetGlobal("februaryStartMonthDay", org.joda.time.MonthDay(2, 1)))
+        cmds.add(CommandFactory.newSetGlobal("marchStartMonthDay", org.joda.time.MonthDay(3, 1)))
         cmds.add(CommandFactory.newSetGlobal("aprilStartMonthDay", org.joda.time.MonthDay(4, 1)))
         cmds.add(CommandFactory.newSetGlobal("aprilEndMonthDay", org.joda.time.MonthDay(4, 30)))
         cmds.add(CommandFactory.newSetGlobal("isRSVHighRisk", isRsvIndicated == true))
@@ -370,6 +372,9 @@ class OPEngine(
                 FOCAL_PERSON_ID
             )
         )
+        // CVX codes for RSV vaccines/mAbs evaluated by the RSV rules
+        // (306/307 = Beyfortus, 332 = Enflonsia, 93 = Synagis)
+        private val RSV_CVX_CODES: Set<String> = setOf("306", "307", "332", "93")
     }
 
     private data class RsvSeasonDates(
@@ -383,7 +388,7 @@ class OPEngine(
         val extendedSecondSeasonEnd: LocalDate,
     )
 
-    private fun calculateRsvSeasonDates(birthdate: LocalDate): RsvSeasonDates {
+    private fun calculateRsvSeasonDates(birthdate: LocalDate, vaccines: List<Vaccine>, mommyVaxGiven: Boolean): RsvSeasonDates {
         // Define constant season boundaries
         val standardSeason = SeasonBoundary(
             startMonth = Month.OCTOBER,
@@ -399,24 +404,34 @@ class OPEngine(
             endDay = 30
         )
 
-        // Determine if baby was born after RSV season (April 1st or later)
-        val isBornAfterRSVSeason = birthdate.monthValue >= 4
+        // Edge case for April-born babies: anchor the 1st extended RSV season to the prior
+        // September (Sep - Apr 30) when either:
+        //  - the first RSV dose is also given in the same April (the dose belongs to the
+        //    still-ongoing extended season), or
+        //  - a valid maternal RSV vaccination is documented (counts as a 1st-season dose).
+        val firstRsvDoseDate = vaccines
+            .filter { it.cvx in RSV_CVX_CODES }
+            .minByOrNull { it.date }
+            ?.date
 
-        return if (isBornAfterRSVSeason) {
-            // Baby born April-December: gets upcoming seasons
-            buildSeasonDates(
-                birthYear = birthdate.year,
-                standardSeason = standardSeason,
-                extendedSeason = extendedSeason
-            )
-        } else {
-            // Baby born January-March: gets previous seasons
-            buildSeasonDates(
-                birthYear = birthdate.year - 1,
-                standardSeason = standardSeason,
-                extendedSeason = extendedSeason
-            )
+        val isAprilBorn = birthdate.monthValue == 4
+        val hasAprilFirstDose = firstRsvDoseDate != null &&
+                firstRsvDoseDate.monthValue == 4 &&
+                firstRsvDoseDate.year == birthdate.year
+        val aprilBornEdgeCase = isAprilBorn && (hasAprilFirstDose || mommyVaxGiven)
+
+        val birthYear = when {
+            aprilBornEdgeCase -> birthdate.year - 1
+            // Default: baby born April-December gets upcoming seasons; January-March gets previous.
+            birthdate.monthValue >= 4 -> birthdate.year
+            else -> birthdate.year - 1
         }
+
+        return buildSeasonDates(
+            birthYear = birthYear,
+            standardSeason = standardSeason,
+            extendedSeason = extendedSeason
+        )
     }
 
     // Function to build season dates for a given base year
