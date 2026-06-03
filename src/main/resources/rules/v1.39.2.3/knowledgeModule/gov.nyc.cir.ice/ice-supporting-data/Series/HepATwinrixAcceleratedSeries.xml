@@ -21,7 +21,7 @@
         <ns2:latestRecommendedInterval>12m</ns2:latestRecommendedInterval>
     </ns2:doseInterval>
     <ns2:doseInterval>
-        <ns2:fromDoseNumber>3</ns2:fromDoseNumber>
+        <ns2:fromDoseNumber>1</ns2:fromDoseNumber>
         <ns2:toDoseNumber>4</ns2:toDoseNumber>
         <ns2:absoluteMinimumInterval>12m-4d</ns2:absoluteMinimumInterval>
         <ns2:minimumInterval>12m</ns2:minimumInterval>
