@@ -409,7 +409,6 @@ then
     Log that this dose rule fired for the dose $currentDose in the Series $series
 end
 
-/*
 // ─────────────────────────────────────────────────────────────────────────────
 // Explicitly mark INVALID if dose 3 is too early (< 6m-4d from D1)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -439,4 +438,3 @@ then
     Record that this dose rule was Processed for the TargetDose $currentDose
     Log that this dose rule fired for the dose $currentDose in the Series $series
 end
-*/
