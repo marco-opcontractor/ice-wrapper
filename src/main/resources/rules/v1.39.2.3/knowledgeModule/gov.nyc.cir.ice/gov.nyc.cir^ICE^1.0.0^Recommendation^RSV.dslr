@@ -132,6 +132,51 @@ rule "RSV: Ideal Date High Recommendation Outside season, Move recommendation da
     Log that this Series Rule fired for the Series $evaluatedTargetSeries
 end
 
+// ─────────────────────────────────────────────────────────────────────────────
+// RSV: Non-high-risk, no mommyVax, no valid dose, still under 8 months, and this
+// patient's OWN first RSV season has already ended (evalTime is on/after
+// firstRSVSeasonEnd). Freeze minDate/idealDateLow/idealDateHigh at the first
+// season's end (Mar 31) instead of letting the generic "outside season" rules
+// push them to next Oct 1 or clamp them to evalTime, which otherwise inverts or
+// mis-anchors the window.
+// Note: firstRSVSeasonEnd (not the generic rsvSeasonStartMonthDay/EndMonthDay
+// wrap-check) is used deliberately, because once a second season has started,
+// evalTime falls back "inside" the generic Oct-Mar range even though this
+// patient's own first season ended months earlier - the generic check alone
+// would miss that case.
+// Runs with a salience lower than the two generic date-repositioning rules above
+// (60/70) so it fires after them and its writes are the final ones.
+// ─────────────────────────────────────────────────────────────────────────────
+rule "RSV: If non-high-risk, no mommyVax, no valid dose and under 8 months after first season ends, freeze forecast at first season end"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 55
+	when
+		There is a Series $evaluatedTargetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- the series is not complete
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		There does not exist an Administered Shot
+			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+			- the vaccine administered a member of ("ICE93", "ICE306", "ICE307", "ICE332")
+			- that has already been evaluated and whose shot validity is VALID or ACCEPTED
+			- the shot is not ignored
+		Confirm the variable isRSVHighRisk is == false
+		Confirm the variable wasMommyVaxGiven is == false
+		Confirm elapsed time between $birthDate and evalTime < "8m"
+		Confirm the date evalTime is on the same date or after firstRSVSeasonEnd
+	then
+		Set the final earliest date date for the series $evaluatedTargetSeries to the date of evalTime
+		Set the final recommended date for the series $evaluatedTargetSeries to the date of evalTime
+		Set the Final Recommendation Overdue Forecast Date on series $evaluatedTargetSeries to evalTime
+		Set the final earliest date date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+		Set the final recommended date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+		Set the final overdue forecast date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+		Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
+		Log that this Series Rule fired for the Series $evaluatedTargetSeries
+end
+
 rule "RSV: Complete series after 2 valid doses (last valid dose beyfortus in the second season)"
   agenda-group "RecommendationForecast^postCustomRecommendationCheck"
   salience 100 // Higher priority

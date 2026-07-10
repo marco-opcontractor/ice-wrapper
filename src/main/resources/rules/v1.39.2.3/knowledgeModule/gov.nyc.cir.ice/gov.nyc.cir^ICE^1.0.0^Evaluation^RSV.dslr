@@ -847,11 +847,7 @@ rule "RSV: Validate non-high risk second season dose under 8 months with no prio
 	when
     // Patient information
     The patient information $oEvaluatedPerson must be known to complete writing this rule
-      - make note of the Patient's birthdate as $birthdate
       - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
-
-    // Patient's birthday must be in March (March 1 - March 31)
-    The given date $birthdate falls within the ranges of marchStartMonthDay and rsvSeasonEndMonthDay
 
     // Current shot (Beyfortus ICE306/307 or Enflonsia ICE332)
     There is an Administered Shot $currentShot
@@ -861,6 +857,12 @@ rule "RSV: Validate non-high risk second season dose under 8 months with no prio
         - make note of the date this shot was administered as $currentShotAdministrationDate
         - make note of the associated series as $associatedTargetSeries
         - the Rule "RSV: Validate non-high risk second season dose under 8 months with no prior valid doses" has not been executed before for this Dose
+
+    // Confirm this patient's own first season had already ended by the time of this
+    // shot - replaces the old "birthdate must be in March" heuristic, which missed
+    // February-born (and any other late-first-season-born) patients in this same
+    // situation: no dose in a first season that ends before they turn 8 months old.
+    Confirm the date $currentShotAdministrationDate is on the same date or after firstRSVSeasonEnd
 
     // Patient is NOT high risk nor MommyVax was given
 		Confirm the variable wasMommyVaxGiven is == false
