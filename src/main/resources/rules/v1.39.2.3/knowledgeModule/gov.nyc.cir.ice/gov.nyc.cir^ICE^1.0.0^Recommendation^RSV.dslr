@@ -132,21 +132,6 @@ rule "RSV: Ideal Date High Recommendation Outside season, Move recommendation da
     Log that this Series Rule fired for the Series $evaluatedTargetSeries
 end
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RSV: Non-high-risk, no mommyVax, no valid dose, still under 8 months, and this
-// patient's OWN first RSV season has already ended (evalTime is on/after
-// firstRSVSeasonEnd). Freeze minDate/idealDateLow/idealDateHigh at the first
-// season's end (Mar 31) instead of letting the generic "outside season" rules
-// push them to next Oct 1 or clamp them to evalTime, which otherwise inverts or
-// mis-anchors the window.
-// Note: firstRSVSeasonEnd (not the generic rsvSeasonStartMonthDay/EndMonthDay
-// wrap-check) is used deliberately, because once a second season has started,
-// evalTime falls back "inside" the generic Oct-Mar range even though this
-// patient's own first season ended months earlier - the generic check alone
-// would miss that case.
-// Runs with a salience lower than the two generic date-repositioning rules above
-// (60/70) so it fires after them and its writes are the final ones.
-// ─────────────────────────────────────────────────────────────────────────────
 rule "RSV: If non-high-risk, no mommyVax, no valid dose and under 8 months after first season ends, freeze forecast at first season end"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	salience 55
