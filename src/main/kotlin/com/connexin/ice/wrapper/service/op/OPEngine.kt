@@ -90,6 +90,8 @@ class OPEngine(
                         it == Constants.FlagConstants.FLAG_MENB_HIGH_RISK
             }
         } ?: true
+
+        // Maternal Vaccination (Mommy Vax)
         val mommyVaxGiven = vaccineReport.indicators.any {
             it.interpretation == Interpretation.PREGNANCY_VACCINATED && it.code == Constants.DiseaseCodes.ICE_RSV_DISEASE_CODE
                     && it.date.isBefore(vaccineReport.dateOfBirth.minusDays(13))
