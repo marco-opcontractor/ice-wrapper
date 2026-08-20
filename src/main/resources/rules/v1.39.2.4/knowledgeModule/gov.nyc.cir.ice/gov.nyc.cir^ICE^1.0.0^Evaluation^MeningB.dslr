@@ -1,0 +1,635 @@
+/**
+ * Copyright (C) 2023 New York City Department of Health and Mental Hygiene, Bureau of Immunization
+ * Contributions by HLN Consulting, LLC
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. You should have received a copy of the GNU Lesser
+ * General Public License along with this program. If not, see <http://www.gnu.org/licenses/> for more
+ * details.
+ *
+ * The above-named contributors (HLN Consulting, LLC) are also licensed by the New York City
+ * Department of Health and Mental Hygiene, Bureau of Immunization to have (without restriction,
+ * limitation, and warranty) complete irrevocable access and rights to this project.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; THE
+ *
+ * SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING,
+ * BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS, IF ANY, OR DEVELOPERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES, OR OTHER LIABILITY OF ANY KIND, ARISING FROM, OUT OF, OR IN CONNECTION WITH
+ * THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * For more information about this software, see http://www.hln.com/ice or send
+ * correspondence to ice@hln.com.
+ */
+
+package knowledgeModule.gov.nyc.cir.ice
+
+import java.util.List
+import java.util.Set
+import org.opencds.vmr.v1_0.internal.EvalTime
+import org.opencds.vmr.v1_0.internal.EvaluatedPerson
+import org.cdsframework.ice.service.DiseaseImmunity
+import org.cdsframework.ice.service.DoseRule
+import org.cdsframework.ice.service.DoseStatus
+import org.cdsframework.ice.service.ICEFactTypeFinding
+import org.cdsframework.ice.service.ICELogicHelper
+import org.cdsframework.ice.service.RecommendationStatus
+import org.cdsframework.ice.service.SeriesRules
+import org.cdsframework.ice.supportingdatatmp.SupportedFactConcept
+import org.cdsframework.ice.service.TargetDose
+import org.cdsframework.ice.service.TargetSeries
+import org.cdsframework.ice.util.TimePeriod
+import org.cdsframework.ice.util.TimePeriod.DurationType
+import org.cdsframework.ice.service.Vaccine
+
+expander ../../knowledgeCommon/org.cdsframework.ice/org.cdsframework^ICE^1.0.0.dsl
+
+global java.util.Date evalTime
+global java.lang.Boolean isMenBHighRisk
+global java.lang.Boolean isMenBSharedDecision
+global java.lang.Boolean isEmptyMenBIndicators
+
+
+// CVX 164 (Meningococcal B, NOS) is not listed in the table above because it does not count toward the completion of the Meningococcal B series. CVX 164 is categorized in the "Other Vaccine Group". 
+// (Reference the General Rules for more details.) If CVX 164 is reported, then evaluate as EVALUATION_NOT_STARTED (new evaluation code) and the reason code is VACCINE_NOT_SUPPORTED (new reason code). Ignore
+// he reported CVX 164 when determining the recommended vaccine and calculating the recommended due date for the next target dose. 
+//
+// AI: Confirm if this should be displayed in the Meningococcal B vaccine group, or the Other Vaccine Group
+
+
+/*************************************************************************************************************************************************************************************
+MenB FHbp 2-dose Series specific rules
+*************************************************************************************************************************************************************************************/
+
+// If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
+// Ignore the reported CVX 163 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
+// This rule applies regardless of series completion status to ensure proper cross-vaccine invalidation
+rule "Mening B / FHbp series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "allowableVaccineCheck"
+	when
+		There is an administered shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
+			- the vaccine administered is "ICE163"
+			- make note of the associated series as $targetSeries
+	then
+		Include the reason for shot $currentShot Accepted due to "Vaccine Not Counted Based on Most Recent Vaccine Given"
+		Mark the shot $currentShot as Ignored
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+
+rule "Mening B / FHbp series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN" extends
+		"Mening B / FHbp series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "doseIntervalCheck"
+	when
+		// Nothing to do
+	then
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+
+rule "Mening B / FBhp series: Do not invoke default Absolute Minimum Age check for CVX 163 administered >= 10yrs-4days of age"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "doseAgeCheck"
+	when
+		There is an administered shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
+			- the vaccine administered is "ICE163"
+			- make note of the date this shot was administered as $shotDate
+			- make note of the associated series as $targetSeries
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthdate
+		Confirm Elapsed time between $birthdate and $shotDate >= "10y-4d"	
+	then
+		// Do nothing - overrides default absolute minimum age check
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+
+/*************************************************************************************************************************************************************************************
+MenB FHbp 2-dose Series specific rules END
+*************************************************************************************************************************************************************************************/
+
+
+/*************************************************************************************************************************************************************************************
+MenB FHbp 3-dose Series specific rules
+*************************************************************************************************************************************************************************************/
+
+// Absolute minimum interval between Dose 1 and Dose 3o in Men B FHbp 3-dose series of 0 days
+// Nothing to do
+
+
+// If CVX 163 (Meningococcal B 4C, OMV (Bexsero)) is reported in Men B FHbp series, evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN.
+// Ignore the reported CVX 163 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
+// This rule applies regardless of series completion status to ensure proper cross-vaccine invalidation
+rule "MeningB: FHbp series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "allowableVaccineCheck"
+	when
+		There is an administered shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenBFHbpSeries"
+			- the vaccine administered is "ICE163"
+			- make note of the associated series as $targetSeries
+	then
+		Include the reason for shot $currentShot Accepted due to "Vaccine Not Counted Based on Most Recent Vaccine Given"
+		Mark the shot $currentShot as Ignored
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+
+rule "Mening B / FHbp 3-dose series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN" extends 
+		"MeningB: FHbp series : Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "doseIntervalCheck"
+	when
+		// Nothing to do
+	then
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+/*************************************************************************************************************************************************************************************
+MenB FHbp 3-dose Series specific rules END
+*************************************************************************************************************************************************************************************/
+
+
+/*************************************************************************************************************************************************************************************
+MenB 4C 2-dose Series specific rules
+*************************************************************************************************************************************************************************************/
+
+// If CVX 162 (Meningococcal B FHbp, recombinant (Trumenba)) is reported, then evaluate as Accepted and the reason code is VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN
+// Ignore the reported CVX 162 when determining the recommended vaccine and calculating the recommended due date for the next target dose.
+// This rule applies regardless of series completion status to ensure proper cross-vaccine invalidation
+rule "MeningB: MenB 4C 2-dose Series: Evaluate CVX 162 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "allowableVaccineCheck"
+	when
+		There is an administered shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835" and the Series with name "MenB4C2DoseSeries"
+			- the vaccine administered is "ICE162"
+			- make note of the associated series as $targetSeries
+	then
+		Include the reason for shot $currentShot Accepted due to "Vaccine Not Counted Based on Most Recent Vaccine Given"
+		Mark the shot $currentShot as Ignored
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+
+rule "Mening B / MenB 4C 2-dose Series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN" extends 
+		"MeningB: MenB 4C 2-dose Series: Evaluate CVX 162 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule"
+	activation-group "doseIntervalCheck"
+	when
+		// Nothing to do
+	then
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+rule "MeningB: 4C 2-dose Series: Evaluate Invalid third dose for Men B 4C 2-dose Series when two previous shots before Oct 24, 2024"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	activation-group "allowableVaccineCheck"
+	salience 989
+	when
+    // Patient Information
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the Patient's birthdate as $birthdate
+		There is an administered shot $currentShot
+			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
+			- the vaccine administered is "ICE163"
+			- the series that the shot belongs to is complete
+			- make note of the associated series as $targetSeries
+			- make note of the date this shot was administered as $currentShotDate
+		There is an administered shot $previousShot
+		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+		  - the vaccine administered is "ICE163"
+		  - the administration date of the shot is < $currentShotDate
+		  - that has already been evaluated and whose Shot Validity is VALID
+		  - the shot is not ignored
+		  - the administration date of the shot is < "24-Oct-2024"
+		  - make note of the date this shot was administered as $previousShotDate
+		There is an administered shot $previousShot2
+		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+		  - the vaccine administered is "ICE163"
+		  - the administration date of the shot is < $previousShotDate
+		  - that has already been evaluated and whose Shot Validity is VALID
+		  - the shot is not ignored
+		  - the administration date of the shot is < "24-Oct-2024"
+		  - make note of the date this shot was administered as $previousShot2Date
+		// Age Validations - ensure patient was 16+ for both doses
+    Confirm Elapsed time between $birthdate and $previousShotDate >= "16y-4d"
+    Confirm Elapsed time between $birthdate and $previousShot2Date >= "16y-4d"
+    Confirm the variable isMenBHighRisk is == false
+	then
+	  Set the shot status of $currentShot to Invalid
+		Include the reason for shot $currentShot Invalid due to "Third dose is not indicated for completed the MenB 4C 2-dose"
+		Refresh all facts in the shot $currentShot
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+end
+
+rule "MeningB: 4C 3-dose Series: Evaluate Invalid fourth dose for Men B 4C 3-dose Series for High Risk Patients when three previous shots before Oct 24, 2024"
+    dialect "mvel"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    activation-group "allowableVaccineCheck"
+    salience 990
+    when
+        // Patient Information
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+    		There is an administered shot $currentShot
+    			- the shot belongs to the Series with name a member of ("MenB4C2DoseSeries")
+    			- the vaccine administered is "ICE163"
+    			- the series that the shot belongs to is complete
+          - that has already been evaluated and whose Shot Validity is VALID or ACCEPTED
+    			- make note of the associated series as $targetSeries
+    			- make note of the date this shot was administered as $currentShotDate
+    		There is an administered shot $previousShot
+    		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+    		  - the vaccine administered is "ICE163"
+    		  - the administration date of the shot is < $currentShotDate
+    		  - that has already been evaluated and whose Shot Validity is VALID
+    		  - the shot is not ignored
+    		  - make note of the date this shot was administered as $previousShotDate
+    		There is an administered shot $previousShot2
+    		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+    		  - the vaccine administered is "ICE163"
+    		  - the administration date of the shot is < $previousShotDate
+    		  - that has already been evaluated and whose Shot Validity is VALID
+    		  - the shot is not ignored
+    		  - the administration date of the shot is < "24-Oct-2024"
+    		  - make note of the date this shot was administered as $previousShot2Date
+    		There is an administered shot $previousShot3
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the vaccine administered is "ICE163"
+          - the administration date of the shot is < $previousShot2Date
+          - that has already been evaluated and whose Shot Validity is VALID
+          - the shot is not ignored
+          - the administration date of the shot is < "24-Oct-2024"
+          - make note of the date this shot was administered as $previousShot3Date
+    		// Age Validations - ensure patient was 16+ for both doses
+        Confirm Elapsed time between $birthdate and $previousShotDate >= "16y-4d"
+        Confirm Elapsed time between $birthdate and $previousShot2Date >= "16y-4d"
+        Confirm the variable isMenBHighRisk is == true
+    	then
+    	  Set the shot status of $currentShot to Invalid
+    		Include the reason for shot $currentShot Invalid due to "Vaccine not Permitted for this Dose"
+    		Refresh all facts in the shot $currentShot
+    		Record that this dose rule was Processed for the TargetDose $currentShot
+    		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+    end
+
+/*************************************************************************************************************************************************************************************
+MenB 4C 2-dose Series specific rules
+*************************************************************************************************************************************************************************************/
+
+/*************************************************************************************************************************************************************************************
+MenB FHbp 3-dose Series specific rules
+*************************************************************************************************************************************************************************************/
+
+rule "Mening B Trumenba: Invalidate doses given at age 26+ years"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    salience 100  // High priority to catch invalid doses first
+    no-loop true
+    dialect "mvel"
+    when
+        // Find any MenB Trumenba/Bexsero dose
+        There is an Administered Shot $shot
+            - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+            - that has already been evaluated and whose shot validity is VALID
+            - make note of the associated series as $targetSeries
+            - make note of the date this shot was administered as $shotDate
+
+        // Get patient info
+        The Patient information $patientInfo must be known to complete writing this rule
+            - make note of the Patient's birthdate as $birthdate
+
+        // Check if shot was given at/after 26 years old
+        Confirm elapsed time between $birthdate and $shotDate >= "26y"
+        Confirm the variable isMenBHighRisk is == true
+        Confirm the variable isMenBSharedDecision is == false
+    then
+        Set the Shot Status of $shot to Invalid
+        Remove all evaluation reasons from shot $shot
+        Include the reason for shot $shot Invalid due to "Above Recommended Age for Series"
+        Refresh all facts in the shot $shot
+        Record that this dose rule was Processed for the TargetDose $shot
+        Log that this dose rule fired for the dose $shot in the Series $targetSeries
+end
+
+rule "Mening B: Invalidate doses given at age 24+ years"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    salience 100  // High priority to catch invalid doses first
+    no-loop true
+    dialect "mvel"
+    when
+        // Find any MenB Trumenba dose
+        There is an Administered Shot $shot
+            - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+            - that has already been evaluated and whose shot validity is VALID
+            - make note of the associated series as $targetSeries
+            - make note of the date this shot was administered as $shotDate
+
+        // Get patient info
+        The Patient information $patientInfo must be known to complete writing this rule
+            - make note of the Patient's birthdate as $birthdate
+
+        // Check if shot was given at/after 24 years old
+        Confirm elapsed time between $birthdate and $shotDate >= "24y"
+        Confirm the variable isMenBSharedDecision is == true
+        Confirm the variable isMenBHighRisk is == false
+    then
+        Set the Shot Status of $shot to Invalid
+        Remove all evaluation reasons from shot $shot
+        Include the reason for shot $shot Invalid due to "Above Recommended Age for Series"
+        Refresh all facts in the shot $shot
+        Record that this dose rule was Processed for the TargetDose $shot
+        Log that this dose rule fired for the dose $shot in the Series $targetSeries
+end
+
+rule "Mening B: Invalidate doses when at Not Forecast indicator before 26 years"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    salience 99
+    no-loop true
+    dialect "mvel"
+    when
+        // Find any MenB Trumenba/Bexsero dose
+        There is an Administered Shot $shot
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the shot belongs to the Series with name a member of ("MenB4C2DoseSeries", "MenBFHbpSeries")
+          - that has already been evaluated and whose shot validity is VALID
+          - make note of the associated series as $targetSeries
+          - make note of the date this shot was administered as $shotDate
+          - the Administration Date of the shot is >= "24-Oct-2024"
+
+        // Get patient info
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+
+        // Check if shot was given before 26 years old
+        Confirm elapsed time between $birthdate and $shotDate < "26y"
+
+        // Check if patient is at Not Forecast indicator
+        Confirm the variable isMenBHighRisk is == false
+        Confirm the variable isMenBSharedDecision is == false
+
+        // This condition ensures the patient is in the not forecast indicator group (SDM and High Risk are FALSE)
+        // In case isEmptyMenBIndicators is TRUE that means there are no indicators at all and this rule should not fire
+        // Confirm the variable isEmptyMenBIndicators is == false
+    then
+        Set the Shot Status of $shot to Invalid
+        Remove all evaluation reasons from shot $shot
+        Include the reason for shot $shot Invalid due to "Invalid due to Not Forecast Indicator"
+        Refresh all facts in the shot $shot
+        Record that this dose rule was Processed for the TargetDose $shot
+        Log that this dose rule fired for the dose $shot in the Series $targetSeries
+end
+
+rule "Mening B: Invalidate doses given at age 26+ years"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    salience 99
+    no-loop true
+    dialect "mvel"
+    when
+        // Find any MenB Trumenba/Bexsero dose
+        There is an Administered Shot $shot
+            - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+            - the shot belongs to the Series with name a member of ("MenB4C2DoseSeries", "MenBFHbpSeries")
+            - that has already been evaluated and whose shot validity is VALID
+            - make note of the associated series as $targetSeries
+            - make note of the date this shot was administered as $shotDate
+
+        // Get patient info
+        The Patient information $patientInfo must be known to complete writing this rule
+            - make note of the Patient's birthdate as $birthdate
+
+        // Check if shot was given at/after 26 years old
+        Confirm elapsed time between $birthdate and $shotDate >= "26y"
+        Confirm the variable isMenBHighRisk is == false
+        Confirm the variable isMenBSharedDecision is == false
+    then
+        Set the Shot Status of $shot to Invalid
+        Remove all evaluation reasons from shot $shot
+        Include the reason for shot $shot Invalid due to "Above Recommended Age for Series"
+        Refresh all facts in the shot $shot
+        Record that this dose rule was Processed for the TargetDose $shot
+        Log that this dose rule fired for the dose $shot in the Series $targetSeries
+end
+
+rule "Mening B: Invalidate doses when at SDM indicator given before 16y-4d"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    salience 99
+    no-loop true
+    dialect "mvel"
+    when
+        // Get patient info
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+          - make note of the date as $dtDateAtAge16y when the patient is "16y-4d" of age
+
+        // Find any MenB dose
+        There is an Administered Shot $shot
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the shot belongs to the Series with name a member of ("MenB4C2DoseSeries", "MenBFHbpSeries")
+          - that has already been evaluated and whose shot validity is VALID
+          - make note of the associated series as $targetSeries
+          - make note of the date this shot was administered as $shotDate
+          - the Administration Date of the shot is < $dtDateAtAge16y
+
+        // Check if shot was given before 16 years old and grace period
+        Confirm elapsed time between $birthdate and $shotDate < "16y-4d"
+
+        // Check if patient is at SDM indicator
+        Confirm the variable isMenBSharedDecision is == true
+        Confirm the variable isMenBHighRisk is == false
+    then
+        Set the Shot Status of $shot to Invalid
+        Remove all evaluation reasons from shot $shot
+        Include the reason for shot $shot Invalid due to "Outside Meningococcal Season with SDM"
+        Refresh all facts in the shot $shot
+        Record that this dose rule was Processed for the TargetDose $shot
+        Log that this dose rule fired for the dose $shot in the Series $targetSeries
+end
+
+rule "Mening B: Invalidate doses when at SDM indicator given after 24y-1d"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    salience 99
+    no-loop true
+    dialect "mvel"
+    when
+        // Get patient info
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+          - make note of the date as $dtDateAtAge23y when the patient is "24y-1d" of age
+
+        // Find any MenB dose
+        There is an Administered Shot $shot
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the shot belongs to the Series with name a member of ("MenB4C2DoseSeries", "MenBFHbpSeries")
+          - that has already been evaluated and whose shot validity is VALID
+          - make note of the associated series as $targetSeries
+          - make note of the date this shot was administered as $shotDate
+          - the Administration Date of the shot is > $dtDateAtAge23y
+
+        // Check if shot was given after 24 years old
+        Confirm elapsed time between $birthdate and $shotDate > "24y-1d"
+
+        // Check if patient is at SDM indicator
+        Confirm the variable isMenBHighRisk is == false
+        Confirm the variable isMenBSharedDecision is == true
+    then
+        Set the Shot Status of $shot to Invalid
+        Remove all evaluation reasons from shot $shot
+        Include the reason for shot $shot Invalid due to "Outside Meningococcal Season with SDM"
+        Refresh all facts in the shot $shot
+        Record that this dose rule was Processed for the TargetDose $shot
+        Log that this dose rule fired for the dose $shot in the Series $targetSeries
+end
+
+rule "Mening B: Trumemba - Invalidate pre-Oct 24 doses with NOT_FORECAST indicator given after 24y-1d"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    salience 99
+    no-loop true
+    dialect "mvel"
+    when
+        // Get patient info
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+          - make note of the date as $dtDateAtAge24y when the patient is "24y-1d" of age
+
+        // Find any MenB dose
+        There is an Administered Shot $shot
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the shot belongs to the Series with name a member of ("MenBFHbpSeries")
+          - that has already been evaluated and whose shot validity is VALID
+          - make note of the associated series as $targetSeries
+          - make note of the date this shot was administered as $shotDate
+          - the Administration Date of the shot is > $dtDateAtAge24y
+          - the administration date of the shot is < "24-Oct-2024"
+
+        // Check if patient is at NOT_FORECAST indicator
+        Confirm the variable isMenBSharedDecision is == false
+        Confirm the variable isMenBHighRisk is == false
+    then
+        Set the Shot Status of $shot to Invalid
+        Remove all evaluation reasons from shot $shot
+        Include the reason for shot $shot Invalid due to "Above Recommended Age for Series"
+        Refresh all facts in the shot $shot
+        Record that this dose rule was Processed for the TargetDose $shot
+        Log that this dose rule fired for the dose $shot in the Series $targetSeries
+end
+
+rule "MeningB: Trumemba - Invalidate pre-Oct 24 doses with NOT_FORECAST indicator given a second dose before 6m-4d"
+    dialect "mvel"
+    agenda-group "HistoryEvaluation^postEvaluationCheck"
+    activation-group "allowableVaccineCheck"
+    salience 990
+    when
+        // Patient Information
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+    		There is an administered shot $currentShot
+    			- the shot belongs to the Series with name a member of ("MenBFHbpSeries")
+    			- the vaccine administered is "ICE162"
+    			//- the series that the shot belongs to is complete
+          - that has already been evaluated and whose Shot Validity is VALID or ACCEPTED
+    			- make note of the associated series as $targetSeries
+    			- make note of the date this shot was administered as $currentShotDate
+    		There is an administered shot $previousShot
+    		  - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+    		  - the vaccine administered is "ICE162"
+    		  - the administration date of the shot is < $currentShotDate
+    		  - that has already been evaluated and whose Shot Validity is VALID
+    		  - the shot is not ignored
+    		  - make note of the date this shot was administered as $previousShotDate
+
+        // Ensure dose 2 is not INVALID - if dose 2 is invalid, don't check spacing between dose 1 and current dose
+        // This prevents the rule from firing if there's an invalid dose 2 in the series
+        There does not exist an Administered Shot
+          - the Shot belongs to the Series $targetSeries
+          - the Dose Number in the Series is == 2
+          - that has already been Evaluated and whose Shot Validity is INVALID
+
+    		// Age Validations - ensure patient was 10+ for both doses
+        Confirm Elapsed time between $birthdate and $previousShotDate >= "10y-4d"
+
+        // Validate minimum interval between doses
+        Confirm Elapsed time between $previousShotDate and $currentShotDate < "6m-4d"
+
+        // Confirm Not Forecast indicator is configured
+        Confirm the variable isMenBHighRisk is == false
+        Confirm the variable isMenBSharedDecision is == false
+
+    	then
+    	  Set the shot status of $currentShot to Invalid
+    		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
+    		Refresh all facts in the shot $currentShot
+    		Record that this dose rule was Processed for the TargetDose $currentShot
+    		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+    end
+
+    rule "MeningB: Trumemba - Invalidate pre-Oct 24 doses with NOT_FORECAST indicator given a second dose before 4m-4d"
+      dialect "mvel"
+      agenda-group "HistoryEvaluation^postEvaluationCheck"
+      activation-group "allowableVaccineCheck"
+      salience 990
+      when
+        // Patient Information
+        The Patient information $patientInfo must be known to complete writing this rule
+          - make note of the Patient's birthdate as $birthdate
+        There is an administered shot $currentShot
+          - the shot belongs to the Series with name a member of ("MenBFHbpSeries")
+          - the vaccine administered is "ICE162"
+          - that has already been evaluated and whose Shot Validity is VALID or ACCEPTED
+          - make note of the associated series as $targetSeries
+          - make note of the date this shot was administered as $currentShotDate
+        // first VALID dose
+        There is an Administered Shot $dose1
+          - the Shot belongs to the Series $targetSeries
+          - the Dose Number in the Series is == 1
+          - that has already been Evaluated and whose Shot Validity is VALID
+          - Make note of the Date this Shot was Administered as $dtAdministrationDate1
+
+        There is an administered shot $previousShot
+          - the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.835"
+          - the vaccine administered is "ICE162"
+          - the administration date of the shot is > $dtAdministrationDate1
+          - the administration date of the shot is < $currentShotDate
+          - that has already been evaluated and whose Shot Validity is INVALID
+          - make note of the date this shot was administered as $previousShotDate
+
+        // Validate minimum interval between doses (current shot too close to most recent invalid shot)
+        // Current shot must be LESS than 4m-4d after the most recent invalid shot to be invalidated
+        Confirm Elapsed time between $previousShotDate and $currentShotDate < "4m-4d"
+
+        // Confirm Not Forecast indicator is configured
+        Confirm the variable isMenBHighRisk is == false
+        Confirm the variable isMenBSharedDecision is == false
+
+        then
+          Set the shot status of $currentShot to Invalid
+          Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
+          Refresh all facts in the shot $currentShot
+          Record that this dose rule was Processed for the TargetDose $currentShot
+          Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
+      end
+/*************************************************************************************************************************************************************************************
+MenB FHbp 3-dose Series specific rules END
+*************************************************************************************************************************************************************************************/
