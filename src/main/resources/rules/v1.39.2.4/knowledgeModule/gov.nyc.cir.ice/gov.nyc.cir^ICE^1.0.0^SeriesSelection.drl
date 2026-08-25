@@ -938,16 +938,16 @@ end
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-rule "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
+rule "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 2 years series should apply"
 	dialect "mvel"
 	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS, seriesSelectionSeason!.seasonName == "COVID19Sep2023Season")
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
-		$person : EvaluatedPerson($birthDate : demographics.birthTime,  $dateAt5yrs : TimePeriod.addTimePeriod(demographics.birthTime, "5y"))
-	  exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", administrationDate < $dateAt5yrs)
+		$person : EvaluatedPerson($birthDate : demographics.birthTime,  $dateAt2yrs : TimePeriod.addTimePeriod(demographics.birthTime, "2y"))
+	  exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", administrationDate < $dateAt2yrs)
 	  or
-	  eval(evalTime.compareTo($dateAt5yrs) < 0)
+	  eval(evalTime.compareTo($dateAt2yrs) < 0)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "EarlySeriesSelection");
@@ -955,7 +955,7 @@ end
 
 
 
-rule "EarlySeriesSelection(COVID-19): In Sep2023 season, if patient is >= 5 years of age, select GTE 5 years by default if no other series was selected before"
+rule "EarlySeriesSelection(COVID-19): In Sep2023 season, if patient is >= 2 years of age, select the single-dose series by default if no other series was selected before"
 	dialect "mvel"
 	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	when
@@ -1000,7 +1000,7 @@ rule "EarlySeriesSelection(COVID-19): In the Sep2023 season, if the first dose a
 end
 
 rule "EarlySeriesSelection(COVID-19): In Sep2023 season, select Mixed series when patient is < 5 years old and Pfizer or Moderna do not apply"
-		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
+		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 2 years series should apply"
 	dialect "mvel"
 	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	salience 25
@@ -1018,7 +1018,7 @@ end
 
 
 rule "EarlySeriesSelection(COVID-19): In Sep2023 season, select the Pfizer < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the prior season are Pfizer vaccines, and all shots (if any) are in the current season are a Pfizer vaccine"
-		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
+		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 2 years series should apply"
 	dialect "mvel"
 	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	salience 30
@@ -1038,7 +1038,7 @@ end
 
 
 rule "EarlySeriesSelection(COVID-19): In Sep2023 season, select the Moderna < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the prior season are Moderna vaccines, and all shots (if any) in the current season are a Moderna vaccine"
-		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 5 years series should apply"
+		extends "EarlySeriesSelection(COVID-19 Abstract): In Sep2023 season, determine when any < 2 years series should apply"
 	dialect "mvel"
 	agenda-group "EarlySeriesSelection^customSeriesSelectionRules"
 	salience 30

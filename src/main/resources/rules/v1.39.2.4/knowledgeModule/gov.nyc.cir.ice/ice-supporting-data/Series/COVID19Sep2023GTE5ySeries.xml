@@ -9,8 +9,8 @@
     <ns2:vaccineGroup code="850" codeSystem="2.16.840.1.113883.3.795.12.100.1" codeSystemName="ICE Vaccine Group" displayName="COVID-19"/>
     <ns2:iceSeriesDose>
         <ns2:doseNumber>1</ns2:doseNumber>
-		<ns2:absoluteMinimumAge>5y</ns2:absoluteMinimumAge>
-		<ns2:earliestRecommendedAge>5y</ns2:earliestRecommendedAge>
+		<ns2:absoluteMinimumAge>2y</ns2:absoluteMinimumAge>
+		<ns2:earliestRecommendedAge>2y</ns2:earliestRecommendedAge>
 		<ns2:doseVaccine>
         	<ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="213" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="SARS-COV-2 (COVID-19) vaccine, UNSPECIFIED"/>
