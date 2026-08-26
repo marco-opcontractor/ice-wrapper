@@ -1,0 +1,706 @@
+/**
+ * Copyright (C) 2022 New York City Department of Health and Mental Hygiene, Bureau of Immunization
+ * Contributions by HLN Consulting, LLC
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. You should have received a copy of the GNU Lesser
+ * General Public License along with this program. If not, see <http://www.gnu.org/licenses/> for more
+ * details.
+ *
+ * The above-named contributors (HLN Consulting, LLC) are also licensed by the New York City
+ * Department of Health and Mental Hygiene, Bureau of Immunization to have (without restriction,
+ * limitation, and warranty) complete irrevocable access and rights to this project.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; THE
+ *
+ * SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING,
+ * BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS, IF ANY, OR DEVELOPERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES, OR OTHER LIABILITY OF ANY KIND, ARISING FROM, OUT OF, OR IN CONNECTION WITH
+ * THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * For more information about this software, see http://www.hln.com/ice or send
+ * correspondence to ice@hln.com.
+ */
+
+package knowledgeModule.gov.nyc.cir.ice
+
+import java.util.Date
+import org.opencds.vmr.v1_0.internal.datatypes.CD
+import org.opencds.vmr.v1_0.internal.EvalTime
+import org.cdsframework.ice.service.DiseaseImmunity
+import org.opencds.vmr.v1_0.internal.EvaluatedPerson
+import org.cdsframework.ice.service.ICELogicHelper
+import org.cdsframework.ice.service.Recommendation
+import org.cdsframework.ice.service.RecommendationStatus
+import org.cdsframework.ice.service.TargetDose
+import org.cdsframework.ice.service.TargetSeries
+import org.cdsframework.ice.util.TimePeriod
+import org.cdsframework.ice.util.TimePeriod.DurationType
+
+global java.util.Date evalTime
+global org.joda.time.MonthDay rsvSeasonStartMonthDay
+global org.joda.time.MonthDay rsvSeasonEndMonthDay
+global org.joda.time.MonthDay februaryStartMonthDay
+global org.joda.time.MonthDay extendedRsvSeasonStartMonthDay
+global org.joda.time.MonthDay extendedRsvSeasonEndMonthDay
+global org.joda.time.MonthDay aprilStartMonthDay
+global org.joda.time.MonthDay aprilEndMonthDay
+global java.lang.Boolean isRSVHighRisk
+global java.lang.Boolean wasMommyVaxGiven
+global java.util.Date firstRSVSeasonStart
+global java.util.Date firstRSVSeasonEnd
+global java.util.Date secondRSVSeasonStart
+global java.util.Date secondRSVSeasonEnd
+global java.util.Date extendedFirstRSVSeasonStart
+global java.util.Date extendedFirstRSVSeasonEnd
+global java.util.Date extendedSecondRSVSeasonStart
+global java.util.Date extendedSecondRSVSeasonEnd
+
+expander ../../knowledgeCommon/org.cdsframework.ice/org.cdsframework^ICE^1.0.0.dsl
+
+rule "RSV(Beyfortus): No longer recommend RSV Immunization if Beyfortus was administered and patient is NOT high risk"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	activation-group "RSVCustomRecommendation"
+	salience 65
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+    There is an Administered Shot $currentShot
+    	- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+    	- the vaccine administered a member of ("ICE306", "ICE307")
+    	- that has already been evaluated and whose shot validity is VALID or ACCEPTED
+    	- the shot is not ignored
+		Confirm the variable isRSVHighRisk is == false
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV: Recommendation previous than eval time, Move recommendation date to now"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 70
+	when
+		There is a Series $evaluatedTargetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    	- Make note of the earliest date as $pastEarliestDate
+    Confirm the date $pastEarliestDate is before evalTime
+	then
+	  //Set the final recommended date for the series $evaluatedTargetSeries to the date of evalTime
+	  Set the final earliest date date for the series $evaluatedTargetSeries to the date of evalTime
+	  Set the final recommended date for the series $evaluatedTargetSeries to the date of evalTime
+		Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
+    Log that this Series Rule fired for the Series $evaluatedTargetSeries
+end
+
+rule "RSV: Recommendation Outside season, Move recommendation date to in-season"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 60
+	when
+		There is a Series $evaluatedTargetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    	- Make note of the earliest date as $outOfSeasonDate
+    The given date $outOfSeasonDate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+	then
+	  Set the final recommended date for the series $evaluatedTargetSeries to the monthday of rsvSeasonStartMonthDay on the same year
+	  Set the final earliest date date for the series $evaluatedTargetSeries to the monthday of rsvSeasonStartMonthDay on the same year
+		Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
+    Log that this Series Rule fired for the Series $evaluatedTargetSeries
+end
+
+rule "RSV: Ideal Date High Recommendation Outside season, Move recommendation date to in-season"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 60
+	when
+		There is a Series $evaluatedTargetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- make note of the overdue date as $outOfSeasonDate
+    // Confirm Elapsed time between $finalRecommendedDate and $finalOverdueDate < "1d"
+    The given date $outOfSeasonDate does not fall within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+	then
+		Set the final overdue forecast date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+    Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
+    Log that this Series Rule fired for the Series $evaluatedTargetSeries
+end
+
+rule "RSV: If non-high-risk, no mommyVax, no valid dose and under 8 months after first season ends, freeze forecast at first season end"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 55
+	when
+		There is a Series $evaluatedTargetSeries
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- the series is not complete
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		There does not exist an Administered Shot
+			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+			- the vaccine administered a member of ("ICE93", "ICE306", "ICE307", "ICE332")
+			- that has already been evaluated and whose shot validity is VALID or ACCEPTED
+			- the shot is not ignored
+		Confirm the variable isRSVHighRisk is == false
+		Confirm the variable wasMommyVaxGiven is == false
+		Confirm elapsed time between $birthDate and evalTime < "8m"
+		Confirm the date evalTime is on the same date or after firstRSVSeasonEnd
+	then
+		Set the final earliest date date for the series $evaluatedTargetSeries to the date of evalTime
+		Set the final recommended date for the series $evaluatedTargetSeries to the date of evalTime
+		Set the Final Recommendation Overdue Forecast Date on series $evaluatedTargetSeries to evalTime
+		Set the final earliest date date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+		Set the final recommended date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+		Set the final overdue forecast date for the series $evaluatedTargetSeries to the monthday of rsvSeasonEndMonthDay on the same year
+		Record that this Series Rule was Processed for the TargetSeries $evaluatedTargetSeries
+		Log that this Series Rule fired for the Series $evaluatedTargetSeries
+end
+
+rule "RSV: Complete series after 2 valid doses (last valid dose beyfortus in the second season)"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 100 // Higher priority
+  when
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - the series is not complete
+    There is an Administered Shot $currentShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $currentShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+
+    There is an Administered Shot $previousBeyfortusShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE93", "ICE306", "ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - the administration date of the shot is < $dateAt8MonthsAge
+      - the administration date of the shot is < $currentShotAdministrationDate
+
+    The given date $currentShotAdministrationDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+
+    // Check if the dose was administered in the second RSV season
+    Confirm the date $currentShotAdministrationDate is on the same date or after extendedSecondRSVSeasonStart
+    Confirm the date $currentShotAdministrationDate is on the same date or before extendedSecondRSVSeasonEnd
+
+  then
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+end
+
+rule "RSV: No longer recommend RSV Immunization starting 20 months old using earliest recommended date"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 50
+	when
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- a forecast for the Series has been made and a recommendation date has been determined
+    	- Make note of the earliest date as $pastEarliestDate
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		Confirm elapsed time between $birthDate and $pastEarliestDate >= "20m"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV: No longer recommend RSV Immunization starting 8 months old using earliest recommended date"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	when
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- a forecast for the Series has been made and a recommendation date has been determined
+    	- Make note of the earliest date as $pastEarliestDate
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		Confirm elapsed time between $birthDate and $pastEarliestDate >= "8m"
+		Confirm the variable isRSVHighRisk is == false
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Enflonsia): No longer recommend when ACCEPTED ICE332 dose given at >= 8 months old"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 110
+	when
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+			- a forecast for the Series has been made and a recommendation date has been determined
+			- Make note of the earliest date as $earliestDate
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		There is an Administered Shot $acceptedShot
+			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+			- the vaccine administered a member of ("ICE332")
+			- that has already been evaluated and whose shot validity is ACCEPTED
+			- the shot is not ignored
+			- make note of the date this shot was administered as $acceptedShotDate
+		Confirm elapsed time between $birthDate and $acceptedShotDate >= "8m"
+		Confirm elapsed time between $birthDate and $earliestDate >= "8m"
+		Confirm the variable isRSVHighRisk is == false
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+rule "RSV: No longer recommend RSV Immunization starting 20 months old, Unless Synagis given on same season, using earliest recommended date"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience -10
+	when
+	  There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+  		- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+		  - Make note of the earliest date as $earliestRecommendedDate
+	  There is an Administered Shot $currentShot
+	    - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+		  - the vaccine administered a member of ("ICE93")
+		  - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+		  - the shot is not ignored
+		  - make note of the date this shot was administered as $latestShotAdministrationDate
+    There does not exist an Administered Shot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+		  - the vaccine administered a member of ("ICE93")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the administration date of the shot is > $latestShotAdministrationDate
+      - the shot is not ignored
+	  The Patient information $patientInfo must be known to complete writing this rule
+		  - make note of the date as $dateAt20MonthsAge when the patient is "20m-1d" of age
+	  Confirm the Date $dateAt20MonthsAge is before $earliestRecommendedDate
+	  Confirm elapsed time between $latestShotAdministrationDate and $earliestRecommendedDate > "6m"
+	  Confirm the variable isRSVHighRisk is == true
+	then
+	  Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+	  Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+	  Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Beyfortus): If patient latest vaccine was Beyfortus at least 6 months ago, move recommendation to 6 months"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	salience 25
+	activation-group "RSVCustomRecommendation"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    	- This rule "RSVCustomRecommendation" has not been executed before for this series
+	  There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+  		- the vaccine administered a member of ("ICE306", "ICE307")
+      - the administration date of the shot falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $latestShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    There does not exist an Administered Shot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the administration date of the shot is > $latestShotAdministrationDate
+      - the administration date of the shot falls within the ranges of rsvSeasonStartMonthDay and rsvSeasonEndMonthDay
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+		Confirm elapsed time between $latestShotAdministrationDate and evalTime < "6m"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.RECOMMENDED for the Series $targetSeries
+		Add "6m" to $latestShotAdministrationDate and make note of the newly calculated date as $dtCalculated
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.DUE_NOW"
+		Set the recommendation Recommended Forecast Date for $recommendation to $dtCalculated
+		Set the recommendation Earliest Forecast Date for $recommendation to $dtCalculated
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Record that the Series Rule "RSVCustomRecommendation" was processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Beyfortus): If patient has received MommyVax and recommended date is before 8 months, move to at least 8 months"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 150
+	when
+		There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+		  - Make note of the earliest date as $earliestRecommendedDate
+	  The Patient information $patientInfo must be known to complete writing this rule
+		  - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+		Confirm the variable wasMommyVaxGiven is == true
+		Confirm the date $earliestRecommendedDate is before $dateAt8MonthsAge
+	then
+		Set the final recommended date for the series $targetSeries to the date of $dateAt8MonthsAge
+	  Set the final earliest date date for the series $targetSeries to the date of $dateAt8MonthsAge
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Beyfortus): If patient has received a previous valid dose of Beyfortus and recommended date is before 8 months, move to at least 8 months"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 55
+	when
+		There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+		  - Make note of the earliest date as $earliestRecommendedDate
+	  There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+  		- the vaccine administered a member of ("ICE306", "ICE307")
+    	- that has already been evaluated and whose shot validity is VALID or ACCEPTED
+    	- the shot is not ignored
+	  The Patient information $patientInfo must be known to complete writing this rule
+		  - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+		Confirm the date $earliestRecommendedDate is before $dateAt8MonthsAge
+	then
+		Set the final recommended date for the series $targetSeries to the date of $dateAt8MonthsAge
+	  Set the final earliest date date for the series $targetSeries to the date of $dateAt8MonthsAge
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Enflonsia): If high-risk patient has received a previous valid dose of Enflonsia and recommended date is before 8 months, move to at least 8 months"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	salience 151
+	when
+		There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+		  - Make note of the earliest date as $earliestRecommendedDate
+	  There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+  		- the vaccine administered a member of ("ICE332")
+    	- that has already been evaluated and whose shot validity is VALID or ACCEPTED
+    	- the shot is not ignored
+	  The Patient information $patientInfo must be known to complete writing this rule
+		  - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+		Confirm the date $earliestRecommendedDate is before $dateAt8MonthsAge
+		Confirm the variable isRSVHighRisk is == true
+	then
+		Set the final recommended date for the series $targetSeries to the date of $dateAt8MonthsAge
+	  Set the final earliest date date for the series $targetSeries to the date of $dateAt8MonthsAge
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Enflonsia): If high-risk patient has valid Enflonsia in 1st season, recommend 2nd season start or DOB+8m (whichever is later)"
+  dialect "mvel"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 152  // Higher than the "move to 8 months" rule (151)
+  when
+    There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+    There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $latestShotDate
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    // Confirm the shot was in the 1st extended season
+    The given date $latestShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+    Confirm the date $latestShotDate is on the same date or after extendedFirstRSVSeasonStart
+    Confirm the date $latestShotDate is on the same date or before extendedFirstRSVSeasonEnd
+    // Confirm high-risk patient
+    Confirm the variable isRSVHighRisk is == true
+  then
+    // Calculate the later of: 2nd season start OR DOB + 8 months
+    Calculate the latter of secondRSVSeasonStart and $dateAt8MonthsAge and save Calculated Date as $recommendedDate
+    Set the final recommended date for the series $targetSeries to the date of $recommendedDate
+    Set the final earliest date date for the series $targetSeries to the date of $recommendedDate
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Enflonsia): Override maximum age check on APRIL-born patients for high-risk patients in season"
+    dialect "mvel"
+    agenda-group "HistoryEvaluation^customEvaluationRule"
+    activation-group "maximumAgeVaccineCheck"
+    salience 35
+    when
+        There is an administered shot $administeredShot that needs to be evaluated
+            - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+            - the vaccine administered a member of ("ICE332")
+            - make note of the date this shot was administered as $currentShotDate
+            - make note of the Associated Series as $associatedTargetSeries
+        // Confirm patient is high-risk
+        Confirm the variable isRSVHighRisk is == true
+        Confirm the variable wasMommyVaxGiven is == false
+
+        // Confirm shot is in RSV season (extended season month/day range)
+        The given date $currentShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+    then
+        // Override maximum age vaccine check for high-risk patients
+        Record that this dose rule was Processed for the TargetDose $administeredShot
+        Log that this dose rule fired for the dose $administeredShot in the Series $associatedTargetSeries
+end
+
+rule "RSV(Enflonsia): If high-risk April-born patient received Enflonsia in April, recommend 2nd dose in 2nd season"
+  dialect "mvel"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 152  // Higher than the 8-month rule (151)
+  when
+    There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - Make note of the earliest date as $earliestRecommendedDate
+    There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $latestShotAdministrationDate
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+      - make note of the Patient's birthdate as $birthDate
+    // Check if birthdate is in April (April 1 - April 30)
+    The given date $birthDate falls within the ranges of aprilStartMonthDay and aprilEndMonthDay
+    // Check if shot was in 1st EXTENDED season (Sept-Apr), not just April
+    The given date $latestShotAdministrationDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+    Confirm the date $latestShotAdministrationDate is on the same date or after extendedFirstRSVSeasonStart
+    Confirm the date $latestShotAdministrationDate is on the same date or before extendedFirstRSVSeasonEnd
+    //Confirm the date $earliestRecommendedDate is before $dateAt8MonthsAge
+    Confirm the variable isRSVHighRisk is == true
+  then
+    // Set forecast to 2nd standard season start (October)
+    Set the final recommended date for the series $targetSeries to the date of secondRSVSeasonStart
+    Set the final earliest date date for the series $targetSeries to the date of secondRSVSeasonStart
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Enflonsia): If high-risk April-born patient received Enflonsia in April, set overdue date to end of 2nd season"
+  dialect "mvel"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 152  // Same as the other April rule
+  when
+    There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - make note of the overdue date as $overdueDate
+    There is an Administered Shot $latestShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $latestShotAdministrationDate
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the Patient's birthdate as $birthDate
+    // Check if birthdate is in April (April 1 - April 30)
+    The given date $birthDate falls within the ranges of aprilStartMonthDay and aprilEndMonthDay
+    // Check if shot was in April (same month as birth)
+    The given date $latestShotAdministrationDate falls within the ranges of aprilStartMonthDay and aprilEndMonthDay
+    Confirm the variable isRSVHighRisk is == true
+  then
+    // Set overdue date to end of 2nd standard season (March 31)
+    Set the Final Recommendation Overdue Forecast Date on series $targetSeries to firstRSVSeasonEnd
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(Edge case): If patient was born between February and March, stop recommending once they have 18 months"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+	when
+		There is a Series $targetSeries
+      - a forecast for the Series has been made and a recommendation date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+		  - Make note of the earliest date as $earliestRecommendedDate
+	  The Patient information $patientInfo must be known to complete writing this rule
+		  - make note of the date as $dateAt18MonthsAge when the patient is "18m" of age
+		  - make note of the Patient's birthdate as $birthDate
+		The given date $birthDate falls within the ranges of februaryStartMonthDay and rsvSeasonEndMonthDay
+		Confirm the date $dateAt18MonthsAge is before $earliestRecommendedDate
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+	  Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+//
+rule "RSV: Complete series after 1 Enflonsia valid dose (or valid dose in the first season) with no mommyvax"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 100 // Higher priority
+  when
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - the series is not complete
+    There is an Administered Shot $currentShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $currentShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    The given date $currentShotAdministrationDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+
+    // Check if the dose was administered in the second RSV season
+    Confirm the variable wasMommyVaxGiven is == false
+    Confirm the variable isRSVHighRisk is == false
+
+  then
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+end
+
+rule "RSV(High Risk): Complete series after Enflonsia (1st season) + Beyfortus (2nd season) with no mommyVax"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 105 // Higher priority than standard completion rules
+  when
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - the series is not complete
+
+    // First dose: Enflonsia (CVX 332) in first extended season - VALID
+    There is an Administered Shot $enflonsiaShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - that has already been evaluated and whose shot validity is VALID
+      - the shot is not ignored
+      - make note of the date this shot was administered as $enflosniaShotDate
+      - make note of the associated series as $associatedTargetSeries
+
+    // Confirm Enflonsia was in first extended season
+    The given date $enflosniaShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+    Confirm the date $enflosniaShotDate is on the same date or after extendedFirstRSVSeasonStart
+    Confirm the date $enflosniaShotDate is on the same date or before extendedFirstRSVSeasonEnd
+
+    // Second dose: Beyfortus (CVX 307) in second extended season - VALID or ACCEPTED
+    There is an Administered Shot $beyfortusShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - the administration date of the shot is > $enflosniaShotDate
+      - make note of the date this shot was administered as $beyfortusShotDate
+
+    // Confirm Beyfortus was in second extended season ONLY
+    Confirm the date $beyfortusShotDate is on the same date or after extendedSecondRSVSeasonStart
+    Confirm the date $beyfortusShotDate is on the same date or before extendedSecondRSVSeasonEnd
+
+    // High risk and no mommyVax
+    Confirm the variable isRSVHighRisk is == true
+    Confirm the variable wasMommyVaxGiven is == false
+
+  then
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(High Risk): Complete series after Enflonsia ACCEPTED (1st season) + Beyfortus (2nd season) with mommyVax"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 105 // Higher priority than standard completion rules
+  when
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - the series is not complete
+
+    // First dose: Enflonsia (CVX 332) in first extended season - ACCEPTED as EXTRA_DOSE
+    There is an Administered Shot $enflonsiaShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE332")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $enflosniaShotDate
+      - make note of the associated series as $associatedTargetSeries
+
+    // Confirm Enflonsia was in first extended season
+    The given date $enflosniaShotDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+    Confirm the date $enflosniaShotDate is on the same date or after extendedFirstRSVSeasonStart
+    Confirm the date $enflosniaShotDate is on the same date or before extendedFirstRSVSeasonEnd
+
+    // Second dose: Beyfortus (CVX 307) in second extended season - VALID or ACCEPTED
+    There is an Administered Shot $beyfortusShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - the administration date of the shot is > $enflosniaShotDate
+      - make note of the date this shot was administered as $beyfortusShotDate
+
+    // Confirm Beyfortus was in second extended season ONLY
+    Confirm the date $beyfortusShotDate is on the same date or after extendedSecondRSVSeasonStart
+    Confirm the date $beyfortusShotDate is on the same date or before extendedSecondRSVSeasonEnd
+
+    // High risk and mommyVax given
+    Confirm the variable isRSVHighRisk is == true
+    Confirm the variable wasMommyVaxGiven is == true
+
+  then
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+    Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "RSV(High Risk): Complete series after last valid Beyfortus (CVX307) in 2nd season with mommyVax"
+  agenda-group "RecommendationForecast^postCustomRecommendationCheck"
+  salience 110 // Higher priority
+  when
+    The Patient information $patientInfo must be known to complete writing this rule
+      - make note of the date as $dateAt8MonthsAge when the patient is "8m" of age
+    There is a Series $targetSeries
+      - the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.905"
+      - the series is not complete
+    There is an Administered Shot $currentShot
+      - the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.905"
+      - the vaccine administered a member of ("ICE307")
+      - that has already been evaluated and whose shot validity is VALID or ACCEPTED
+      - the shot is not ignored
+      - make note of the date this shot was administered as $currentShotAdministrationDate
+      - make note of the associated series as $associatedTargetSeries
+    // Confirm Beyfortus was in second extended season
+    The given date $currentShotAdministrationDate falls within the ranges of extendedRsvSeasonStartMonthDay and extendedRsvSeasonEndMonthDay
+
+    // Check if the dose was administered in the second RSV season
+    Confirm the variable wasMommyVaxGiven is == true
+    Confirm the variable isRSVHighRisk is == true
+
+  then
+    Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+    Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+    Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+    Mark the Series $targetSeries Complete
+    Record that this Series Rule was Processed for the TargetSeries $targetSeries
+end
