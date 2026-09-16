@@ -239,6 +239,14 @@
     		<displayName>Influenza, live, trivalent, intranasal, self/caregiver admin</displayName>
     	</cdsListItemConceptMapping>
     </cdsListItem>
+	<cdsListItem>
+		<cdsListItemKey>338</cdsListItemKey>
+		<cdsListItemValue>influenza, mRNA, lipid nanoparticle</cdsListItemValue>
+		<cdsListItemConceptMapping>
+			<code>ICE338</code>
+			<displayName>influenza, mRNA, lipid nanoparticle</displayName>
+		</cdsListItemConceptMapping>
+	</cdsListItem>
     <cdsListItem>
     	<cdsListItemKey>135</cdsListItemKey>
     	<cdsListItemValue>Influenza, high dose, seasonal</cdsListItemValue>

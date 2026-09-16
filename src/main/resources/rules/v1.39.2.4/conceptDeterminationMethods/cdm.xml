@@ -143,6 +143,15 @@
     </conceptMapping>
     <conceptMapping>
       <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
+        codeSystemName="OpenCDS concepts" code="ICE338"
+        displayName="influenza, mRNA, lipid nanoparticle"/>
+      <fromConcepts codeSystem="2.16.840.1.113883.12.292"
+        codeSystemName="Vaccines administered (CVX)" displayName="influenza, mRNA, lipid nanoparticle">
+        <concept code="338" displayName="influenza, mRNA, lipid nanoparticle"/>
+      </fromConcepts>
+    </conceptMapping>
+    <conceptMapping>
+      <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
         codeSystemName="OpenCDS concepts" code="ICE22"
         displayName="DTP-Hib (Tetramune; OmniHib-DTP)"/>
       <fromConcepts codeSystem="2.16.840.1.113883.12.292"

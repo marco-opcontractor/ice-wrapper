@@ -64,6 +64,10 @@
         </ns2:doseVaccine>
         <ns2:doseVaccine>
             <ns2:preferred>true</ns2:preferred>
+            <ns2:vaccine code="338" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="influenza, mRNA, lipid nanoparticle"/>
+        </ns2:doseVaccine>
+        <ns2:doseVaccine>
+            <ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="150" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="Influenza, injectable, quadrivalent (IIV4), preservative free"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
