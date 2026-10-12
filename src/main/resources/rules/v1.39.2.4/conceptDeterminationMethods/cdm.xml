@@ -75,14 +75,7 @@
         <concept code="371111005" displayName="Serology confirmed measles"/>
       </fromConcepts>
     </conceptMapping>
-    <conceptMapping>
-      <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-        codeSystemName="OpenCDS concepts" code="ICE102" displayName="DTP-Hib-HepB"/>
-      <fromConcepts codeSystem="2.16.840.1.113883.12.292"
-        codeSystemName="Vaccines administered (CVX)" displayName="DTP-Hib-HepB">
-        <concept code="102" displayName="DTP-Hib-HepB"/>
-      </fromConcepts>
-    </conceptMapping>
+    <!-- CVX 102 (DTP-Hib-HepB, non-US) intentionally unmapped per PEDS-8028: non-US product, must receive no evaluation. -->
     <conceptMapping>
       <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
         codeSystemName="OpenCDS concepts" code="ICE133" displayName="Pneumococcal Conjugate NOS"/>
@@ -201,14 +194,7 @@
           displayName="Seasonal trivalent influenza vaccine, adjuvanted, preservative free"/>
       </fromConcepts>
     </conceptMapping>
-    <conceptMapping>
-      <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-        codeSystemName="OpenCDS concepts" code="ICE170" displayName="DTaP-IPV-Hib"/>
-      <fromConcepts codeSystem="2.16.840.1.113883.12.292"
-        codeSystemName="Vaccines administered (CVX)" displayName="DTaP-IPV-Hib">
-        <concept code="170" displayName="DTaP-IPV-Hib"/>
-      </fromConcepts>
-    </conceptMapping>
+    <!-- CVX 170 (DTaP-IPV-Hib / Pentaxim, non-US) intentionally unmapped per PEDS-8028: non-US product, must receive no evaluation. -->
     <conceptMapping>
       <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
         codeSystemName="OpenCDS concepts" code="ICE171" displayName="Influenza, injectable, Madin Darby Canine Kidney, preservative free, quadrivalent"/>
@@ -536,14 +522,7 @@
         <concept code="189" displayName="Hep B, adjuvanted"/>
       </fromConcepts>
     </conceptMapping>
-    <conceptMapping>
-      <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-        codeSystemName="OpenCDS concepts" code="ICE198" displayName="DTP-Hep B-Hib, Pentavalent"/>
-      <fromConcepts codeSystem="2.16.840.1.113883.12.292"
-        codeSystemName="Vaccines administered (CVX)" displayName="DTP-Hep B-Hib, Pentavalent">
-        <concept code="198" displayName="Hep B, adjuvanted"/>
-      </fromConcepts>
-    </conceptMapping>
+    <!-- CVX 198 (DTP-HepB-Hib pentavalent, non-US) intentionally unmapped per PEDS-8028: non-US product, must receive no evaluation. -->
     <conceptMapping>
       <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
         codeSystemName="OpenCDS concepts" code="ICE220" displayName="HepB recombinant, 3-antigen, Al(OH)3"/>
@@ -697,14 +676,7 @@
         <concept code="120" displayName="DTaP-Hib (PRP-T)-IPV"/>
       </fromConcepts>
     </conceptMapping>
-    <conceptMapping>
-      <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
-        codeSystemName="OpenCDS concepts" code="ICE120" displayName="DT-IPV adsorbed Non-US"/>
-      <fromConcepts codeSystem="2.16.840.1.113883.12.292"
-        codeSystemName="Vaccines administered (CVX)" displayName="DT-IPV adsorbed Non-US">
-        <concept code="195" displayName="DT-IPV adsorbed Non-US"/>
-      </fromConcepts>
-    </conceptMapping>
+    <!-- CVX 195 (DT-IPV adsorbed, non-US) intentionally unmapped per PEDS-8028: non-US product, must receive no evaluation. -->
     <conceptMapping>
       <toConcept codeSystem="2.16.840.1.113883.3.795.12.1.1"
         codeSystemName="OpenCDS concepts" code="ICE991"
