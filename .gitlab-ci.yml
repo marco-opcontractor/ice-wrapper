@@ -4,6 +4,10 @@ variables:
 stages:
   - upload
 
+default:
+  tags:
+    - docker-runner-care
+
 upload-repo:
   image: maven:3-jdk-8-slim
   stage: upload
